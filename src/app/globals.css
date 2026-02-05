@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FDFBFF;
+  --foreground: #4A4458;
+  --nm-shadow-dark: rgba(220, 210, 240, 0.6);
+  --nm-shadow-light: rgba(255, 255, 255, 1);
+  --nm-primary: #8E7AB5;
+  --nm-primary-light: #B1A1D4;
+  --nm-primary-dark: #6B5B95;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-nm-primary: var(--nm-primary);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --shadow-nm-protrude: 9px 9px 16px var(--nm-shadow-dark), -9px -9px 16px var(--nm-shadow-light);
+  --shadow-nm-inset: inset 6px 6px 12px var(--nm-shadow-dark), inset -6px -6px 12px var(--nm-shadow-light);
+  --shadow-nm-sm: 4px 4px 8px var(--nm-shadow-dark), -4px -4px 8px var(--nm-shadow-light);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer utilities {
+  .nm-card {
+    @apply bg-background rounded-3xl shadow-nm-protrude transition-all duration-300;
+  }
+
+  .nm-inset {
+    @apply shadow-nm-inset;
+  }
+
+  .nm-flat {
+    @apply bg-background shadow-nm-sm;
+  }
+
+  .nm-convex {
+    background: linear-gradient(145deg, #f0f5fb, #cad0d4);
+  }
+}
