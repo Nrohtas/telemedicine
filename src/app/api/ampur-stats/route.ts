@@ -31,6 +31,10 @@ export async function GET() {
         return NextResponse.json(stats);
     } catch (error: any) {
         console.error('Database error in ampur-stats:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({
+            error: 'Database connection failed',
+            details: error.message,
+            rows: []
+        }, { status: 500 });
     }
 }

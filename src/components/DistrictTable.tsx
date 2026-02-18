@@ -13,16 +13,24 @@ interface DistrictStat {
 export default function DistrictTable() {
     const [stats, setStats] = useState<DistrictStat[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         fetch('/api/ampur-stats')
             .then(res => res.json())
             .then(data => {
-                setStats(data);
+                if (Array.isArray(data)) {
+                    setStats(data);
+                    setError(null);
+                } else {
+                    console.error('API Error:', data);
+                    setError(data.error || 'ไม่สามารถโหลดข้อมูลได้');
+                }
                 setLoading(false);
             })
             .catch(err => {
                 console.error('Error fetching district stats:', err);
+                setError('เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล');
                 setLoading(false);
             });
     }, []);
@@ -35,8 +43,24 @@ export default function DistrictTable() {
         );
     }
 
+    if (error) {
+        return (
+            <div className="p-8 text-center bg-red-50 rounded-2xl border border-red-100">
+                <p className="text-red-500 font-bold mb-2">ขออภัย! {error}</p>
+                <button
+                    onClick={() => { setLoading(true); window.location.reload(); }}
+                    className="text-xs text-red-600 underline font-bold uppercase tracking-wider"
+                >
+                    ลองอีกครั้ง
+                </button>
+            </div>
+        );
+    }
+
     // Find max value for relative progress bars
-    const maxVal = Math.max(...stats.map(s => Math.max(s.mohpromt_count, s.sornbuddy_count)), 1);
+    const maxVal = Array.isArray(stats) && stats.length > 0
+        ? Math.max(...stats.map(s => Math.max(s.mohpromt_count || 0, s.sornbuddy_count || 0)), 1)
+        : 1;
 
     return (
         <div className="space-y-8">
@@ -55,7 +79,7 @@ export default function DistrictTable() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {stats.map((stat) => (
+                {Array.isArray(stats) && stats.map((stat) => (
                     <SoftCard key={stat.amp_code} className="p-6 group hover:scale-[1.02] transition-all duration-500 cursor-default">
                         <div className="flex items-center gap-4 mb-6">
                             <div>
@@ -79,12 +103,12 @@ export default function DistrictTable() {
                                         </div>
                                         <span className="opacity-60">หมอพร้อม Station</span>
                                     </div>
-                                    <span className="text-[#006837] font-black">{stat.mohpromt_count.toLocaleString()} <span className="opacity-50">ราย</span></span>
+                                    <span className="text-[#006837] font-black">{(stat.mohpromt_count || 0).toLocaleString()} <span className="opacity-50">ราย</span></span>
                                 </div>
                                 <div className="h-2 w-full nm-inset rounded-full overflow-hidden p-[2px]">
                                     <div
                                         className="h-full bg-[#006837] rounded-full transition-all duration-1000 ease-out"
-                                        style={{ width: `${(stat.mohpromt_count / maxVal) * 100}%` }}
+                                        style={{ width: `${((stat.mohpromt_count || 0) / maxVal) * 100}%` }}
                                     ></div>
                                 </div>
                             </div>
@@ -104,12 +128,12 @@ export default function DistrictTable() {
                                         </div>
                                         <span className="opacity-60 font-bold">สอน.บัดดี้</span>
                                     </div>
-                                    <span className="text-[#00ADEF] font-black">{stat.sornbuddy_count.toLocaleString()} <span className="opacity-50">ราย</span></span>
+                                    <span className="text-[#00ADEF] font-black">{(stat.sornbuddy_count || 0).toLocaleString()} <span className="opacity-50">ราย</span></span>
                                 </div>
                                 <div className="h-2 w-full nm-inset rounded-full overflow-hidden p-[2px]">
                                     <div
                                         className="h-full bg-[#00ADEF] rounded-full transition-all duration-1000 ease-out"
-                                        style={{ width: `${(stat.sornbuddy_count / maxVal) * 100}%` }}
+                                        style={{ width: `${((stat.sornbuddy_count || 0) / maxVal) * 100}%` }}
                                     ></div>
                                 </div>
                             </div>

@@ -54,7 +54,12 @@ export default function HospitalDirectory() {
         fetch(url)
             .then(res => res.json())
             .then(data => {
-                setData(data);
+                if (Array.isArray(data)) {
+                    setData(data);
+                } else {
+                    console.error('API returned non-array data:', data);
+                    setData([]);
+                }
                 setLoading(false);
             })
             .catch(err => {
