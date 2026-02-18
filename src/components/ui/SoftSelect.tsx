@@ -69,8 +69,8 @@ export default function SoftSelect({ label, options, value, onChange, placeholde
                                 setIsOpen(false);
                             }}
                             className={`px-3 py-2 rounded-lg text-sm cursor-pointer transition-colors duration-200 ${option.value === value
-                                    ? 'bg-nm-primary text-white shadow-sm'
-                                    : 'hover:bg-nm-primary/10 text-foreground'
+                                ? 'bg-nm-primary text-white shadow-sm'
+                                : 'hover:bg-nm-primary/10 text-foreground'
                                 }`}
                         >
                             {option.label}
@@ -82,22 +82,6 @@ export default function SoftSelect({ label, options, value, onChange, placeholde
                 </div>
             </div>
 
-            <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(0,0,0,0.05);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: var(--nm-primary-light);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: var(--nm-primary);
-        }
-      `}</style>
         </div>
     );
 }

@@ -1,13 +1,14 @@
 import Navbar from "@/components/Navbar";
 import SoftCard from "@/components/ui/SoftCard";
 import SoftButton from "@/components/ui/SoftButton";
+import DistrictTable from "@/components/DistrictTable";
 
 export default function Home() {
   const stats = [
     { label: "จำนวนการรับบริการ", value: "1,240", unit: "ครั้ง", trend: "+12%", color: "text-nm-primary" },
     { label: "จำนวนผู้มารับบริการ", value: "850", unit: "ราย", trend: "+5%", color: "text-green-500" },
-    { label: "ระยะเวลารอเฉลี่ย", value: "12", unit: "นาที", trend: "-2%", color: "text-orange-400" },
-    { label: "ความพึงพอใจ", value: "98", unit: "%", trend: "+1%", color: "text-purple-500" },
+    { label: "หมอพร้อม Station", value: "12", unit: "ราย", trend: "-2%", color: "text-[#006837]" },
+    { label: "สอน.บัดดี้", value: "98", unit: "ราย", trend: "+1%", color: "text-[#00ADEF]" },
   ];
 
   return (
@@ -60,55 +61,6 @@ export default function Home() {
             </div>
           </SoftCard>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <SoftCard className="p-6">
-              <h3 className="text-lg font-bold mb-4">กลุ่มโรคที่รับบริการสูงสุด</h3>
-              <div className="space-y-4">
-                {[
-                  { name: "ความดันโลหิตสูง", count: 420, percent: 75 },
-                  { name: "เบาหวาน", count: 280, percent: 50 },
-                  { name: "โรคทางเดินหายใจ", count: 150, percent: 30 },
-                ].map((item, i) => (
-                  <div key={i} className="space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span>{item.name}</span>
-                      <span className="font-bold">{item.count}</span>
-                    </div>
-                    <div className="h-3 w-full nm-card inset rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-nm-primary rounded-full"
-                        style={{ width: `${item.percent}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </SoftCard>
-
-            <SoftCard className="p-6">
-              <h3 className="text-lg font-bold mb-4">สถานะการเชื่อมต่อ</h3>
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full nm-card flex items-center justify-center text-green-500">
-                    <div className="w-4 h-4 rounded-full bg-green-500 animate-pulse"></div>
-                  </div>
-                  <div>
-                    <p className="font-bold">ระบบ HIS</p>
-                    <p className="text-xs opacity-60">เชื่อมต่อล่าสุด: 2 นาทีที่แล้ว</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full nm-card flex items-center justify-center text-nm-primary">
-                    <div className="w-4 h-4 rounded-full bg-nm-primary animate-pulse"></div>
-                  </div>
-                  <div>
-                    <p className="font-bold">Telemedicine API</p>
-                    <p className="text-xs opacity-60">เชื่อมต่อล่าสุด: 1 นาทีที่แล้ว</p>
-                  </div>
-                </div>
-              </div>
-            </SoftCard>
-          </div>
         </div>
 
         {/* Sidebar Section */}
@@ -142,23 +94,11 @@ export default function Home() {
             </p>
           </SoftCard>
 
-          <SoftCard className="p-6 overflow-hidden">
-            <h3 className="text-lg font-bold mb-4">กิจกรรมล่าสุด</h3>
-            <div className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex gap-4 p-3 nm-flat rounded-2xl">
-                  <div className="w-10 h-10 rounded-full bg-slate-200 shadow-inner flex-shrink-0"></div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold truncate">พญ. สมรศรี รับเคสใหม่</p>
-                    <p className="text-[10px] opacity-60">เมื่อ 5 นาทีที่แล้ว</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <SoftButton className="w-full mt-6 text-sm py-3">
-              ดูทั้งหมด
-            </SoftButton>
-          </SoftCard>
+        </div>
+
+        {/* District Stats Section */}
+        <div className="lg:col-span-12">
+          <DistrictTable />
         </div>
       </div>
     </main>
