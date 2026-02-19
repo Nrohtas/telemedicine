@@ -25,6 +25,7 @@ interface NavbarProps {
     onStationChange?: (value: string) => void;
     selectedType?: string;
     onTypeChange?: (value: string) => void;
+    showAllDistrict?: boolean;
 }
 
 const Navbar = ({
@@ -35,7 +36,8 @@ const Navbar = ({
     selectedStation,
     onStationChange,
     selectedType,
-    onTypeChange
+    onTypeChange,
+    showAllDistrict = true
 }: NavbarProps) => {
     const pathname = usePathname();
     const [fiscalYear, setFiscalYear] = useState('');
@@ -152,7 +154,7 @@ const Navbar = ({
     ];
 
     const districtOptions = [
-        { label: 'ทั้งหมด', value: 'ทั้งหมด' },
+        ...(showAllDistrict ? [{ label: 'ทั้งหมด', value: 'ทั้งหมด' }] : []),
         ...districts.map(d => ({ label: d.amp_name, value: d.amp_code }))
     ];
 
@@ -264,7 +266,8 @@ const Navbar = ({
                             label="ประเภท"
                             options={[
                                 { label: 'ทั้งหมด', value: 'ทั้งหมด' },
-                                ...(types || []).map(t => ({ label: t, value: t }))
+                                { label: 'รายโรงพยาบาล', value: 'hospitals_only' },
+                                { label: 'รายหน่วยบริการ', value: 'health_units_only' }
                             ]}
                             value={selectedType || 'ทั้งหมด'}
                             onChange={onTypeChange || (() => { })}

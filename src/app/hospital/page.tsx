@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Navbar from "@/components/Navbar";
 import SoftSelect from '@/components/ui/SoftSelect';
 
@@ -24,6 +25,19 @@ interface DistrictGroup {
 }
 
 export default function HospitalDirectory() {
+    return (
+        <Suspense fallback={
+            <div className="flex justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-nm-primary"></div>
+            </div>
+        }>
+            <HospitalDirectoryContent />
+        </Suspense>
+    );
+}
+
+function HospitalDirectoryContent() {
+    const searchParams = useSearchParams();
     const [data, setData] = useState<DistrictGroup[]>([]);
     const [loading, setLoading] = useState(true);
     const [affiliations, setAffiliations] = useState<string[]>([]);
@@ -31,7 +45,9 @@ export default function HospitalDirectory() {
     // Filter State
     const [selectedAffiliation, setSelectedAffiliation] = useState("ทั้งหมด");
     const [selectedType, setSelectedType] = useState("ทั้งหมด");
-    const [selectedDistrict, setSelectedDistrict] = useState("ทั้งหมด");
+    const [selectedDistrict, setSelectedDistrict] = useState(() => {
+        return searchParams.get('amp_code') || "6501";
+    });
     const [selectedStation, setSelectedStation] = useState("ทั้งหมด");
 
     useEffect(() => {
@@ -96,6 +112,7 @@ export default function HospitalDirectory() {
                 onDistrictChange={setSelectedDistrict}
                 selectedStation={selectedStation}
                 onStationChange={setSelectedStation}
+                showAllDistrict={true}
             />
 
             <div className="px-6 max-w-7xl mx-auto">
@@ -108,11 +125,12 @@ export default function HospitalDirectory() {
                     </div>
                 ) : (
                     <div className="space-y-12">
-                        {filteredData.map((group) => (
-                            <div key={group.amp_code} className="space-y-4">
+                        {selectedDistrict === 'ทั้งหมด' ? (
+                            /* Unified Province-Wide Table */
+                            <div className="space-y-4">
                                 <div className="flex items-center gap-4 px-2">
                                     <div className="h-px w-8 bg-nm-primary/20"></div>
-                                    <h3 className="text-lg font-bold text-nm-primary opacity-80">อำเภอ{group.amp_name}</h3>
+                                    <h3 className="text-lg font-bold text-nm-primary opacity-80">สรุปข้อมูลทั้งจังหวัด</h3>
                                     <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
                                 </div>
 
@@ -122,14 +140,15 @@ export default function HospitalDirectory() {
                                             <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
                                                 <th className="px-6 py-4 w-24">รหัส</th>
                                                 <th className="px-6 py-4">ชื่อหน่วยบริการ</th>
-                                                <th className="px-6 py-4 w-40">ตำบล</th>
+                                                <th className="px-6 py-4 w-32">อำเภอ</th>
+                                                <th className="px-6 py-4 w-32">ตำบล</th>
                                                 <th className="px-6 py-4 w-32">ประเภท</th>
-                                                <th className="px-6 py-4 w-32 text-right text-[#006837]">หมอพร้อม Station</th>
+                                                <th className="px-6 py-4 w-32 text-right text-[#006837]">หมอพร้อม STATION</th>
                                                 <th className="px-6 py-4 w-32 text-right text-[#00ADEF]">สอน.บัดดี้</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100">
-                                            {group.hospitals.map((hospital) => {
+                                            {filteredData.flatMap(group => group.hospitals).map((hospital) => {
                                                 const rowColor = getRowColor(hospital.hostype_name);
                                                 return (
                                                     <tr key={hospital.hospcode} className="group hover:bg-white/60 transition-colors duration-200">
@@ -141,6 +160,9 @@ export default function HospitalDirectory() {
                                                                 {hospital.hospname}
                                                             </span>
                                                         </td>
+                                                        <td className="px-6 py-3 text-sm opacity-70 font-bold">
+                                                            อ.{hospital.amp_name}
+                                                        </td>
                                                         <td className="px-6 py-3 text-sm opacity-70">
                                                             ต.{hospital.tmb_name || '-'}
                                                         </td>
@@ -150,23 +172,108 @@ export default function HospitalDirectory() {
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-3 text-right">
-                                                            <div className="flex flex-col items-end">
-                                                                <span className="text-sm font-bold text-[#006837]">{hospital.moph.toLocaleString()}</span>
-                                                            </div>
+                                                            <span className="text-sm font-bold text-[#006837]">{hospital.moph.toLocaleString()}</span>
                                                         </td>
                                                         <td className="px-6 py-3 text-right">
-                                                            <div className="flex flex-col items-end">
-                                                                <span className="text-sm font-bold text-[#00ADEF]">{hospital.buddycare.toLocaleString()}</span>
-                                                            </div>
+                                                            <span className="text-sm font-bold text-[#00ADEF]">{hospital.buddycare.toLocaleString()}</span>
                                                         </td>
                                                     </tr>
                                                 );
                                             })}
+                                            {/* Unified Summary Row */}
+                                            <tr className="bg-nm-primary/10 font-bold border-t-2 border-nm-primary/30">
+                                                <td colSpan={5} className="px-6 py-5 text-nm-primary text-right text-base">
+                                                    รวมทั้งจังหวัด
+                                                </td>
+                                                <td className="px-6 py-5 text-right">
+                                                    <span className="text-xl text-[#006837]">
+                                                        {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph, 0), 0).toLocaleString()}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-5 text-right">
+                                                    <span className="text-xl text-[#00ADEF]">
+                                                        {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare, 0), 0).toLocaleString()}
+                                                    </span>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                        ))}
+                        ) : (
+                            /* Existing District-Grouped Tables */
+                            filteredData.map((group) => (
+                                <div key={group.amp_code} className="space-y-4">
+                                    <div className="flex items-center gap-4 px-2">
+                                        <div className="h-px w-8 bg-nm-primary/20"></div>
+                                        <h3 className="text-lg font-bold text-nm-primary opacity-80">อำเภอ{group.amp_name}</h3>
+                                        <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
+                                    </div>
+
+                                    <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-xl overflow-hidden shadow-sm">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
+                                                    <th className="px-6 py-4 w-24">รหัส</th>
+                                                    <th className="px-6 py-4">ชื่อหน่วยบริการ</th>
+                                                    <th className="px-6 py-4 w-40">ตำบล</th>
+                                                    <th className="px-6 py-4 w-32">ประเภท</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-[#006837]">หมอพร้อม STATION</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-[#00ADEF]">สอน.บัดดี้</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100">
+                                                {group.hospitals.map((hospital) => {
+                                                    const rowColor = getRowColor(hospital.hostype_name);
+                                                    return (
+                                                        <tr key={hospital.hospcode} className="group hover:bg-white/60 transition-colors duration-200">
+                                                            <td className={`px-6 py-3 font-mono text-sm opacity-70 font-bold ${rowColor}`}>
+                                                                {hospital.hospcode}
+                                                            </td>
+                                                            <td className="px-6 py-3">
+                                                                <span className={`text-sm font-bold transition-colors cursor-pointer ${rowColor}`}>
+                                                                    {hospital.hospname}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-3 text-sm opacity-70">
+                                                                ต.{hospital.tmb_name || '-'}
+                                                            </td>
+                                                            <td className="px-6 py-3">
+                                                                <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${getHostColor(hospital.hostype).replace('text-', 'bg-')} ${getHostColor(hospital.hostype)}`}>
+                                                                    {hospital.hostype_level || (hospital.hostype === '05' ? 'รพช.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.')}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-3 text-right">
+                                                                <span className="text-sm font-bold text-[#006837]">{hospital.moph.toLocaleString()}</span>
+                                                            </td>
+                                                            <td className="px-6 py-3 text-right">
+                                                                <span className="text-sm font-bold text-[#00ADEF]">{hospital.buddycare.toLocaleString()}</span>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                                {/* Summary Row */}
+                                                <tr className="bg-nm-primary/5 font-bold border-t-2 border-nm-primary/20">
+                                                    <td colSpan={4} className="px-6 py-4 text-nm-primary text-right">
+                                                        รวมทั้งหมด
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <span className="text-base text-[#006837]">
+                                                            {group.hospitals.reduce((sum, h) => sum + h.moph, 0).toLocaleString()}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <span className="text-base text-[#00ADEF]">
+                                                            {group.hospitals.reduce((sum, h) => sum + h.buddycare, 0).toLocaleString()}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 )}
 
