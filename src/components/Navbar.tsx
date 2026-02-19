@@ -207,10 +207,18 @@ const Navbar = ({
                                 variant="nav"
                                 active={pathname === '/hospital'}
                             >
-                                รายชื่อหน่วยบริการ
+                                หน่วยบริการ
                             </SoftButton>
                         </a>
                         <SoftButton active={false} className="opacity-40 cursor-not-allowed">สถิติรวม</SoftButton>
+                        <a href="/admin" className="hover:opacity-80 transition-opacity">
+                            <SoftButton
+                                variant="nav"
+                                active={pathname.startsWith('/admin')}
+                            >
+                                Admin
+                            </SoftButton>
+                        </a>
                     </div>
                 </div>
 
@@ -227,67 +235,72 @@ const Navbar = ({
                         />
                     </div>
 
-                    {/* Month Filter */}
-                    <div className="min-w-[150px]">
-                        <SoftSelect
-                            label="เดือน"
-                            options={monthOptions}
-                            value={month}
-                            onChange={setMonth}
-                            className="w-full"
-                        />
-                    </div>
+                    {/* Month Filter - Hide on / and /hospital */}
+                    {pathname !== '/' && pathname !== '/hospital' && (
+                        <div className="min-w-[150px]">
+                            <SoftSelect
+                                label="เดือน"
+                                options={monthOptions}
+                                value={month}
+                                onChange={setMonth}
+                                className="w-full"
+                            />
+                        </div>
+                    )}
 
-                    {/* District Filter */}
-                    <div className="min-w-[180px]">
-                        <SoftSelect
-                            label="อำเภอ"
-                            options={districtOptions}
-                            value={district}
-                            onChange={setDistrict}
-                            className="w-full"
-                        />
-                    </div>
+                    {pathname !== '/' && (
+                        <>
+                            {/* District Filter */}
+                            <div className="min-w-[180px]">
+                                <SoftSelect
+                                    label="อำเภอ"
+                                    options={districtOptions}
+                                    value={district}
+                                    onChange={setDistrict}
+                                    className="w-full"
+                                />
+                            </div>
 
-                    {/* Health Station Filter */}
-                    <div className="min-w-[220px]">
-                        <SoftSelect
-                            label="หน่วยบริการ"
-                            options={stationOptions}
-                            value={station}
-                            onChange={setStation}
-                            className="w-full"
-                        />
-                    </div>
+                            {/* Type Filter */}
+                            <div className="min-w-[180px]">
+                                <SoftSelect
+                                    label="ประเภท"
+                                    options={[
+                                        { label: 'ทั้งหมด', value: 'ทั้งหมด' },
+                                        ...types.map(t => ({ label: t, value: t }))
+                                    ]}
+                                    value={selectedType || 'ทั้งหมด'}
+                                    onChange={onTypeChange || (() => { })}
+                                    className="w-full"
+                                />
+                            </div>
 
-                    {/* Type Filter */}
-                    <div className="min-w-[180px]">
-                        <SoftSelect
-                            label="ประเภท"
-                            options={[
-                                { label: 'ทั้งหมด', value: 'ทั้งหมด' },
-                                { label: 'รายโรงพยาบาล', value: 'hospitals_only' },
-                                { label: 'รายหน่วยบริการ', value: 'health_units_only' }
-                            ]}
-                            value={selectedType || 'ทั้งหมด'}
-                            onChange={onTypeChange || (() => { })}
-                            className="w-full"
-                        />
-                    </div>
+                            {/* Health Station Filter */}
+                            <div className="min-w-[220px]">
+                                <SoftSelect
+                                    label="หน่วยบริการ"
+                                    options={stationOptions}
+                                    value={station}
+                                    onChange={setStation}
+                                    className="w-full"
+                                />
+                            </div>
 
-                    {/* Affiliation Filter */}
-                    <div className="min-w-[180px]">
-                        <SoftSelect
-                            label="สังกัด"
-                            options={[
-                                { label: 'ทั้งหมด', value: 'ทั้งหมด' },
-                                ...affiliations.map(a => ({ label: a, value: a }))
-                            ]}
-                            value={selectedAffiliation || 'ทั้งหมด'}
-                            onChange={onAffiliationChange || (() => { })}
-                            className="w-full"
-                        />
-                    </div>
+                            {/* Affiliation Filter */}
+                            <div className="min-w-[180px]">
+                                <SoftSelect
+                                    label="สังกัด"
+                                    options={[
+                                        { label: 'ทั้งหมด', value: 'ทั้งหมด' },
+                                        ...affiliations.map(a => ({ label: a, value: a }))
+                                    ]}
+                                    value={selectedAffiliation || 'ทั้งหมด'}
+                                    onChange={onAffiliationChange || (() => { })}
+                                    className="w-full"
+                                />
+                            </div>
+                        </>
+                    )}
                 </div>
             </SoftCard>
         </nav>

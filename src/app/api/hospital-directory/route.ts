@@ -35,14 +35,8 @@ export async function GET(request: Request) {
         }
 
         if (type && type !== 'ทั้งหมด') {
-            if (type === 'hospitals_only') {
-                query += " AND h.hostype_new IN (5, 7, 11)";
-            } else if (type === 'health_units_only') {
-                query += " AND h.hostype_new IN (8, 18, 21)";
-            } else {
-                query += " AND ht.hostype = ?";
-                params.push(type);
-            }
+            query += " AND ht.hostype_list = ?";
+            params.push(type);
         }
 
         if (amp_code && amp_code !== 'ทั้งหมด') {

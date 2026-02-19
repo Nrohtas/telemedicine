@@ -4,23 +4,14 @@ import pool from '@/lib/db';
 export async function GET() {
     try {
         const query = `
-            SELECT DISTINCT hostype 
+            SELECT DISTINCT hostype_list 
             FROM telemedicine.hostype 
-            WHERE hostype IS NOT NULL 
-            ORDER BY 
-                CASE 
-                    WHEN hostype = 'รพ.สต.' THEN 1
-                    WHEN hostype = 'ศูนย์สุขภาพ' THEN 2
-                    WHEN hostype = 'รพช.' THEN 3
-                    WHEN hostype = 'รพศ.' THEN 4
-                    WHEN hostype LIKE '%รพ.จิต%' THEN 5
-                    WHEN hostype = 'สถานพยาบาล' THEN 6
-                    ELSE 99 
-                END
+            WHERE hostype_list IS NOT NULL 
+            ORDER BY hostype_list ASC
         `;
 
         const [rows]: any = await pool.query(query);
-        const types = rows.map((row: any) => row.hostype);
+        const types = rows.map((row: any) => row.hostype_list);
 
         return NextResponse.json(types);
     } catch (error: any) {

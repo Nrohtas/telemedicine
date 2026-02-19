@@ -134,9 +134,9 @@ function HospitalDirectoryContent() {
                                     <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
                                 </div>
 
-                                <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-xl overflow-hidden shadow-sm">
+                                <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-xl shadow-sm">
                                     <table className="w-full text-left border-collapse">
-                                        <thead>
+                                        <thead className="sticky top-0 z-20 bg-[#FDFBFF]">
                                             <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
                                                 <th className="px-6 py-4 w-24">รหัส</th>
                                                 <th className="px-6 py-4">ชื่อหน่วยบริการ</th>
@@ -148,38 +148,41 @@ function HospitalDirectoryContent() {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100">
-                                            {filteredData.flatMap(group => group.hospitals).map((hospital) => {
-                                                const rowColor = getRowColor(hospital.hostype_name);
-                                                return (
-                                                    <tr key={hospital.hospcode} className="group hover:bg-white/60 transition-colors duration-200">
-                                                        <td className={`px-6 py-3 font-mono text-sm opacity-70 font-bold ${rowColor}`}>
-                                                            {hospital.hospcode}
-                                                        </td>
-                                                        <td className="px-6 py-3">
-                                                            <span className={`text-sm font-bold transition-colors cursor-pointer ${rowColor}`}>
-                                                                {hospital.hospname}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-6 py-3 text-sm opacity-70 font-bold">
-                                                            อ.{hospital.amp_name}
-                                                        </td>
-                                                        <td className="px-6 py-3 text-sm opacity-70">
-                                                            ต.{hospital.tmb_name || '-'}
-                                                        </td>
-                                                        <td className="px-6 py-3">
-                                                            <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${getHostColor(hospital.hostype).replace('text-', 'bg-')} ${getHostColor(hospital.hostype)}`}>
-                                                                {hospital.hostype_level || (hospital.hostype === '05' ? 'รพช.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.')}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-6 py-3 text-right">
-                                                            <span className="text-sm font-bold text-[#006837]">{hospital.moph.toLocaleString()}</span>
-                                                        </td>
-                                                        <td className="px-6 py-3 text-right">
-                                                            <span className="text-sm font-bold text-[#00ADEF]">{hospital.buddycare.toLocaleString()}</span>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
+                                            {filteredData
+                                                .flatMap(group => group.hospitals)
+                                                .sort((a, b) => a.hospcode.localeCompare(b.hospcode))
+                                                .map((hospital) => {
+                                                    const rowColor = getRowColor(hospital.hostype_name);
+                                                    return (
+                                                        <tr key={hospital.hospcode} className="group hover:bg-white/60 transition-colors duration-200">
+                                                            <td className={`px-6 py-3 font-mono text-sm opacity-70 font-bold ${rowColor}`}>
+                                                                {hospital.hospcode}
+                                                            </td>
+                                                            <td className="px-6 py-3">
+                                                                <span className={`text-sm font-bold transition-colors cursor-pointer ${rowColor}`}>
+                                                                    {hospital.hospname}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-3 text-sm opacity-70 font-bold">
+                                                                อ.{hospital.amp_name}
+                                                            </td>
+                                                            <td className="px-6 py-3 text-sm opacity-70">
+                                                                ต.{hospital.tmb_name || '-'}
+                                                            </td>
+                                                            <td className="px-6 py-3">
+                                                                <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${getHostColor(hospital.hostype).replace('text-', 'bg-')} ${getHostColor(hospital.hostype)}`}>
+                                                                    {hospital.hostype_level || (hospital.hostype === '05' ? 'รพช.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.')}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-3 text-right">
+                                                                <span className="text-sm font-bold text-[#006837]">{hospital.moph.toLocaleString()}</span>
+                                                            </td>
+                                                            <td className="px-6 py-3 text-right">
+                                                                <span className="text-sm font-bold text-[#00ADEF]">{hospital.buddycare.toLocaleString()}</span>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
                                             {/* Unified Summary Row */}
                                             <tr className="bg-nm-primary/10 font-bold border-t-2 border-nm-primary/30">
                                                 <td colSpan={5} className="px-6 py-5 text-nm-primary text-right text-base">
@@ -210,9 +213,9 @@ function HospitalDirectoryContent() {
                                         <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
                                     </div>
 
-                                    <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-xl overflow-hidden shadow-sm">
+                                    <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-xl shadow-sm">
                                         <table className="w-full text-left border-collapse">
-                                            <thead>
+                                            <thead className="sticky top-0 z-20 bg-[#FDFBFF]">
                                                 <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
                                                     <th className="px-6 py-4 w-24">รหัส</th>
                                                     <th className="px-6 py-4">ชื่อหน่วยบริการ</th>

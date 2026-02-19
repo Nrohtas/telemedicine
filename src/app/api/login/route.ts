@@ -18,6 +18,7 @@ export async function POST(request: Request) {
         }
 
         const user = rows[0];
+
         const isPasswordValid = await comparePassword(password, user.password);
 
         if (!isPasswordValid) {
