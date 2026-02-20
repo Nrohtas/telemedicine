@@ -26,6 +26,11 @@ interface NavbarProps {
     selectedType?: string;
     onTypeChange?: (value: string) => void;
     showAllDistrict?: boolean;
+    showFilters?: boolean;
+    showSignOut?: boolean;
+    onSignOut?: () => void;
+    searchValue?: string;
+    onSearchChange?: (value: string) => void;
 }
 
 const Navbar = ({
@@ -37,14 +42,19 @@ const Navbar = ({
     onStationChange,
     selectedType,
     onTypeChange,
-    showAllDistrict = true
+    showAllDistrict = true,
+    showFilters = true,
+    showSignOut = false,
+    onSignOut,
+    searchValue,
+    onSearchChange
 }: NavbarProps) => {
     const pathname = usePathname();
     const [fiscalYear, setFiscalYear] = useState('');
     const [month, setMonth] = useState('ทั้งหมด');
 
     // Internal state for backward compatibility
-    const [internalDistrict, setInternalDistrict] = useState('6501');
+    const [internalDistrict, setInternalDistrict] = useState('เลือกอำเภอ');
     const [internalStation, setInternalStation] = useState('ทั้งหมด');
 
     // Use props if available, otherwise internal state
@@ -154,6 +164,7 @@ const Navbar = ({
     ];
 
     const districtOptions = [
+        { label: 'เลือกอำเภอ', value: 'เลือกอำเภอ' },
         ...(showAllDistrict ? [{ label: 'ทั้งหมด', value: 'ทั้งหมด' }] : []),
         ...districts.map(d => ({ label: d.amp_name, value: d.amp_code }))
     ];
@@ -179,15 +190,17 @@ const Navbar = ({
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-gray-100 pb-8">
                     {/* Brand Section */}
                     <div className="flex items-center gap-5">
-                        <div className="w-14 h-14 rounded-full bg-nm-primary flex items-center justify-center text-white shadow-lg nm-flat-nm-primary-lg shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
+                        <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 overflow-hidden border-2 border-green-700/20">
+                            <img
+                                src="/logo-moph.png"
+                                alt="Ministry of Public Health Logo"
+                                className="w-full h-full object-contain p-0.5"
+                            />
                         </div>
                         <div className="flex flex-col">
-                            <h1 className="text-2xl font-black text-foreground tracking-tight">สำนักงานสาธารณสุขจังหวัดพิษณุโลก</h1>
-                            <p className="text-[13px] font-bold uppercase mt-1 tracking-[0.12em] whitespace-nowrap">
-                                <span className="text-gray-400">Dashboard</span> <span className="text-[#006837]">Telemedicine</span> <span className="text-gray-300 mx-1">:</span> <span className="text-[#00ADEF]">การแพทย์ทางไกล</span>
+                            <h1 className="text-2xl font-black text-purple-950 tracking-tight">สำนักงานสาธารณสุขจังหวัดพิษณุโลก</h1>
+                            <p className="text-[13px] font-black uppercase mt-1 tracking-[0.12em] whitespace-nowrap drop-shadow-sm">
+                                <span className="text-gray-500">Dashboard</span> <span className="text-[#006837]">Telemedicine</span> <span className="text-gray-400 mx-1">:</span> <span className="text-[#00ADEF]">การแพทย์ทางไกล</span>
                             </p>
                         </div>
                     </div>
@@ -202,7 +215,10 @@ const Navbar = ({
                                 Dashboard
                             </SoftButton>
                         </a>
-                        <a href="/hospital" className="hover:opacity-80 transition-opacity">
+                        <a
+                            href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}` : ''}`}
+                            className="hover:opacity-80 transition-opacity"
+                        >
                             <SoftButton
                                 variant="nav"
                                 active={pathname === '/hospital'}
@@ -210,7 +226,6 @@ const Navbar = ({
                                 หน่วยบริการ
                             </SoftButton>
                         </a>
-                        <SoftButton active={false} className="opacity-40 cursor-not-allowed">สถิติรวม</SoftButton>
                         <a href="/admin" className="hover:opacity-80 transition-opacity">
                             <SoftButton
                                 variant="nav"
@@ -219,89 +234,122 @@ const Navbar = ({
                                 Admin
                             </SoftButton>
                         </a>
+
+                        {showSignOut && (
+                            <button
+                                onClick={onSignOut}
+                                className="group px-4 py-2 bg-indigo-50 text-indigo-400 hover:text-rose-500 hover:bg-rose-50 border border-indigo-100 hover:border-rose-100 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] transition-all flex items-center gap-2 active:scale-95 ml-2"
+                            >
+                                Sign Out
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                            </button>
+                        )}
                     </div>
                 </div>
 
                 {/* Filters Row */}
-                <div className="flex flex-wrap items-center gap-6 justify-end">
-                    {/* Fiscal Year Filter */}
-                    <div className="min-w-[140px]">
-                        <SoftSelect
-                            label="ปีงบประมาณ"
-                            options={fiscalYearOptions}
-                            value={fiscalYear}
-                            onChange={setFiscalYear}
-                            className="w-full"
-                        />
-                    </div>
-
-                    {/* Month Filter - Hide on / and /hospital */}
-                    {pathname !== '/' && pathname !== '/hospital' && (
-                        <div className="min-w-[150px]">
+                {showFilters && (
+                    <div className="flex flex-wrap items-center gap-6 justify-end">
+                        {/* Fiscal Year Filter */}
+                        <div className="min-w-[140px]">
                             <SoftSelect
-                                label="เดือน"
-                                options={monthOptions}
-                                value={month}
-                                onChange={setMonth}
+                                label="ปีงบประมาณ"
+                                options={fiscalYearOptions}
+                                value={fiscalYear}
+                                onChange={setFiscalYear}
                                 className="w-full"
                             />
                         </div>
-                    )}
 
-                    {pathname !== '/' && (
-                        <>
-                            {/* District Filter */}
-                            <div className="min-w-[180px]">
+                        {/* Month Filter - Hide on / and /hospital */}
+                        {pathname !== '/' && pathname !== '/hospital' && (
+                            <div className="min-w-[150px]">
                                 <SoftSelect
-                                    label="อำเภอ"
-                                    options={districtOptions}
-                                    value={district}
-                                    onChange={setDistrict}
+                                    label="เดือน"
+                                    options={monthOptions}
+                                    value={month}
+                                    onChange={setMonth}
                                     className="w-full"
                                 />
                             </div>
+                        )}
 
-                            {/* Type Filter */}
-                            <div className="min-w-[180px]">
-                                <SoftSelect
-                                    label="ประเภท"
-                                    options={[
-                                        { label: 'ทั้งหมด', value: 'ทั้งหมด' },
-                                        ...types.map(t => ({ label: t, value: t }))
-                                    ]}
-                                    value={selectedType || 'ทั้งหมด'}
-                                    onChange={onTypeChange || (() => { })}
-                                    className="w-full"
-                                />
-                            </div>
+                        {pathname !== '/' && (
+                            <>
+                                {/* District Filter */}
+                                <div className="min-w-[180px]">
+                                    <SoftSelect
+                                        label="อำเภอ"
+                                        options={districtOptions}
+                                        value={district}
+                                        onChange={setDistrict}
+                                        className="w-full"
+                                    />
+                                </div>
 
-                            {/* Health Station Filter */}
-                            <div className="min-w-[220px]">
-                                <SoftSelect
-                                    label="หน่วยบริการ"
-                                    options={stationOptions}
-                                    value={station}
-                                    onChange={setStation}
-                                    className="w-full"
-                                />
-                            </div>
+                                {/* Type Filter */}
+                                <div className="min-w-[180px]">
+                                    <SoftSelect
+                                        label="ประเภท"
+                                        options={[
+                                            { label: 'ทั้งหมด', value: 'ทั้งหมด' },
+                                            ...types.map(t => ({ label: t, value: t }))
+                                        ]}
+                                        value={selectedType || 'ทั้งหมด'}
+                                        onChange={onTypeChange || (() => { })}
+                                        className="w-full"
+                                    />
+                                </div>
 
-                            {/* Affiliation Filter */}
-                            <div className="min-w-[180px]">
-                                <SoftSelect
-                                    label="สังกัด"
-                                    options={[
-                                        { label: 'ทั้งหมด', value: 'ทั้งหมด' },
-                                        ...affiliations.map(a => ({ label: a, value: a }))
-                                    ]}
-                                    value={selectedAffiliation || 'ทั้งหมด'}
-                                    onChange={onAffiliationChange || (() => { })}
-                                    className="w-full"
-                                />
-                            </div>
-                        </>
-                    )}
-                </div>
+                                {/* Health Station Filter */}
+                                <div className="min-w-[220px]">
+                                    <SoftSelect
+                                        label="หน่วยบริการ"
+                                        options={stationOptions}
+                                        value={station}
+                                        onChange={setStation}
+                                        className="w-full"
+                                    />
+                                </div>
+
+                                {/* Affiliation Filter */}
+                                <div className="min-w-[180px]">
+                                    <SoftSelect
+                                        label="สังกัด"
+                                        options={[
+                                            { label: 'ทั้งหมด', value: 'ทั้งหมด' },
+                                            ...affiliations.map(a => ({ label: a, value: a }))
+                                        ]}
+                                        value={selectedAffiliation || 'ทั้งหมด'}
+                                        onChange={onAffiliationChange || (() => { })}
+                                        className="w-full"
+                                    />
+                                </div>
+
+                                {/* Search Box */}
+                                <div className="min-w-[120px] flex flex-col gap-1 relative group">
+                                    <label className="text-[10px] font-bold uppercase tracking-wider opacity-50 px-2 transition-opacity group-focus-within:opacity-80">ค้นหาหน่วยบริการ</label>
+                                    <div className="relative">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-nm-primary opacity-30 group-focus-within:opacity-60 transition-opacity">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="ค้นหา..."
+                                            value={searchValue || ''}
+                                            onChange={(e) => onSearchChange?.(e.target.value)}
+                                            className="w-full pl-11 pr-4 py-2 bg-transparent nm-card rounded-xl text-sm font-bold text-nm-primary placeholder:text-nm-primary/20 outline-none transition-all focus:nm-inset"
+                                        />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
             </SoftCard>
         </nav>
     );

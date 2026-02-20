@@ -1,9 +1,15 @@
+"use client";
+
+import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import SoftCard from "@/components/ui/SoftCard";
 import SoftButton from "@/components/ui/SoftButton";
 import DistrictTable from "@/components/DistrictTable";
+import Footer from "@/components/Footer";
 
 export default function Home() {
+  const [selectedDistrict, setSelectedDistrict] = useState("เลือกอำเภอ");
+
   const stats = [
     {
       label: "จำนวนการรับบริการ",
@@ -65,7 +71,12 @@ export default function Home() {
 
   return (
     <main className="min-h-screen pb-12">
-      <Navbar />
+      <Navbar
+        selectedDistrict={selectedDistrict}
+        onDistrictChange={setSelectedDistrict}
+        searchValue=""
+        onSearchChange={() => { }}
+      />
 
       <div className="px-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Stats Section */}
@@ -97,6 +108,7 @@ export default function Home() {
           <DistrictTable />
         </div>
       </div>
+      <Footer />
     </main>
   );
 }

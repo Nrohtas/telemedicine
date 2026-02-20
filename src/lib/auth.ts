@@ -10,7 +10,15 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 export async function comparePassword(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash);
+    // Check if the hash starts with $2a$, $2b$, or $2y$ (common bcrypt prefixes)
+    const isBcryptHash = /^\$2[ayb]\$.{56}$/.test(hash);
+
+    if (isBcryptHash) {
+        return bcrypt.compare(password, hash);
+    }
+
+    // Fallback for plain text passwords (not recommended for production but needed for migration/current DB state)
+    return password === hash;
 }
 
 export async function signJWT(payload: any): Promise<string> {

@@ -95,8 +95,8 @@ export default function LoginPage() {
                     </form>
                 </SoftCard>
 
-                <p className="mt-8 text-center text-sm text-gray-300 font-medium">
-                    &copy; 2026 Admin Dashboard
+                <p className="mt-8 text-center text-[10px] text-gray-300 font-bold uppercase tracking-[0.2em] max-w-[280px] leading-relaxed">
+                    Copyright © Telemedicine of Phitsanulok Provincial Public Health Office
                 </p>
             </div>
         </main>

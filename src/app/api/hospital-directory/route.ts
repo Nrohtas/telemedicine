@@ -23,7 +23,11 @@ export async function GET(request: Request) {
                 COALESCE(t.moph, 0) as moph,
                 COALESCE(t.buddycare, 0) as buddycare
             FROM hospital h
-            LEFT JOIN telemedicine.hostype ht ON h.hostype_new = ht.hostype_new
+            LEFT JOIN (
+                SELECT hostype_new, hostype_name, hostype_list, MAX(CASE WHEN hostype = 'รพช.' THEN 'รพ.' ELSE hostype END) as hostype
+                FROM telemedicine.hostype
+                GROUP BY hostype_new, hostype_name, hostype_list
+            ) ht ON h.hostype_new = ht.hostype_new
             LEFT JOIN telemedicine.telemedicine t ON h.hospcode = t.hospcode AND t.b_year = ?
             WHERE h.status = '1' 
         `;

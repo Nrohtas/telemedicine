@@ -19,8 +19,8 @@ const SoftButton: React.FC<SoftButtonProps> = ({
                 return 'bg-nm-primary text-white shadow-[4px_4px_8px_rgba(142,122,181,0.4),-4px_-4px_8px_rgba(142,122,181,0.1)] active:shadow-inner';
             case 'nav':
                 return active
-                    ? 'bg-white/50 text-nm-primary shadow-nm-inset font-black ring-1 ring-nm-primary/20 backdrop-blur-sm'
-                    : 'text-nm-primary/40 hover:text-nm-primary/70 hover:bg-white/10 transition-all font-bold';
+                    ? 'bg-white/50 text-purple-950 shadow-nm-inset font-black ring-1 ring-nm-primary/20 backdrop-blur-sm'
+                    : 'text-purple-950/60 hover:text-purple-950 hover:bg-white/30 transition-all font-bold';
             case 'none':
                 return '';
             default:

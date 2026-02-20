@@ -4,6 +4,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Navbar from "@/components/Navbar";
 import SoftSelect from '@/components/ui/SoftSelect';
+import Footer from '@/components/Footer';
 
 interface Hospital {
     hospcode: string;
@@ -46,9 +47,10 @@ function HospitalDirectoryContent() {
     const [selectedAffiliation, setSelectedAffiliation] = useState("ทั้งหมด");
     const [selectedType, setSelectedType] = useState("ทั้งหมด");
     const [selectedDistrict, setSelectedDistrict] = useState(() => {
-        return searchParams.get('amp_code') || "6501";
+        return searchParams.get('amp_code') || "เลือกอำเภอ";
     });
     const [selectedStation, setSelectedStation] = useState("ทั้งหมด");
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         fetch('/api/affiliations')
@@ -58,6 +60,12 @@ function HospitalDirectoryContent() {
     }, []);
 
     useEffect(() => {
+        if (selectedDistrict === "เลือกอำเภอ") {
+            setData([]);
+            setLoading(false);
+            return;
+        }
+
         setLoading(true);
         const params = new URLSearchParams();
         if (selectedAffiliation !== "ทั้งหมด") params.append('affiliation', selectedAffiliation);
@@ -84,7 +92,13 @@ function HospitalDirectoryContent() {
             });
     }, [selectedAffiliation, selectedType, selectedDistrict, selectedStation]);
 
-    const filteredData = data;
+    const filteredData = data.map(group => ({
+        ...group,
+        hospitals: group.hospitals.filter(h =>
+            h.hospname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            h.hospcode.includes(searchTerm)
+        )
+    })).filter(group => group.hospitals.length > 0);
 
     const getRowColor = (hostypeName: string) => {
         if (hostypeName === 'กระทรวงสาธารณสุข') return 'text-green-600';
@@ -92,13 +106,14 @@ function HospitalDirectoryContent() {
         return 'text-black';
     };
 
-    const getHostColor = (type: string) => {
-        switch (type) {
-            case '05': return 'text-purple-500'; // รพช.
-            case '06': return 'text-blue-500';   // รพท.
-            case '07': return 'text-indigo-500'; // รพศ.
-            default: return 'text-green-600';     // รพ.สต.
-        }
+    const getHostColor = (label: string) => {
+        const text = label || '';
+        if (text.includes('รพ.สต.')) return 'text-blue-600';
+        if (text.includes('รพศ.')) return 'text-pink-500';
+        if (text === 'รพ.' || text === 'รพช.' || text.includes('รพช.')) return 'text-orange-500';
+        if (text.includes('ศูนย์สุขภาพ')) return 'text-indigo-900';
+        if (text.includes('นอกสังกัด')) return 'text-black';
+        return 'text-slate-500';
     };
 
     return (
@@ -113,6 +128,8 @@ function HospitalDirectoryContent() {
                 selectedStation={selectedStation}
                 onStationChange={setSelectedStation}
                 showAllDistrict={true}
+                searchValue={searchTerm}
+                onSearchChange={setSearchTerm}
             />
 
             <div className="px-6 max-w-7xl mx-auto">
@@ -122,6 +139,17 @@ function HospitalDirectoryContent() {
                 {loading ? (
                     <div className="flex justify-center items-center py-20">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-nm-primary"></div>
+                    </div>
+                ) : selectedDistrict === "เลือกอำเภอ" ? (
+                    <div className="flex flex-col items-center justify-center py-32 text-center opacity-40">
+                        <div className="w-24 h-24 mb-6 rounded-full bg-nm-primary/10 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-nm-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-xl font-bold mb-2">กรุณาเลือกอำเภอ</h3>
+                        <p className="text-sm">ระบุอำเภอที่ด้านบนเพื่อแสดงข้อมูลหน่วยบริการ</p>
                     </div>
                 ) : (
                     <div className="space-y-12">
@@ -140,11 +168,11 @@ function HospitalDirectoryContent() {
                                             <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
                                                 <th className="px-6 py-4 w-24">รหัส</th>
                                                 <th className="px-6 py-4">ชื่อหน่วยบริการ</th>
-                                                <th className="px-6 py-4 w-32">อำเภอ</th>
-                                                <th className="px-6 py-4 w-32">ตำบล</th>
-                                                <th className="px-6 py-4 w-32">ประเภท</th>
-                                                <th className="px-6 py-4 w-32 text-right text-[#006837]">หมอพร้อม STATION</th>
-                                                <th className="px-6 py-4 w-32 text-right text-[#00ADEF]">สอน.บัดดี้</th>
+                                                <th className="px-6 py-4 w-40 whitespace-nowrap">อำเภอ</th>
+                                                <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
+                                                <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
+                                                <th className="px-6 py-4 w-32 text-right text-[#006837] whitespace-nowrap">หมอพร้อม STATION</th>
+                                                <th className="px-6 py-4 w-32 text-right text-[#00ADEF] whitespace-nowrap">สอน.บัดดี้</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100">
@@ -163,16 +191,22 @@ function HospitalDirectoryContent() {
                                                                     {hospital.hospname}
                                                                 </span>
                                                             </td>
-                                                            <td className="px-6 py-3 text-sm opacity-70 font-bold">
+                                                            <td className="px-6 py-3 text-sm opacity-70 font-bold whitespace-nowrap">
                                                                 อ.{hospital.amp_name}
                                                             </td>
-                                                            <td className="px-6 py-3 text-sm opacity-70">
+                                                            <td className="px-6 py-3 text-sm opacity-70 whitespace-nowrap">
                                                                 ต.{hospital.tmb_name || '-'}
                                                             </td>
-                                                            <td className="px-6 py-3">
-                                                                <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${getHostColor(hospital.hostype).replace('text-', 'bg-')} ${getHostColor(hospital.hostype)}`}>
-                                                                    {hospital.hostype_level || (hospital.hostype === '05' ? 'รพช.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.')}
-                                                                </span>
+                                                            <td className="px-6 py-3 whitespace-nowrap">
+                                                                {(() => {
+                                                                    const label = hospital.hostype_level || (hospital.hostype === '05' ? 'รพ.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.');
+                                                                    const colorClass = getHostColor(label);
+                                                                    return (
+                                                                        <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${colorClass.replace('text-', 'bg-')} ${colorClass} whitespace-nowrap`}>
+                                                                            {label}
+                                                                        </span>
+                                                                    );
+                                                                })()}
                                                             </td>
                                                             <td className="px-6 py-3 text-right">
                                                                 <span className="text-sm font-bold text-[#006837]">{hospital.moph.toLocaleString()}</span>
@@ -219,10 +253,10 @@ function HospitalDirectoryContent() {
                                                 <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
                                                     <th className="px-6 py-4 w-24">รหัส</th>
                                                     <th className="px-6 py-4">ชื่อหน่วยบริการ</th>
-                                                    <th className="px-6 py-4 w-40">ตำบล</th>
-                                                    <th className="px-6 py-4 w-32">ประเภท</th>
-                                                    <th className="px-6 py-4 w-32 text-right text-[#006837]">หมอพร้อม STATION</th>
-                                                    <th className="px-6 py-4 w-32 text-right text-[#00ADEF]">สอน.บัดดี้</th>
+                                                    <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
+                                                    <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-[#006837] whitespace-nowrap">หมอพร้อม STATION</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-[#00ADEF] whitespace-nowrap">สอน.บัดดี้</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-100">
@@ -238,13 +272,19 @@ function HospitalDirectoryContent() {
                                                                     {hospital.hospname}
                                                                 </span>
                                                             </td>
-                                                            <td className="px-6 py-3 text-sm opacity-70">
+                                                            <td className="px-6 py-3 text-sm opacity-70 whitespace-nowrap">
                                                                 ต.{hospital.tmb_name || '-'}
                                                             </td>
-                                                            <td className="px-6 py-3">
-                                                                <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${getHostColor(hospital.hostype).replace('text-', 'bg-')} ${getHostColor(hospital.hostype)}`}>
-                                                                    {hospital.hostype_level || (hospital.hostype === '05' ? 'รพช.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.')}
-                                                                </span>
+                                                            <td className="px-6 py-3 whitespace-nowrap">
+                                                                {(() => {
+                                                                    const label = hospital.hostype_level || (hospital.hostype === '05' ? 'รพ.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.');
+                                                                    const colorClass = getHostColor(label);
+                                                                    return (
+                                                                        <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${colorClass.replace('text-', 'bg-')} ${colorClass} whitespace-nowrap`}>
+                                                                            {label}
+                                                                        </span>
+                                                                    );
+                                                                })()}
                                                             </td>
                                                             <td className="px-6 py-3 text-right">
                                                                 <span className="text-sm font-bold text-[#006837]">{hospital.moph.toLocaleString()}</span>
@@ -286,6 +326,7 @@ function HospitalDirectoryContent() {
                     </div>
                 )}
             </div>
+            <Footer />
         </main>
     );
 }

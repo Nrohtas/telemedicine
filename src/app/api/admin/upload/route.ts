@@ -6,6 +6,7 @@ export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
         const file = formData.get('file') as File;
+        const type = formData.get('type') as string || 'Telemedicine';
 
         if (!file) {
             return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
@@ -43,6 +44,32 @@ export async function POST(request: NextRequest) {
         `;
 
         const [results]: any = await pool.query(query, [values]);
+
+        // Log to fileupload table
+        try {
+            const token = request.cookies.get('token')?.value;
+            const payload = token ? await (async () => {
+                const { verifyJWT } = await import('@/lib/auth');
+                return await verifyJWT(token);
+            })() : null;
+            const username = payload?.username || 'system';
+
+            const logQuery = `
+                INSERT INTO telemedicine.fileupload 
+                (file_name, file_type, file_size, file_time, username, file_log)
+                VALUES (?, ?, ?, NOW(), ?, ?)
+            `;
+            await pool.query(logQuery, [
+                file.name,
+                file.type.substring(0, 10),
+                file.size / 1024, // KB
+                username,
+                type
+            ]);
+        } catch (logError) {
+            console.error('Failed to log file upload:', logError);
+            // Don't fail the whole request if logging fails
+        }
 
         return NextResponse.json({
             success: true,
