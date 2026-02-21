@@ -211,7 +211,11 @@ const Navbar = ({
                             <SoftButton
                                 variant="nav"
                                 active={pathname === '/'}
+                                className="flex items-center gap-2"
                             >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
                                 Dashboard
                             </SoftButton>
                         </a>
@@ -222,7 +226,11 @@ const Navbar = ({
                             <SoftButton
                                 variant="nav"
                                 active={pathname === '/hospital'}
+                                className="flex items-center gap-2"
                             >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
                                 หน่วยบริการ
                             </SoftButton>
                         </a>
@@ -230,7 +238,11 @@ const Navbar = ({
                             <SoftButton
                                 variant="nav"
                                 active={pathname.startsWith('/admin')}
+                                className="flex items-center gap-2"
                             >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
                                 Admin
                             </SoftButton>
                         </a>
@@ -255,7 +267,14 @@ const Navbar = ({
                         {/* Fiscal Year Filter */}
                         <div className="min-w-[140px]">
                             <SoftSelect
-                                label="ปีงบประมาณ"
+                                label={
+                                    <div className="flex items-center gap-1.5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span>ปีงบประมาณ</span>
+                                    </div>
+                                }
                                 options={fiscalYearOptions}
                                 value={fiscalYear}
                                 onChange={setFiscalYear}
@@ -267,7 +286,14 @@ const Navbar = ({
                         {pathname !== '/' && pathname !== '/hospital' && (
                             <div className="min-w-[150px]">
                                 <SoftSelect
-                                    label="เดือน"
+                                    label={
+                                        <div className="flex items-center gap-1.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>เดือน</span>
+                                        </div>
+                                    }
                                     options={monthOptions}
                                     value={month}
                                     onChange={setMonth}
@@ -281,7 +307,15 @@ const Navbar = ({
                                 {/* District Filter */}
                                 <div className="min-w-[180px]">
                                     <SoftSelect
-                                        label="อำเภอ"
+                                        label={
+                                            <div className="flex items-center gap-1.5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                                <span>อำเภอ</span>
+                                            </div>
+                                        }
                                         options={districtOptions}
                                         value={district}
                                         onChange={setDistrict}
@@ -292,7 +326,14 @@ const Navbar = ({
                                 {/* Type Filter */}
                                 <div className="min-w-[180px]">
                                     <SoftSelect
-                                        label="ประเภท"
+                                        label={
+                                            <div className="flex items-center gap-1.5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                                </svg>
+                                                <span>ประเภท</span>
+                                            </div>
+                                        }
                                         options={[
                                             { label: 'ทั้งหมด', value: 'ทั้งหมด' },
                                             ...types.map(t => ({ label: t, value: t }))
@@ -303,21 +344,17 @@ const Navbar = ({
                                     />
                                 </div>
 
-                                {/* Health Station Filter */}
-                                <div className="min-w-[220px]">
-                                    <SoftSelect
-                                        label="หน่วยบริการ"
-                                        options={stationOptions}
-                                        value={station}
-                                        onChange={setStation}
-                                        className="w-full"
-                                    />
-                                </div>
-
                                 {/* Affiliation Filter */}
                                 <div className="min-w-[180px]">
                                     <SoftSelect
-                                        label="สังกัด"
+                                        label={
+                                            <div className="flex items-center gap-1.5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                </svg>
+                                                <span>สังกัด</span>
+                                            </div>
+                                        }
                                         options={[
                                             { label: 'ทั้งหมด', value: 'ทั้งหมด' },
                                             ...affiliations.map(a => ({ label: a, value: a }))
@@ -330,19 +367,19 @@ const Navbar = ({
 
                                 {/* Search Box */}
                                 <div className="min-w-[120px] flex flex-col gap-1 relative group">
-                                    <label className="text-[10px] font-bold uppercase tracking-wider opacity-50 px-2 transition-opacity group-focus-within:opacity-80">ค้นหาหน่วยบริการ</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider opacity-50 px-2 transition-opacity group-focus-within:opacity-80 flex items-center gap-1.5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                        <span>ค้นหาหน่วยบริการ</span>
+                                    </label>
                                     <div className="relative">
-                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-nm-primary opacity-30 group-focus-within:opacity-60 transition-opacity">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
-                                        </div>
                                         <input
                                             type="text"
                                             placeholder="ค้นหา..."
                                             value={searchValue || ''}
                                             onChange={(e) => onSearchChange?.(e.target.value)}
-                                            className="w-full pl-11 pr-4 py-2 bg-transparent nm-card rounded-xl text-sm font-bold text-nm-primary placeholder:text-nm-primary/20 outline-none transition-all focus:nm-inset"
+                                            className="w-full px-4 py-2 bg-transparent nm-card rounded-xl text-sm font-bold text-nm-primary placeholder:text-nm-primary/20 outline-none transition-all focus:nm-inset"
                                         />
                                     </div>
                                 </div>

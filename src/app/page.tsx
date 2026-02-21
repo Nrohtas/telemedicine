@@ -9,11 +9,28 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   const [selectedDistrict, setSelectedDistrict] = useState("เลือกอำเภอ");
+  const [globalStats, setGlobalStats] = useState({
+    total_services: 0,
+    total_patients: 0,
+    total_moph: 0,
+    total_buddycare: 0
+  });
+
+  React.useEffect(() => {
+    fetch('/api/global-stats')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) {
+          setGlobalStats(data);
+        }
+      })
+      .catch(err => console.error('Error fetching global stats:', err));
+  }, []);
 
   const stats = [
     {
       label: "จำนวนการรับบริการ",
-      value: "1,240",
+      value: globalStats.total_services.toLocaleString(),
       unit: "ครั้ง",
       trend: "+12%",
       color: "text-red-500",
@@ -25,7 +42,7 @@ export default function Home() {
     },
     {
       label: "จำนวนผู้มารับบริการ",
-      value: "850",
+      value: globalStats.total_patients.toLocaleString(),
       unit: "ราย",
       trend: "+5%",
       color: "text-pink-500",
@@ -38,7 +55,7 @@ export default function Home() {
     },
     {
       label: "หมอพร้อม STATION",
-      value: "12",
+      value: globalStats.total_moph.toLocaleString(),
       unit: "ราย",
       trend: "-2%",
       color: "text-[#006837]",
@@ -53,7 +70,7 @@ export default function Home() {
     },
     {
       label: "สอน.บัดดี้",
-      value: "98",
+      value: globalStats.total_buddycare.toLocaleString(),
       unit: "ราย",
       trend: "+1%",
       color: "text-[#00ADEF]",
@@ -70,7 +87,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen pb-12">
+    <main className="min-h-screen pb-12 bg-background">
       <Navbar
         selectedDistrict={selectedDistrict}
         onDistrictChange={setSelectedDistrict}
@@ -78,25 +95,22 @@ export default function Home() {
         onSearchChange={() => { }}
       />
 
-      <div className="px-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
         {/* Stats Section */}
         <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, idx) => (
-            <SoftCard key={idx} className="p-6">
+            <SoftCard key={idx} className="p-6 group hover:translate-y-[-4px] transition-all duration-300">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg nm-inset opacity-80 ${stat.color}`}>
+                  <div className={`p-2 rounded-xl nm-inset shadow-inner opacity-90 ${stat.color} bg-white/50`}>
                     {stat.icon}
                   </div>
-                  <span className="text-sm font-bold opacity-60 uppercase tracking-widest leading-tight">{stat.label}</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-tight">{stat.label}</span>
                 </div>
-                <span className={`text-xs font-bold ${stat.trend.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>
-                  {stat.trend}
-                </span>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className={`text-3xl font-black ${stat.color}`}>{stat.value}</span>
-                <span className="text-sm opacity-60">{stat.unit}</span>
+                <span className={`text-4xl font-black tracking-tighter ${stat.color}`}>{stat.value}</span>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.unit}</span>
               </div>
             </SoftCard>
           ))}

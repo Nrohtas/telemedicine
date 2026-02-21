@@ -156,8 +156,12 @@ function HospitalDirectoryContent() {
                         {selectedDistrict === 'ทั้งหมด' ? (
                             /* Unified Province-Wide Table */
                             <div className="space-y-4">
-                                <div className="flex items-center gap-4 px-2">
-                                    <div className="h-px w-8 bg-nm-primary/20"></div>
+                                <div className="flex items-center gap-2 px-2">
+                                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    </div>
                                     <h3 className="text-lg font-bold text-nm-primary opacity-80">สรุปข้อมูลทั้งจังหวัด</h3>
                                     <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
                                 </div>
@@ -173,6 +177,7 @@ function HospitalDirectoryContent() {
                                                 <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
                                                 <th className="px-6 py-4 w-32 text-right text-[#006837] whitespace-nowrap">หมอพร้อม STATION</th>
                                                 <th className="px-6 py-4 w-32 text-right text-[#00ADEF] whitespace-nowrap">สอน.บัดดี้</th>
+                                                <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">รวม</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100">
@@ -214,6 +219,9 @@ function HospitalDirectoryContent() {
                                                             <td className="px-6 py-3 text-right">
                                                                 <span className="text-sm font-bold text-[#00ADEF]">{hospital.buddycare.toLocaleString()}</span>
                                                             </td>
+                                                            <td className="px-6 py-3 text-right bg-indigo-50/30">
+                                                                <span className="text-sm font-black text-indigo-700">{(hospital.moph + hospital.buddycare).toLocaleString()}</span>
+                                                            </td>
                                                         </tr>
                                                     );
                                                 })}
@@ -232,6 +240,11 @@ function HospitalDirectoryContent() {
                                                         {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare, 0), 0).toLocaleString()}
                                                     </span>
                                                 </td>
+                                                <td className="px-6 py-5 text-right bg-indigo-50/50">
+                                                    <span className="text-xl font-black text-indigo-700">
+                                                        {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0).toLocaleString()}
+                                                    </span>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -241,8 +254,13 @@ function HospitalDirectoryContent() {
                             /* Existing District-Grouped Tables */
                             filteredData.map((group) => (
                                 <div key={group.amp_code} className="space-y-4">
-                                    <div className="flex items-center gap-4 px-2">
-                                        <div className="h-px w-8 bg-nm-primary/20"></div>
+                                    <div className="flex items-center gap-2 px-2">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </div>
                                         <h3 className="text-lg font-bold text-nm-primary opacity-80">อำเภอ{group.amp_name}</h3>
                                         <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
                                     </div>
@@ -257,6 +275,7 @@ function HospitalDirectoryContent() {
                                                     <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
                                                     <th className="px-6 py-4 w-32 text-right text-[#006837] whitespace-nowrap">หมอพร้อม STATION</th>
                                                     <th className="px-6 py-4 w-32 text-right text-[#00ADEF] whitespace-nowrap">สอน.บัดดี้</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">รวม</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-100">
@@ -292,6 +311,9 @@ function HospitalDirectoryContent() {
                                                             <td className="px-6 py-3 text-right">
                                                                 <span className="text-sm font-bold text-[#00ADEF]">{hospital.buddycare.toLocaleString()}</span>
                                                             </td>
+                                                            <td className="px-6 py-3 text-right bg-indigo-50/30">
+                                                                <span className="text-sm font-black text-indigo-700">{(hospital.moph + hospital.buddycare).toLocaleString()}</span>
+                                                            </td>
                                                         </tr>
                                                     );
                                                 })}
@@ -308,6 +330,11 @@ function HospitalDirectoryContent() {
                                                     <td className="px-6 py-4 text-right">
                                                         <span className="text-base text-[#00ADEF]">
                                                             {group.hospitals.reduce((sum, h) => sum + h.buddycare, 0).toLocaleString()}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right bg-indigo-50/30">
+                                                        <span className="text-base font-black text-indigo-700">
+                                                            {group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0).toLocaleString()}
                                                         </span>
                                                     </td>
                                                 </tr>

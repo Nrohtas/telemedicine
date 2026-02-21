@@ -8,7 +8,7 @@ interface Option {
 }
 
 interface SoftSelectProps {
-    label?: string;
+    label?: React.ReactNode;
     options: Option[];
     value: string;
     onChange: (value: string) => void;
