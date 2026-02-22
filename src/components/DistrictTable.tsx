@@ -18,6 +18,7 @@ export default function DistrictTable() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        // Fetch stats
         fetch('/api/ampur-stats')
             .then(res => res.json())
             .then(data => {
@@ -66,26 +67,13 @@ export default function DistrictTable() {
 
     return (
         <div className="space-y-8">
-            <div className="flex justify-between items-center">
-                <h3 className="text-2xl font-black text-nm-primary tracking-tight">สรุปข้อมูลเชิงลึกรายอำเภอ</h3>
-                <div className="flex gap-4 text-[10px] font-bold uppercase tracking-widest opacity-60">
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#006837]"></div>
-                        หมอพร้อม STATION
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#00ADEF]"></div>
-                        สอน.บัดดี้
-                    </div>
-                </div>
-            </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {(() => {
-                    const sortedByTotal = [...stats].sort((a, b) => (b.total_result || 0) - (a.total_result || 0));
-                    return Array.isArray(stats) && stats.map((stat) => {
-                        const rank = sortedByTotal.findIndex(s => s.amp_code === stat.amp_code) + 1;
-                        const isTop3 = rank <= 3;
+                    const sortedStats = [...stats].sort((a, b) => (b.total_result || 0) - (a.total_result || 0));
+                    return sortedStats.map((stat) => {
+                        const rank = sortedStats.findIndex(s => s.amp_code === stat.amp_code) + 1;
                         const rankColor = rank === 1 ? 'from-amber-400 to-yellow-600' :
                             rank === 2 ? 'from-slate-300 to-slate-500' :
                                 rank === 3 ? 'from-orange-300 to-orange-500' :
@@ -99,13 +87,13 @@ export default function DistrictTable() {
 
                                     <div className="flex items-start justify-between mb-8 relative z-10">
                                         <div>
-                                            <h4 className="font-black text-2xl group-hover:text-nm-primary transition-colors">{stat.amp_name}</h4>
+                                            <h4 className="font-black text-xl group-hover:text-nm-primary transition-colors">{stat.amp_name}</h4>
                                             <div className="flex items-center gap-2 mt-1">
                                                 <p className="text-[10px] opacity-40 uppercase font-bold tracking-widest whitespace-nowrap">รหัส {stat.amp_code}</p>
                                                 <div className="w-px h-2 bg-slate-200" />
                                                 <p className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${rank === 1 ? 'text-orange-600' :
-                                                        rank <= 3 ? 'text-orange-400' :
-                                                            'text-slate-400 opacity-60'
+                                                    rank <= 3 ? 'text-orange-400' :
+                                                        'text-slate-400 opacity-60'
                                                     }`}>อันดับ {rank}</p>
                                             </div>
                                         </div>
@@ -129,7 +117,7 @@ export default function DistrictTable() {
                                                 <span className="text-2xl font-black text-indigo-600 tabular-nums transition-colors">
                                                     {(stat.total_result || 0).toLocaleString()}
                                                 </span>
-                                                <span className="text-[10px] font-bold text-indigo-400/60 uppercase transition-colors">ราย</span>
+                                                <span className="text-[10px] font-bold text-indigo-400/60 uppercase transition-colors">ครั้ง</span>
                                             </div>
                                         </div>
                                     </div>
@@ -149,7 +137,7 @@ export default function DistrictTable() {
                                                 </div>
                                                 <div>
                                                     <p className="text-[9px] font-black text-emerald-800/60 uppercase tracking-tighter">หมอพร้อม STATION</p>
-                                                    <p className="text-lg font-black text-[#006837]">{(stat.mohpromt_count || 0).toLocaleString()} <span className="text-[10px] opacity-40">ราย</span></p>
+                                                    <p className="text-lg font-black text-[#006837]">{(stat.mohpromt_count || 0).toLocaleString()} <span className="text-[10px] opacity-40">ครั้ง</span></p>
                                                 </div>
                                             </div>
 
@@ -166,7 +154,7 @@ export default function DistrictTable() {
                                                 </div>
                                                 <div>
                                                     <p className="text-[9px] font-black text-sky-800/60 uppercase tracking-tighter">สอน.บัดดี้</p>
-                                                    <p className="text-lg font-black text-[#00ADEF]">{(stat.sornbuddy_count || 0).toLocaleString()} <span className="text-[10px] opacity-40">ราย</span></p>
+                                                    <p className="text-lg font-black text-[#00ADEF]">{(stat.sornbuddy_count || 0).toLocaleString()} <span className="text-[10px] opacity-40">ครั้ง</span></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -183,9 +171,8 @@ export default function DistrictTable() {
                                                     style={{ width: `${stat.total_result > 0 ? ((stat.sornbuddy_count || 0) / stat.total_result) * 100 : 0}%` }}
                                                 ></div>
                                             </div>
-                                            <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest opacity-40">
-                                                <span>Contribution Ratio</span>
-                                                <span>Platform Mix</span>
+                                            <div className="flex justify-center text-[8px] font-bold uppercase tracking-widest opacity-40 mt-1">
+                                                <span className="tracking-[0.2em] bg-white/60 px-2 py-0.5 rounded-full backdrop-blur-sm text-[7px] text-slate-500 font-black">RATIO</span>
                                             </div>
                                         </div>
                                     </div>

@@ -1,22 +1,25 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import SoftCard from "@/components/ui/SoftCard";
 import SoftButton from "@/components/ui/SoftButton";
 import DistrictTable from "@/components/DistrictTable";
 import Footer from "@/components/Footer";
+import LastUpdate from "@/components/LastUpdate";
 
 export default function Home() {
   const [selectedDistrict, setSelectedDistrict] = useState("เลือกอำเภอ");
   const [globalStats, setGlobalStats] = useState({
     total_services: 0,
-    total_patients: 0,
+    total_hospitals: 0,
     total_moph: 0,
     total_buddycare: 0
   });
 
   React.useEffect(() => {
+    // Fetch global stats
     fetch('/api/global-stats')
       .then(res => res.json())
       .then(data => {
@@ -26,6 +29,7 @@ export default function Home() {
       })
       .catch(err => console.error('Error fetching global stats:', err));
   }, []);
+
 
   const stats = [
     {
@@ -41,22 +45,22 @@ export default function Home() {
       )
     },
     {
-      label: "จำนวนผู้มารับบริการ",
-      value: globalStats.total_patients.toLocaleString(),
-      unit: "ราย",
+      label: "จำนวนหน่วยบริการ",
+      value: globalStats.total_hospitals.toLocaleString(),
+      unit: "แห่ง",
       trend: "+5%",
       color: "text-pink-500",
+      href: "/hospital",
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
+          <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
         </svg>
       )
     },
     {
       label: "หมอพร้อม STATION",
       value: globalStats.total_moph.toLocaleString(),
-      unit: "ราย",
+      unit: "ครั้ง",
       trend: "-2%",
       color: "text-[#006837]",
       icon: (
@@ -71,7 +75,7 @@ export default function Home() {
     {
       label: "สอน.บัดดี้",
       value: globalStats.total_buddycare.toLocaleString(),
-      unit: "ราย",
+      unit: "ครั้ง",
       trend: "+1%",
       color: "text-[#00ADEF]",
       icon: (
@@ -96,26 +100,43 @@ export default function Home() {
       />
 
       <div className="px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
-        {/* Stats Section */}
-        <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, idx) => (
-            <SoftCard key={idx} className="p-6 group hover:translate-y-[-4px] transition-all duration-300">
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-xl nm-inset shadow-inner opacity-90 ${stat.color} bg-white/50`}>
-                    {stat.icon}
-                  </div>
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-tight">{stat.label}</span>
-                </div>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className={`text-4xl font-black tracking-tighter ${stat.color}`}>{stat.value}</span>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.unit}</span>
-              </div>
-            </SoftCard>
-          ))}
+        {/* Stats Section Header */}
+        <div className="lg:col-span-12 flex justify-between items-end mb-[-16px]">
+          <h3 className="text-2xl font-black text-nm-primary tracking-tight">ภาพรวมจังหวัด</h3>
+          <LastUpdate />
         </div>
 
+        {/* Stats Section Cards */}
+        <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, idx) => {
+            const cardContent = (
+              <SoftCard className={`p-6 group transition-all duration-300 ${stat.href ? 'hover:translate-y-[-4px] cursor-pointer' : 'cursor-default'}`}>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-xl nm-inset shadow-inner opacity-90 ${stat.color} bg-white/50`}>
+                      {stat.icon}
+                    </div>
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] leading-tight">{stat.label}</span>
+                  </div>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className={`text-5xl font-black tracking-tighter ${stat.color}`}>{stat.value}</span>
+                  <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">{stat.unit}</span>
+                </div>
+              </SoftCard>
+            );
+
+            return stat.href ? (
+              <Link key={idx} href={stat.href} className="block">
+                {cardContent}
+              </Link>
+            ) : (
+              <div key={idx} className="block">
+                {cardContent}
+              </div>
+            );
+          })}
+        </div>
 
         {/* District Stats Section */}
         <div className="lg:col-span-12">

@@ -6,11 +6,11 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const ampCode = searchParams.get('amp_code');
 
-        let query = 'SELECT hospcode, hospname FROM hospital ORDER BY hospcode ASC';
+        let query = "SELECT hospcode, hospname FROM hospital WHERE status = '1' ORDER BY hospcode ASC";
         let params: string[] = [];
 
         if (ampCode && ampCode !== 'ทั้งหมด') {
-            query = 'SELECT hospcode, hospname FROM hospital WHERE amp_code = ? ORDER BY hospcode ASC';
+            query = "SELECT hospcode, hospname FROM hospital WHERE amp_code = ? AND status = '1' ORDER BY hospcode ASC";
             params = [ampCode];
         }
 

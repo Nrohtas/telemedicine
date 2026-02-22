@@ -5,6 +5,7 @@ import SoftCard from '@/components/ui/SoftCard';
 import SoftButton from '@/components/ui/SoftButton';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { formatThaiDate } from '@/utils/date';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface UploadHistory {
@@ -183,16 +184,6 @@ export default function AdminPage() {
         }
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return new Intl.DateTimeFormat('th-TH', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        }).format(date);
-    };
 
     return (
         <main className="min-h-screen bg-background font-sans relative overflow-hidden pb-12">
@@ -223,7 +214,7 @@ export default function AdminPage() {
 
                     <div className="grid grid-cols-1 gap-4">
                         {history.length > 0 ? (
-                            history.map((item, idx) => (
+                            history.slice(0, 5).map((item, idx) => (
                                 <motion.div
                                     key={item.file_id}
                                     initial={{ opacity: 0, y: 10 }}
@@ -255,7 +246,7 @@ export default function AdminPage() {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-slate-900 font-bold text-sm tracking-tight">{formatDate(item.file_time)}</p>
+                                        <p className="text-slate-900 font-bold text-sm tracking-tight">{formatThaiDate(item.file_time)}</p>
                                         <p className="text-emerald-500 text-[9px] font-black uppercase tracking-widest mt-1 flex items-center justify-end gap-1.5">
                                             <span className="w-1 h-1 rounded-full bg-emerald-500"></span> Synced
                                         </p>
@@ -270,8 +261,192 @@ export default function AdminPage() {
                     </div>
                 </div>
 
+                {/* System Updates Manager Section */}
+                <SystemUpdatesManager />
+
                 <Footer />
             </div>
         </main>
     );
 }
+
+// SystemUpdatesManager Component
+const SystemUpdatesManager = () => {
+    const [updates, setUpdates] = useState<any[]>([]);
+    const [date, setDate] = useState('');
+    const dateInputRef = useRef<HTMLInputElement>(null);
+    const [description, setDescription] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [status, setStatus] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+    const fetchUpdates = async () => {
+        try {
+            const res = await fetch('/api/updates');
+            const data = await res.json();
+            if (Array.isArray(data)) {
+                setUpdates(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch updates:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUpdates();
+    }, []);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setStatus(null);
+
+        try {
+            // Generate version from date: "2026-02-22" -> "V20260222"
+            const version = `V${date.replace(/-/g, '')}`;
+
+            const res = await fetch('/api/updates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date, description, version })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                setStatus({ type: 'success', text: 'บันทึกรายการอัปเดตเรียบร้อยแล้ว' });
+                setDate('');
+                setDescription('');
+                fetchUpdates();
+            } else {
+                setStatus({ type: 'error', text: data.error || 'Failed to save update' });
+            }
+        } catch (error) {
+            setStatus({ type: 'error', text: 'An error occurred. Please try again.' });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleDelete = async (id: number) => {
+        if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?')) return;
+
+        try {
+            const res = await fetch(`/api/updates?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                fetchUpdates();
+            } else {
+                alert('เกิดข้อผิดพลาดในการลบรายการ');
+            }
+        } catch (error) {
+            console.error('Failed to delete:', error);
+        }
+    };
+
+    return (
+        <SoftCard className="p-8">
+            <div className="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 7v6m-3-3h6" />
+                </svg>
+                <h2 className="text-xl font-black text-slate-800 tracking-tight">System Update</h2>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {status && (
+                    <div className={`p-4 rounded-xl text-sm font-bold ${status.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+                        {status.text}
+                    </div>
+                )}
+
+                <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500">Date (วัน/เดือน/ปี)</label>
+                    <div className="relative">
+                        <input
+                            ref={dateInputRef}
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            required
+                            className="absolute inset-0 w-full h-full opacity-0 pointer-events-none z-[-1]"
+                        />
+                        <div
+                            onClick={() => {
+                                try {
+                                    dateInputRef.current?.showPicker();
+                                } catch (err) {
+                                    dateInputRef.current?.focus();
+                                }
+                            }}
+                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 shadow-sm flex items-center justify-between cursor-pointer hover:border-purple-500 focus-within:border-purple-500 focus-within:ring-2 focus-within:ring-purple-500/20 transition-all"
+                        >
+                            <span className={date ? 'text-slate-700' : 'text-slate-400'}>
+                                {date ? date.split('-').reverse().join('/') : 'DD / MM / YYYY'}
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500">Description</label>
+                    <textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        required
+                        rows={3}
+                        placeholder="Update description..."
+                        className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all text-slate-700 shadow-sm resize-y"
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex items-center gap-2 px-6 py-3 bg-purple-400 hover:bg-purple-500 text-white font-bold rounded-xl transition-colors shadow-sm disabled:opacity-50"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                    </svg>
+                    {isSubmitting ? 'Saving...' : 'Save Update'}
+                </button>
+            </form>
+
+            <div className="mt-10 pt-8 border-t border-slate-100">
+                <h3 className="text-sm font-black text-slate-800 tracking-tight mb-4">Update List</h3>
+
+                <div className="space-y-3">
+                    {updates.length > 0 ? (
+                        updates.slice(0, 5).map((upd) => (
+                            <div key={upd.update_id} className="flex items-center justify-between p-4 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-sm font-bold text-purple-800">{formatThaiDate(upd.update_created)}</p>
+                                        {upd.update_version && (
+                                            <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">
+                                                {upd.update_version}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-sm text-slate-600 mt-1">{upd.update_description}</p>
+                                </div>
+                                <button
+                                    onClick={() => handleDelete(upd.update_id)}
+                                    className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors ml-4 shrink-0"
+                                    title="Delete update"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-sm text-slate-400 text-center py-4 bg-slate-50 rounded-xl">ไม่มีรายการอัปเดต</p>
+                    )}
+                </div>
+            </div>
+        </SoftCard>
+    );
+};

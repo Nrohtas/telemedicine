@@ -44,7 +44,7 @@ export default function LoginPage() {
                 <div className="flex flex-col items-center mb-10">
                     <div className="w-20 h-20 rounded-full bg-nm-primary flex items-center justify-center text-white shadow-xl nm-flat-nm-primary-lg mb-6">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                         </svg>
                     </div>
                     <h1 className="text-3xl font-black text-foreground tracking-tight mb-2">Admin Login</h1>
@@ -95,9 +95,22 @@ export default function LoginPage() {
                     </form>
                 </SoftCard>
 
-                <p className="mt-8 text-center text-[10px] text-gray-300 font-bold uppercase tracking-[0.2em] max-w-[280px] leading-relaxed">
+                <p className="mt-8 text-center text-[10px] text-gray-300 font-bold uppercase tracking-[0.2em] max-w-[280px] leading-relaxed mx-auto">
                     Copyright © Telemedicine of Phitsanulok Provincial Public Health Office
                 </p>
+
+                <div className="mt-6 flex justify-center">
+                    <button
+                        type="button"
+                        onClick={() => router.push('/')}
+                        className="text-xs font-bold text-nm-primary/70 hover:text-nm-primary flex items-center gap-2 transition-colors uppercase tracking-widest"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Dashboard
+                    </button>
+                </div>
             </div>
         </main>
     );
