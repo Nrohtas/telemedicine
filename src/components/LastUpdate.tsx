@@ -7,7 +7,7 @@ export default function LastUpdate() {
     const [lastUpdate, setLastUpdate] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch('/telemedicine/api/last-update')
+        fetch('/api/last-update')
             .then(res => res.json())
             .then(data => {
                 if (data.lastUpdate) {
@@ -28,7 +28,7 @@ export default function LastUpdate() {
                 className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50/50 hover:bg-blue-100/50 border border-blue-100 hover:border-blue-200 transition-colors cursor-pointer group"
             >
                 <img
-                    src="/telemedicine/logo-moph.png"
+                    src="/logo-moph.png"
                     alt="MOPH Logo"
                     className="h-3 w-3 object-contain"
                 />

@@ -7,25 +7,27 @@ export async function middleware(request: NextRequest) {
     // console.log('Middleware pathname:', pathname);
 
     // Define public routes
-    const isPublicApiRoute = pathname.startsWith('/telemedicine/api') && (
-        pathname.startsWith('/telemedicine/api/login') ||
-        pathname.startsWith('/telemedicine/api/register') ||
-        pathname.startsWith('/telemedicine/api/auth') ||
+    const isPublicApiRoute = pathname.startsWith('/api') && (
+        pathname.startsWith('/api/login') ||
+        pathname.startsWith('/api/register') ||
+        pathname.startsWith('/api/auth') ||
         (request.method === 'GET' && (
-            pathname.startsWith('/telemedicine/api/hospital-directory') ||
-            pathname.startsWith('/telemedicine/api/affiliations') ||
-            pathname.startsWith('/telemedicine/api/hospital-types') ||
-            pathname.startsWith('/telemedicine/api/districts') ||
-            pathname.startsWith('/telemedicine/api/hospitals') ||
-            pathname.startsWith('/telemedicine/api/months') ||
-            pathname.startsWith('/telemedicine/api/fiscal-years') ||
-            pathname.startsWith('/telemedicine/api/ampur-stats') ||
-            pathname.startsWith('/telemedicine/api/last-update')
+            pathname.startsWith('/api/hospital-directory') ||
+            pathname.startsWith('/api/affiliations') ||
+            pathname.startsWith('/api/hospital-types') ||
+            pathname.startsWith('/api/districts') ||
+            pathname.startsWith('/api/hospitals') ||
+            pathname.startsWith('/api/months') ||
+            pathname.startsWith('/api/fiscal-years') ||
+            pathname.startsWith('/api/ampur-stats') ||
+            pathname.startsWith('/api/last-update') ||
+            pathname.startsWith('/api/global-stats') ||
+            pathname.startsWith('/api/updates')
         ))
     );
 
     // Protect /admin routes and private /api routes
-    if (pathname.startsWith('/telemedicine/admin') || (pathname.startsWith('/telemedicine/api') && !isPublicApiRoute)) {
+    if (pathname.startsWith('/admin') || (pathname.startsWith('/api') && !isPublicApiRoute)) {
         // Check for token in cookie or Authorization header
         let token = request.cookies.get('token')?.value;
 
@@ -37,20 +39,20 @@ export async function middleware(request: NextRequest) {
         }
 
         if (!token) {
-            if (pathname.startsWith('/telemedicine/api')) {
+            if (pathname.startsWith('/api')) {
                 return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
             }
-            return NextResponse.redirect(new URL('/telemedicine/login', request.url));
+            return NextResponse.redirect(new URL('/login', request.url));
         }
 
         // Verify token
         const payload = await verifyJWT(token);
 
         if (!payload) {
-            if (pathname.startsWith('/telemedicine/api')) {
+            if (pathname.startsWith('/api')) {
                 return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
             }
-            const response = NextResponse.redirect(new URL('/telemedicine/login', request.url));
+            const response = NextResponse.redirect(new URL('/login', request.url));
             response.cookies.delete('token');
             return response;
         }

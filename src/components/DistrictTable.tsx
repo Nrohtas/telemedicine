@@ -19,7 +19,7 @@ export default function DistrictTable() {
 
     useEffect(() => {
         // Fetch stats
-        fetch('/telemedicine/api/ampur-stats')
+        fetch('/api/ampur-stats')
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
