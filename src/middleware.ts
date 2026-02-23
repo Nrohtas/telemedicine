@@ -42,7 +42,9 @@ export async function middleware(request: NextRequest) {
             if (pathname.startsWith('/api')) {
                 return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
             }
-            return NextResponse.redirect(new URL('/login', request.url));
+            const loginUrl = request.nextUrl.clone();
+            loginUrl.pathname = '/login';
+            return NextResponse.redirect(loginUrl);
         }
 
         // Verify token
@@ -52,7 +54,9 @@ export async function middleware(request: NextRequest) {
             if (pathname.startsWith('/api')) {
                 return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
             }
-            const response = NextResponse.redirect(new URL('/login', request.url));
+            const loginUrl = request.nextUrl.clone();
+            loginUrl.pathname = '/login';
+            const response = NextResponse.redirect(loginUrl);
             response.cookies.delete('token');
             return response;
         }
