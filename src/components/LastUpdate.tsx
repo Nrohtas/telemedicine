@@ -28,7 +28,7 @@ export default function LastUpdate() {
                 className="flex items-center gap-2 bg-gradient-to-r from-teal-50 to-emerald-50 px-4 items-stretch h-[22px] border border-teal-100 rounded-full shadow-[0_2px_10px_-4px_rgba(20,184,166,0.2)] hover:shadow-[0_4px_12px_-4px_rgba(20,184,166,0.3)] transition-all duration-300 cursor-pointer"
             >
                 <div className="flex items-center justify-center w-[18px]">
-                    <img src="/telemedicine/logo-moph.png" alt="MOPH Logo" className="w-[18px] h-[18px] object-contain" />
+                    <img src="/telemedicine/looker-studio.png" alt="Looker Studio Logo" className="w-[18px] h-[18px] object-contain" />
                 </div>
                 <div className="flex items-center border-l border-teal-200/50 pl-2">
                     <span className="font-bold text-[#059669] text-[9px] uppercase tracking-wider">Source Telemedicine</span>
