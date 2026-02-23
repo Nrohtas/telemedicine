@@ -19,15 +19,18 @@ export default function Home() {
   });
 
   React.useEffect(() => {
-    // Fetch global stats
-    fetch('/api/global-stats')
-      .then(res => res.json())
-      .then(data => {
+    const fetchGlobalStats = async () => {
+      try {
+        const response = await fetch('/telemedicine/api/global-stats');
+        const data = await response.json();
         if (!data.error) {
           setGlobalStats(data);
         }
-      })
-      .catch(err => console.error('Error fetching global stats:', err));
+      } catch (err) {
+        console.error('Error fetching global stats:', err);
+      }
+    };
+    fetchGlobalStats();
   }, []);
 
 

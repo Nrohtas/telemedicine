@@ -64,5 +64,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/api/:path*', '/admin/:path*'],
+    matcher: ['/telemedicine/api/:path*', '/telemedicine/admin/:path*', '/api/:path*', '/admin/:path*'],
 };

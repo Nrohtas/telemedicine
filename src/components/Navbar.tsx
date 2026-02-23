@@ -79,7 +79,7 @@ const Navbar = ({
 
     // Fetch hospital types on mount
     useEffect(() => {
-        fetch('/api/hospital-types')
+        fetch('/telemedicine/api/hospital-types')
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -91,7 +91,7 @@ const Navbar = ({
 
     // Fetch affiliations on mount
     useEffect(() => {
-        fetch('/api/affiliations')
+        fetch('/telemedicine/api/affiliations')
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -103,7 +103,7 @@ const Navbar = ({
 
     // Fetch fiscal years on mount
     useEffect(() => {
-        fetch('/api/fiscal-years')
+        fetch('/telemedicine/api/fiscal-years')
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -118,7 +118,7 @@ const Navbar = ({
 
     // Fetch months on mount
     useEffect(() => {
-        fetch('/api/months')
+        fetch('/telemedicine/api/months')
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -130,7 +130,7 @@ const Navbar = ({
 
     // Fetch districts on mount
     useEffect(() => {
-        fetch('/api/districts')
+        fetch('/telemedicine/api/districts')
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -143,8 +143,8 @@ const Navbar = ({
     // Fetch hospitals when district changes
     useEffect(() => {
         const url = district === 'ทั้งหมด'
-            ? '/api/hospitals'
-            : `/api/hospitals?amp_code=${district}`;
+            ? '/telemedicine/api/hospitals'
+            : `/telemedicine/api/hospitals?amp_code=${district}`;
 
         fetch(url)
             .then(res => res.json())
@@ -193,7 +193,7 @@ const Navbar = ({
                     <div className="flex items-center gap-3 md:gap-5 min-w-0">
                         <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 overflow-hidden border-2 border-green-700/20">
                             <img
-                                src="/logo-moph.png"
+                                src="/telemedicine/logo-moph.png"
                                 alt="Ministry of Public Health Logo"
                                 className="w-full h-full object-contain p-0.5"
                             />

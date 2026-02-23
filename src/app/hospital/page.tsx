@@ -55,7 +55,7 @@ function HospitalDirectoryContent() {
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        fetch('/api/affiliations')
+        fetch('/telemedicine/api/affiliations')
             .then(res => res.json())
             .then(data => setAffiliations(data))
             .catch(err => console.error('Failed to fetch affiliations:', err));
@@ -75,7 +75,7 @@ function HospitalDirectoryContent() {
         if (selectedDistrict !== "ทั้งหมด") params.append('amp_code', selectedDistrict);
         if (selectedStation !== "ทั้งหมด") params.append('hospcode', selectedStation);
 
-        const url = `/api/hospital-directory?${params.toString()}`;
+        const url = `/telemedicine/api/hospital-directory?${params.toString()}`;
 
         fetch(url)
             .then(res => res.json())
@@ -257,12 +257,12 @@ function HospitalDirectoryContent() {
                                                     .map((hospital) => {
                                                         const rowColor = getRowColor(hospital.hostype_name);
                                                         return (
-                                                            <tr key={hospital.hospcode} className="group hover:bg-slate-50 transition-colors duration-200">
+                                                            <tr key={hospital.hospcode} className="transition-colors duration-200">
                                                                 <td className={`px-6 py-3 font-mono text-sm opacity-70 font-bold ${rowColor} sticky left-0 z-10 bg-white/95 backdrop-blur-sm shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.03)]`}>
                                                                     {hospital.hospcode}
                                                                 </td>
                                                                 <td className="px-6 py-3">
-                                                                    <span className={`text-sm font-bold transition-colors cursor-pointer whitespace-nowrap ${rowColor}`}>
+                                                                    <span className={`text-sm font-bold transition-colors whitespace-nowrap ${rowColor}`}>
                                                                         {hospital.hospname}
                                                                     </span>
                                                                 </td>
@@ -363,12 +363,12 @@ function HospitalDirectoryContent() {
                                                     {group.hospitals.map((hospital) => {
                                                         const rowColor = getRowColor(hospital.hostype_name);
                                                         return (
-                                                            <tr key={hospital.hospcode} className="group hover:bg-slate-50 transition-colors duration-200">
-                                                                <td className={`px-6 py-3 font-mono text-sm opacity-70 font-bold ${rowColor} sticky left-0 z-10 bg-white/95 backdrop-blur-sm group-hover:bg-slate-50 shadow-[1px_0_0_0_rgba(0,0,0,0.03)]`}>
+                                                            <tr key={hospital.hospcode} className="transition-colors duration-200">
+                                                                <td className={`px-6 py-3 font-mono text-sm opacity-70 font-bold ${rowColor} sticky left-0 z-10 bg-white/95 backdrop-blur-sm shadow-[1px_0_0_0_rgba(0,0,0,0.03)]`}>
                                                                     {hospital.hospcode}
                                                                 </td>
                                                                 <td className="px-6 py-3">
-                                                                    <span className={`text-sm font-bold transition-colors cursor-pointer whitespace-nowrap ${rowColor}`}>
+                                                                    <span className={`text-sm font-bold transition-colors whitespace-nowrap ${rowColor}`}>
                                                                         {hospital.hospname}
                                                                     </span>
                                                                 </td>

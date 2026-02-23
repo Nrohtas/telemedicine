@@ -16,7 +16,7 @@ const Footer = () => {
 
     const fetchUpdates = async () => {
         try {
-            const res = await fetch('/api/updates');
+            const res = await fetch('/telemedicine/api/updates');
             const data = await res.json();
             if (Array.isArray(data)) {
                 setUpdates(data);
