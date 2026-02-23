@@ -36,7 +36,7 @@ export default function Home() {
 
   const stats = [
     {
-      label: "จำนวนการรับบริการ",
+      label: "การรับบริการ",
       value: globalStats.total_services.toLocaleString(),
       unit: "ครั้ง",
       trend: "+12%",
@@ -48,7 +48,7 @@ export default function Home() {
       )
     },
     {
-      label: "จำนวนหน่วยบริการ",
+      label: "หน่วยบริการ",
       value: globalStats.total_hospitals.toLocaleString(),
       unit: "แห่ง",
       trend: "+5%",
