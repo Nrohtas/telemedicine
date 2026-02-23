@@ -5,9 +5,9 @@ export async function GET() {
     try {
         const query = `
             SELECT file_time FROM (
-                SELECT file_time FROM telemedicine.fileupload
+                SELECT file_time FROM fileupload
                 UNION
-                SELECT d_update as file_time FROM telemedicine.telemedicine
+                SELECT d_update as file_time FROM telemedicine
             ) AS combined_updates
             ORDER BY file_time DESC
             LIMIT 1

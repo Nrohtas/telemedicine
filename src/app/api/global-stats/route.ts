@@ -8,9 +8,9 @@ export async function GET() {
                 SUM(COALESCE(t.result, 0)) as total_services,
                 SUM(COALESCE(t.moph, 0)) as total_moph,
                 SUM(COALESCE(t.buddycare, 0)) as total_buddycare,
-                (SELECT COUNT(*) FROM telemedicine.hospital WHERE status = '1') as total_hospitals
-            FROM telemedicine.telemedicine t
-            INNER JOIN telemedicine.hospital h ON t.hospcode = h.hospcode
+                (SELECT COUNT(*) FROM hospital WHERE status = '1') as total_hospitals
+            FROM telemedicine t
+            INNER JOIN hospital h ON t.hospcode = h.hospcode
             WHERE h.status = '1'
         `;
 

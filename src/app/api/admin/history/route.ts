@@ -3,7 +3,7 @@ import pool from '@/lib/db';
 
 export async function GET(request: NextRequest) {
     try {
-        const query = 'SELECT * FROM telemedicine.fileupload ORDER BY file_time DESC LIMIT 5';
+        const query = 'SELECT * FROM fileupload ORDER BY file_time DESC LIMIT 5';
         const [rows]: any = await pool.query(query);
 
         return NextResponse.json({

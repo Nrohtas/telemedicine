@@ -5,7 +5,7 @@ export async function GET() {
     try {
         const query = `
             SELECT DISTINCT hostype_list 
-            FROM telemedicine.hostype 
+            FROM hostype 
             WHERE hostype_list IS NOT NULL 
             ORDER BY hostype_list ASC
         `;

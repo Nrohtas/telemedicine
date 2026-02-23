@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         }
 
         const query = `
-            INSERT INTO telemedicine.telemedicine (id, hospcode, b_year, moph, buddycare, result)
+            INSERT INTO telemedicine (id, hospcode, b_year, moph, buddycare, result)
             VALUES ?
             ON DUPLICATE KEY UPDATE
                 b_year = VALUES(b_year),
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
             const logType = filteredData[0]['ปีงบประมาณ'] || type;
 
             const logQuery = `
-                INSERT INTO telemedicine.fileupload 
+                INSERT INTO fileupload 
                 (file_name, file_type, file_size, file_time, username, file_log)
                 VALUES (?, ?, ?, NOW(), ?, ?)
             `;

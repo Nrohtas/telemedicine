@@ -25,10 +25,10 @@ export async function GET(request: Request) {
             FROM hospital h
             LEFT JOIN (
                 SELECT hostype_new, hostype_name, hostype_list, MAX(CASE WHEN hostype = 'รพช.' THEN 'รพ.' ELSE hostype END) as hostype
-                FROM telemedicine.hostype
+                FROM hostype
                 GROUP BY hostype_new, hostype_name, hostype_list
             ) ht ON h.hostype_new = ht.hostype_new
-            LEFT JOIN telemedicine.telemedicine t ON h.hospcode = t.hospcode AND t.b_year = ?
+            LEFT JOIN telemedicine t ON h.hospcode = t.hospcode AND t.b_year = ?
             WHERE h.status = '1' 
         `;
         const params: any[] = [year];

@@ -5,7 +5,7 @@ export async function GET() {
     try {
         const query = `
             SELECT update_id, update_date, update_description, update_version, update_created 
-            FROM telemedicine.siteupdate 
+            FROM siteupdate 
             ORDER BY update_date DESC, update_created DESC
         `;
         const [rows]: any = await pool.query(query);
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         }
 
         const query = `
-            INSERT INTO telemedicine.siteupdate (update_date, update_description, update_version)
+            INSERT INTO siteupdate (update_date, update_description, update_version)
             VALUES (?, ?, ?)
         `;
 
@@ -74,7 +74,7 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: 'Update ID is required' }, { status: 400 });
         }
 
-        const query = 'DELETE FROM telemedicine.siteupdate WHERE update_id = ?';
+        const query = 'DELETE FROM siteupdate WHERE update_id = ?';
         const [result]: any = await pool.query(query, [id]);
 
         if (result.affectedRows === 0) {
