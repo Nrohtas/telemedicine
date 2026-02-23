@@ -226,12 +226,12 @@ function HospitalDirectoryContent() {
                                     <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
                                     <button
                                         onClick={handleExportExcel}
-                                        className="flex items-center gap-1.5 px-2.5 h-[22px] bg-white hover:bg-white border border-slate-100 rounded-full transition-all duration-200 group text-slate-600 hover:text-nm-primary leading-none shadow-sm"
+                                        className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-full transition-all duration-200 group text-emerald-700 hover:text-emerald-800 leading-none shadow-sm"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-[#1D6F42] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-emerald-600 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1.5 16.5L10 16l-2.5 2.5H6l3.5-3.5L6 11.5h1.5l2 2.5 2-2.5H13l-3.5 3.5 3.5 3.5h-1.5zM13 9V3.5L18.5 9H13z" />
                                         </svg>
-                                        <span className="font-bold text-[9px] uppercase tracking-wider">Export Excel</span>
+                                        <span className="font-bold text-[10px] uppercase tracking-wider">Export Excel</span>
                                     </button>
                                 </div>
 
@@ -336,12 +336,12 @@ function HospitalDirectoryContent() {
                                         <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
                                         <button
                                             onClick={handleExportExcel}
-                                            className="flex items-center gap-1.5 px-2.5 h-[22px] bg-white hover:bg-white border border-slate-100 rounded-full transition-all duration-200 group text-slate-600 hover:text-nm-primary leading-none shadow-sm ml-1"
+                                            className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-full transition-all duration-200 group text-emerald-700 hover:text-emerald-800 leading-none shadow-sm ml-1"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-[#1D6F42] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-emerald-600 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1.5 16.5L10 16l-2.5 2.5H6l3.5-3.5L6 11.5h1.5l2 2.5 2-2.5H13l-3.5 3.5 3.5 3.5h-1.5zM13 9V3.5L18.5 9H13z" />
                                             </svg>
-                                            <span className="font-bold text-[9px] uppercase tracking-wider">Export Excel</span>
+                                            <span className="font-bold text-[10px] uppercase tracking-wider">Export Excel</span>
                                         </button>
                                     </div>
 
