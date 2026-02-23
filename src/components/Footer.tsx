@@ -48,7 +48,7 @@ const Footer = () => {
 
                         <div className="flex items-center gap-6">
                             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 hidden sm:block">
-                                <span className="text-[#006837]">MOHPROM STATION</span> <span className="text-gray-500">AND</span> <span className="text-[#00ADEF]">BUDDY CARE</span> <span className="text-gray-500">PLATFORM</span>
+                                <span className="text-[#006837]">MOHPROMT STATION</span> <span className="text-gray-500">AND</span> <span className="text-[#00ADEF]">BUDDY CARE</span> <span className="text-gray-500">PLATFORM</span>
                             </p>
 
                             <button
