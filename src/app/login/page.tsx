@@ -95,11 +95,7 @@ export default function LoginPage() {
                     </form>
                 </SoftCard>
 
-                <p className="mt-8 text-center text-[10px] text-gray-300 font-bold uppercase tracking-[0.2em] max-w-[280px] leading-relaxed mx-auto">
-                    Copyright © Telemedicine of Phitsanulok Provincial Public Health Office
-                </p>
-
-                <div className="mt-6 flex justify-center">
+                <div className="mt-8 flex justify-center mb-6">
                     <button
                         type="button"
                         onClick={() => router.push('/')}
