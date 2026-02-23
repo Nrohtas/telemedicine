@@ -8,7 +8,8 @@ export const formatThaiDate = (dateString: string) => {
             day: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            calendar: 'buddhist'
+            calendar: 'buddhist',
+            timeZone: 'Asia/Bangkok'
         } as any).format(date) + " น.";
     } catch (err) {
         console.error('Error formatting date:', err);
