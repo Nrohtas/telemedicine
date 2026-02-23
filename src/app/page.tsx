@@ -119,12 +119,12 @@ export default function Home() {
                     <div className={`p-2 rounded-xl nm-inset shadow-inner opacity-90 ${stat.color} bg-white/50`}>
                       {stat.icon}
                     </div>
-                    <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] leading-tight">{stat.label}</span>
+                    <span className={`text-xs font-black uppercase tracking-[0.2em] leading-tight ${stat.color}`}>{stat.label}</span>
                   </div>
                 </div>
                 <div className="flex items-baseline gap-2">
                   <span className={`text-5xl font-black tracking-tighter ${stat.color}`}>{stat.value}</span>
-                  <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">{stat.unit}</span>
+                  <span className={`text-sm font-bold uppercase tracking-widest ${stat.color}`}>{stat.unit}</span>
                 </div>
               </SoftCard>
             );
