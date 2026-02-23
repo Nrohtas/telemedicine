@@ -55,7 +55,7 @@ function HospitalDirectoryContent() {
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        fetch('/api/affiliations')
+        fetch('/telemedicine/api/affiliations')
             .then(res => res.json())
             .then(data => setAffiliations(data))
             .catch(err => console.error('Failed to fetch affiliations:', err));
@@ -75,7 +75,7 @@ function HospitalDirectoryContent() {
         if (selectedDistrict !== "ทั้งหมด") params.append('amp_code', selectedDistrict);
         if (selectedStation !== "ทั้งหมด") params.append('hospcode', selectedStation);
 
-        const url = `/api/hospital-directory?${params.toString()}`;
+        const url = `/telemedicine/api/hospital-directory?${params.toString()}`;
 
         fetch(url)
             .then(res => res.json())

@@ -20,7 +20,7 @@ export default function Home() {
 
   React.useEffect(() => {
     // Fetch global stats
-    fetch('/api/global-stats')
+    fetch('/telemedicine/api/global-stats')
       .then(res => res.json())
       .then(data => {
         if (!data.error) {

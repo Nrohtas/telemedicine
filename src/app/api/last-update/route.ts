@@ -3,7 +3,16 @@ import pool from '@/lib/db';
 
 export async function GET() {
     try {
-        const [rows]: any = await pool.query('SELECT file_time FROM telemedicine.fileupload ORDER BY file_time DESC LIMIT 1');
+        const query = `
+            SELECT file_time FROM (
+                SELECT file_time FROM telemedicine.fileupload
+                UNION
+                SELECT d_update as file_time FROM telemedicine.telemedicine
+            ) AS combined_updates
+            ORDER BY file_time DESC
+            LIMIT 1
+        `;
+        const [rows]: any = await pool.query(query);
         return NextResponse.json({
             lastUpdate: rows[0]?.file_time || null
         });

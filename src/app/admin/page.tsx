@@ -38,7 +38,7 @@ const TelemedicineUpload = ({ onUploadSuccess }: { onUploadSuccess: () => void }
         formData.append('type', 'Telemedicine');
 
         try {
-            const res = await fetch('/api/admin/upload', {
+            const res = await fetch('/telemedicine/api/admin/upload', {
                 method: 'POST',
                 body: formData,
             });
@@ -174,7 +174,7 @@ export default function AdminPage() {
 
     const fetchHistory = async () => {
         try {
-            const res = await fetch('/api/admin/history');
+            const res = await fetch('/telemedicine/api/admin/history');
             const data = await res.json();
             if (data.success) {
                 setHistory(data.data);
@@ -192,7 +192,7 @@ export default function AdminPage() {
                 showSignOut={true}
                 onSignOut={() => {
                     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-                    window.location.href = '/login';
+                    window.location.href = '/telemedicine/login';
                 }}
             />
 
@@ -281,7 +281,7 @@ const SystemUpdatesManager = () => {
 
     const fetchUpdates = async () => {
         try {
-            const res = await fetch('/api/updates');
+            const res = await fetch('/telemedicine/api/updates');
             const data = await res.json();
             if (Array.isArray(data)) {
                 setUpdates(data);
@@ -304,7 +304,7 @@ const SystemUpdatesManager = () => {
             // Generate version from date: "2026-02-22" -> "V20260222"
             const version = `V${date.replace(/-/g, '')}`;
 
-            const res = await fetch('/api/updates', {
+            const res = await fetch('/telemedicine/api/updates', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ date, description, version })
@@ -330,7 +330,7 @@ const SystemUpdatesManager = () => {
         if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?')) return;
 
         try {
-            const res = await fetch(`/api/updates?id=${id}`, { method: 'DELETE' });
+            const res = await fetch(`/telemedicine/api/updates?id=${id}`, { method: 'DELETE' });
             if (res.ok) {
                 fetchUpdates();
             } else {

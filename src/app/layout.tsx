@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Telemedicine Phitsanulok",
   description: "Phitsanulok Smart Data Management",
   icons: {
-    icon: "/logo-moph.png",
+    icon: "/telemedicine/logo-moph.png",
   },
 };
 
