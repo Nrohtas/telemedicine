@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
             `;
             await pool.query(logQuery, [
                 file.name,
-                file.type.substring(0, 10),
+                file.name.split('.').pop()?.substring(0, 10) || '',
                 file.size / 1024, // KB
                 username,
                 logType
