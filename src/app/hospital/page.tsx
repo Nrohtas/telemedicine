@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { utils, writeFileXLSX } from 'xlsx';
 import Navbar from "@/components/Navbar";
 import SoftSelect from '@/components/ui/SoftSelect';
 import Footer from '@/components/Footer';
@@ -101,6 +102,60 @@ function HospitalDirectoryContent() {
         )
     })).filter(group => group.hospitals.length > 0);
 
+    const handleExportExcel = useCallback(() => {
+        const exportData = filteredData.flatMap(group =>
+            group.hospitals.map(h => ({
+                "รหัส": h.hospcode,
+                "ชื่อหน่วยบริการ": h.hospname,
+                "อำเภอ": h.amp_name,
+                "ตำบล": h.tmb_name || '-',
+                "ประเภท": h.hostype_level || h.hostype_name,
+                "หมอพร้อม STATION": h.moph,
+                "สอน.บัดดี้": h.buddycare,
+                "รวม": h.moph + h.buddycare
+            }))
+        );
+
+        if (exportData.length === 0) {
+            alert("ไม่พบข้อมูลที่จะส่งออก");
+            return;
+        }
+
+        const ws = utils.json_to_sheet(exportData);
+        const wb = utils.book_new();
+        utils.book_append_sheet(wb, ws, "รายชื่อหน่วยบริการ");
+
+        // Set column widths
+        const wscols = [
+            { wch: 10 }, // รหัส
+            { wch: 40 }, // ชื่อหน่วยบริการ
+            { wch: 15 }, // อำเภอ
+            { wch: 15 }, // ตำบล
+            { wch: 15 }, // ประเภท
+            { wch: 20 }, // หมอพร้อม STATION
+            { wch: 15 }, // สอน.บัดดี้
+            { wch: 10 }, // รวม
+        ];
+        ws['!cols'] = wscols;
+
+        const now = new Date();
+        const dateStr = now.getFullYear().toString() +
+            (now.getMonth() + 1).toString().padStart(2, '0') +
+            now.getDate().toString().padStart(2, '0');
+        const timeStr = now.getHours().toString().padStart(2, '0') +
+            now.getMinutes().toString().padStart(2, '0') +
+            now.getSeconds().toString().padStart(2, '0');
+
+        let districtName = "hospital";
+        if (selectedDistrict === 'ทั้งหมด') {
+            districtName = "ทั้งจังหวัด";
+        } else if (filteredData.length > 0) {
+            districtName = filteredData[0].amp_name;
+        }
+
+        writeFileXLSX(wb, `Telemedicine_${districtName}_${dateStr}_${timeStr}.xlsx`);
+    }, [filteredData, selectedDistrict]);
+
     const getRowColor = (hostypeName: string) => {
         if (hostypeName === 'กระทรวงสาธารณสุข') return 'text-green-600';
         if (hostypeName === 'องค์กรปกครองส่วนท้องถิ่น') return 'text-purple-600';
@@ -133,7 +188,7 @@ function HospitalDirectoryContent() {
                 onSearchChange={setSearchTerm}
             />
 
-            <div className="px-6 max-w-7xl mx-auto pt-6 flex justify-end">
+            <div className="px-6 max-w-7xl mx-auto pt-6 flex justify-end items-center gap-3">
                 <LastUpdate />
             </div>
 
@@ -169,6 +224,15 @@ function HospitalDirectoryContent() {
                                     </div>
                                     <h3 className="text-lg font-bold text-nm-primary opacity-80">สรุปข้อมูลทั้งจังหวัด</h3>
                                     <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
+                                    <button
+                                        onClick={handleExportExcel}
+                                        className="flex items-center gap-1.5 px-2.5 h-[22px] bg-white hover:bg-white border border-slate-100 rounded-full transition-all duration-200 group text-slate-600 hover:text-nm-primary leading-none shadow-sm"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-[#1D6F42] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <span className="font-bold text-[9px] uppercase tracking-wider">Export Excel</span>
+                                    </button>
                                 </div>
 
                                 <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-xl shadow-sm overflow-hidden">
@@ -177,7 +241,7 @@ function HospitalDirectoryContent() {
                                             <thead className="sticky top-0 z-20 bg-[#FDFBFF] shadow-sm">
                                                 <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
                                                     <th className="px-6 py-4 w-24 sticky left-0 z-10 bg-[#FDFBFF]/95 backdrop-blur-sm shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.05)]">รหัส</th>
-                                                    <th className="px-6 py-4">ชื่อหน่วยบริการ</th>
+                                                    <th className="px-6 py-4 whitespace-nowrap">ชื่อหน่วยบริการ</th>
                                                     <th className="px-6 py-4 w-40 whitespace-nowrap">อำเภอ</th>
                                                     <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
                                                     <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
@@ -198,7 +262,7 @@ function HospitalDirectoryContent() {
                                                                     {hospital.hospcode}
                                                                 </td>
                                                                 <td className="px-6 py-3">
-                                                                    <span className={`text-sm font-bold transition-colors cursor-pointer ${rowColor}`}>
+                                                                    <span className={`text-sm font-bold transition-colors cursor-pointer whitespace-nowrap ${rowColor}`}>
                                                                         {hospital.hospname}
                                                                     </span>
                                                                 </td>
@@ -270,6 +334,15 @@ function HospitalDirectoryContent() {
                                         </div>
                                         <h3 className="text-lg font-bold text-nm-primary opacity-80">อำเภอ{group.amp_name}</h3>
                                         <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
+                                        <button
+                                            onClick={handleExportExcel}
+                                            className="flex items-center gap-1.5 px-2.5 h-[22px] bg-white hover:bg-white border border-slate-100 rounded-full transition-all duration-200 group text-slate-600 hover:text-nm-primary leading-none shadow-sm ml-1"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-[#1D6F42] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            <span className="font-bold text-[9px] uppercase tracking-wider">Export Excel</span>
+                                        </button>
                                     </div>
 
                                     <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-xl shadow-sm overflow-hidden">
@@ -278,7 +351,7 @@ function HospitalDirectoryContent() {
                                                 <thead className="sticky top-0 z-20 bg-[#FDFBFF] shadow-sm">
                                                     <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
                                                         <th className="px-6 py-4 w-24 sticky left-0 z-10 bg-[#FDFBFF]/95 backdrop-blur-sm shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.05)]">รหัส</th>
-                                                        <th className="px-6 py-4">ชื่อหน่วยบริการ</th>
+                                                        <th className="px-6 py-4 whitespace-nowrap">ชื่อหน่วยบริการ</th>
                                                         <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
                                                         <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
                                                         <th className="px-6 py-4 w-32 text-right text-[#006837] whitespace-nowrap">หมอพร้อม STATION</th>
@@ -295,7 +368,7 @@ function HospitalDirectoryContent() {
                                                                     {hospital.hospcode}
                                                                 </td>
                                                                 <td className="px-6 py-3">
-                                                                    <span className={`text-sm font-bold transition-colors cursor-pointer ${rowColor}`}>
+                                                                    <span className={`text-sm font-bold transition-colors cursor-pointer whitespace-nowrap ${rowColor}`}>
                                                                         {hospital.hospname}
                                                                     </span>
                                                                 </td>

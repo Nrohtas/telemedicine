@@ -18,7 +18,8 @@ export async function middleware(request: NextRequest) {
             pathname.startsWith('/api/hospitals') ||
             pathname.startsWith('/api/months') ||
             pathname.startsWith('/api/fiscal-years') ||
-            pathname.startsWith('/api/ampur-stats')
+            pathname.startsWith('/api/ampur-stats') ||
+            pathname.startsWith('/api/last-update')
         ))
     );
 

@@ -27,9 +27,11 @@ export default function LastUpdate() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50/50 hover:bg-blue-100/50 border border-blue-100 hover:border-blue-200 transition-colors cursor-pointer group"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-blue-500 group-hover:text-blue-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
+                <img
+                    src="/logo-moph.png"
+                    alt="MOPH Logo"
+                    className="h-3 w-3 object-contain"
+                />
                 <span className="text-[9px] font-bold text-blue-600 group-hover:text-blue-700 transition-colors whitespace-nowrap">
                     Source: Telemedicine Data
                 </span>
