@@ -123,7 +123,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className={`text-5xl font-black tracking-tighter ${stat.color}`}>{stat.value}</span>
+                  <span className={`text-4xl font-black tracking-tighter ${stat.color}`}>{stat.value}</span>
                   <span className={`text-sm font-bold uppercase tracking-widest ${stat.color}`}>{stat.unit}</span>
                 </div>
               </SoftCard>
