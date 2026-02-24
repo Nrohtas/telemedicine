@@ -103,30 +103,73 @@ function HospitalDirectoryContent() {
     })).filter(group => group.hospitals.length > 0);
 
     const handleExportExcel = useCallback(() => {
-        const exportData = filteredData.flatMap(group =>
-            group.hospitals.map(h => ({
-                "รหัส": h.hospcode,
-                "ชื่อหน่วยบริการ": h.hospname,
-                "อำเภอ": h.amp_name,
-                "ตำบล": h.tmb_name || '-',
-                "ประเภท": h.hostype_level || h.hostype_name,
-                "หมอพร้อม STATION": h.moph,
-                "สอน.บัดดี้": h.buddycare,
-                "รวม": h.moph + h.buddycare
-            }))
-        );
+        const exportRows: any[] = [];
+        let index = 1;
 
-        if (exportData.length === 0) {
+        filteredData.forEach(group => {
+            // Add Hospital Rows
+            group.hospitals.forEach(h => {
+                const typeLabel = h.hostype_level || (h.hostype === '05' ? 'รพ.' : h.hostype === '06' ? 'รพท.' : h.hostype === '07' ? 'รพศ.' : 'รพ.สต.');
+                exportRows.push({
+                    "ลำดับ": index++,
+                    "รหัส": h.hospcode,
+                    "ชื่อหน่วยบริการ": h.hospname,
+                    "อำเภอ": h.amp_name,
+                    "ตำบล": h.tmb_name || '-',
+                    "ประเภท": typeLabel,
+                    "หมอพร้อม STATION": h.moph,
+                    "สอน.บัดดี้": h.buddycare,
+                    "รวม": h.moph + h.buddycare
+                });
+            });
+
+            // Add District Summary Row (only if multiple districts or if it's the only district shown)
+            const districtMoph = group.hospitals.reduce((sum, h) => sum + h.moph, 0);
+            const districtBuddy = group.hospitals.reduce((sum, h) => sum + h.buddycare, 0);
+
+            exportRows.push({
+                "ลำดับ": "",
+                "รหัส": "",
+                "ชื่อหน่วยบริการ": `รวมอำเภอ${group.amp_name}`,
+                "อำเภอ": "",
+                "ตำบล": "",
+                "ประเภท": "",
+                "หมอพร้อม STATION": districtMoph,
+                "สอน.บัดดี้": districtBuddy,
+                "รวม": districtMoph + districtBuddy
+            });
+        });
+
+        // Add Grand Total Row if searching 'ทั้งหมด' or multiple districts
+        if (selectedDistrict === 'ทั้งหมด' || filteredData.length > 1) {
+            const grandMoph = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph, 0), 0);
+            const grandBuddy = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare, 0), 0);
+
+            exportRows.push({
+                "ลำดับ": "",
+                "รหัส": "",
+                "ชื่อหน่วยบริการ": "รวมทั้งจังหวัด",
+                "อำเภอ": "",
+                "ตำบล": "",
+                "ประเภท": "",
+                "หมอพร้อม STATION": grandMoph,
+                "สอน.บัดดี้": grandBuddy,
+                "รวม": grandMoph + grandBuddy
+            });
+        }
+
+        if (exportRows.length === 0) {
             alert("ไม่พบข้อมูลที่จะส่งออก");
             return;
         }
 
-        const ws = utils.json_to_sheet(exportData);
+        const ws = utils.json_to_sheet(exportRows);
         const wb = utils.book_new();
         utils.book_append_sheet(wb, ws, "รายชื่อหน่วยบริการ");
 
         // Set column widths
         const wscols = [
+            { wch: 8 },  // ลำดับ
             { wch: 10 }, // รหัส
             { wch: 40 }, // ชื่อหน่วยบริการ
             { wch: 15 }, // อำเภอ
@@ -146,14 +189,14 @@ function HospitalDirectoryContent() {
             now.getMinutes().toString().padStart(2, '0') +
             now.getSeconds().toString().padStart(2, '0');
 
-        let districtName = "hospital";
+        let fileNameDistrict = "hospital";
         if (selectedDistrict === 'ทั้งหมด') {
-            districtName = "ทั้งจังหวัด";
+            fileNameDistrict = "ทั้งจังหวัด";
         } else if (filteredData.length > 0) {
-            districtName = filteredData[0].amp_name;
+            fileNameDistrict = filteredData[0].amp_name;
         }
 
-        writeFileXLSX(wb, `Telemedicine_${districtName}_${dateStr}_${timeStr}.xlsx`);
+        writeFileXLSX(wb, `Telemedicine_${fileNameDistrict}_${dateStr}_${timeStr}.xlsx`);
     }, [filteredData, selectedDistrict]);
 
     const getRowColor = (hostypeName: string) => {
