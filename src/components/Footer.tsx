@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { formatThaiDate } from '@/utils/date';
+import { formatThaiDate, formatThaiDateNumeric } from '@/utils/date';
 
 const Footer = () => {
     const [isMounted, setIsMounted] = useState(false);
@@ -114,7 +114,7 @@ const Footer = () => {
                                             <div className="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-white border-[3px] border-purple-400 shadow-sm" />
                                             <div className="flex items-center gap-2 mb-2">
                                                 <p className="text-xs font-black tracking-wider text-purple-700">
-                                                    {formatThaiDate(upd.update_created)}
+                                                    {formatThaiDateNumeric(upd.update_date)}
                                                 </p>
                                                 {upd.update_version && (
                                                     <span className="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest border bg-purple-50 text-purple-600 border-purple-100">

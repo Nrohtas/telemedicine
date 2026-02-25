@@ -5,7 +5,7 @@ import SoftCard from '@/components/ui/SoftCard';
 import SoftButton from '@/components/ui/SoftButton';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { formatThaiDate } from '@/utils/date';
+import { formatThaiDate, formatThaiDateOnly, formatThaiDateNumeric } from '@/utils/date';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface UploadHistory {
@@ -422,7 +422,7 @@ const SystemUpdatesManager = () => {
                             <div key={upd.update_id} className="flex items-center justify-between p-4 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <p className="text-sm font-bold text-purple-800">{formatThaiDate(upd.update_created)}</p>
+                                        <p className="text-sm font-bold text-purple-800">{formatThaiDateNumeric(upd.update_date)}</p>
                                         {upd.update_version && (
                                             <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">
                                                 {upd.update_version}
