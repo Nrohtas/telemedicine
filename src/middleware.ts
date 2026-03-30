@@ -22,7 +22,8 @@ export async function middleware(request: NextRequest) {
             pathname.startsWith('/api/ampur-stats') ||
             pathname.startsWith('/api/last-update') ||
             pathname.startsWith('/api/global-stats') ||
-            pathname.startsWith('/api/updates')
+            pathname.startsWith('/api/updates') ||
+            pathname.startsWith('/api/target')
         ))
     );
 

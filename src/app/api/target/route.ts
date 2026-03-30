@@ -8,8 +8,12 @@ export async function GET() {
         const query = `
             SELECT 
                 (SELECT SUM(COALESCE(result, 0)) FROM telemedicine) as total_result,
-                target, target_2, target_4, target_8, target_10 
-            FROM target 
+                target as target, 
+                target_2 as target_2, 
+                target_4 as target_4, 
+                target_8 as target_8, 
+                target_10 as target_10
+            FROM target
             LIMIT 1
         `;
         const [rows]: any = await pool.query(query);

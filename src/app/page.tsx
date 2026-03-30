@@ -26,6 +26,8 @@ export default function Home() {
     target_10: 0
   });
 
+  const [showIndicators, setShowIndicators] = useState(false);
+
   React.useEffect(() => {
     const fetchGlobalStats = async () => {
       try {
@@ -41,10 +43,15 @@ export default function Home() {
 
     const fetchTargetData = async () => {
       try {
+        console.log('Fetching target data...');
         const response = await fetch('/telemedicine/api/target', { cache: 'no-store' });
+        console.log('Target response status:', response.status);
         const data = await response.json();
+        console.log('Target data received:', data);
         if (!data.error) {
           setTargetData(data);
+        } else {
+          console.error('Target API returned an error:', data.error);
         }
       } catch (err) {
         console.error('Error fetching target data:', err);
@@ -65,20 +72,11 @@ export default function Home() {
       color: "text-red-500",
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h5v5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2h-2z" />
-        </svg>
-      )
-    },
-    {
-      label: "หน่วยบริการ",
-      value: globalStats.total_hospitals.toLocaleString(),
-      unit: "แห่ง",
-      trend: "+5%",
-      color: "text-pink-500",
-      href: "/hospital",
-      icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+          <line x1="8" y1="21" x2="16" y2="21" />
+          <line x1="12" y1="17" x2="12" y2="21" />
+          <line x1="9" y1="10" x2="15" y2="10" />
+          <line x1="12" y1="7" x2="12" y2="13" />
         </svg>
       )
     },
@@ -113,6 +111,19 @@ export default function Home() {
         </svg>
       )
     },
+    {
+      label: "หน่วยบริการ",
+      value: globalStats.total_hospitals.toLocaleString(),
+      unit: "แห่ง",
+      trend: "+5%",
+      color: "text-pink-500",
+      href: "/hospital",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      )
+    },
   ];
 
   return (
@@ -134,33 +145,51 @@ export default function Home() {
         {/* Stats Section Cards */}
         <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, idx) => {
+            const isServiceCard = idx === 0;
+            const isClickable = stat.href || isServiceCard;
+            
+            const cardClass = `p-6 group transition-all duration-300 ${isClickable ? 'hover:translate-y-[-4px] cursor-pointer' : 'cursor-default'} ${isServiceCard && showIndicators ? 'ring-[3px] ring-red-400 ring-offset-2 ring-offset-slate-50 shadow-xl' : 'shadow-lg'}`;
+            
             const cardContent = (
-              <SoftCard className={`p-6 group transition-all duration-300 ${stat.href ? 'hover:translate-y-[-4px] cursor-pointer' : 'cursor-default'}`}>
-                <div className="flex justify-between items-start mb-4">
+              <SoftCard className={cardClass}>
+                <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-xl nm-inset shadow-inner opacity-90 ${stat.color} bg-white/50`}>
                       {stat.icon}
                     </div>
                     <span className={`text-xs font-black uppercase tracking-[0.2em] leading-tight ${stat.color}`}>{stat.label}</span>
                   </div>
+
+                  {/* Expansion Button Hint (Same Line as Label) */}
+                  {idx === 0 && (
+                    <div className="ml-auto shrink-0">
+                      <div className={`cursor-pointer text-[10px] font-extrabold px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-300 transform hover:scale-105 active:scale-95 ${showIndicators ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-md' : 'bg-red-50 text-red-600 border border-red-100 hover:bg-red-100'}`}>
+                        <span className="hidden sm:inline-block md:hidden xl:inline-block">{showIndicators ? 'ปิด' : 'ตัวชี้วัด'}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={showIndicators ? '' : 'animate-bounce'}>
+                          {showIndicators ? <polyline points="18 15 12 9 6 15"/> : <polyline points="6 9 12 15 18 9"/>}
+                        </svg>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="flex flex-col relative">
-                  <div className="flex items-center gap-4">
+
+                <div className="flex flex-col relative w-full">
+                  <div className="flex items-center gap-1.5 sm:gap-3 w-full">
                     {/* Primary Metric: Count */}
-                    <div className="flex items-baseline gap-2">
-                      <span className={`text-4xl font-black tracking-tighter ${stat.color}`}>{stat.value}</span>
-                      <span className={`text-sm font-bold uppercase tracking-widest ${stat.color}`}>{stat.unit}</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className={`text-3xl lg:text-3xl xl:text-4xl font-black tracking-tighter ${stat.color}`}>{stat.value}</span>
+                      <span className={`text-[10px] uppercase font-bold tracking-widest ${stat.color}`}>{stat.unit}</span>
                     </div>
 
                     {/* Secondary Full-Size Metric: Percentage (For Card 1 Only) */}
                     {idx === 0 && (
                       <>
-                        <div className="h-8 w-px bg-gray-200 mx-1" />
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-4xl font-black tracking-tighter text-violet-600">
+                        <div className="h-6 w-px bg-gray-200 mx-0.5" />
+                        <div className="flex items-baseline gap-0.5">
+                          <span className="text-3xl lg:text-3xl xl:text-4xl font-black tracking-tighter text-violet-600">
                             {targetData.target > 0 ? ((globalStats.total_services / targetData.target) * 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}
                           </span>
-                          <span className="text-sm font-bold uppercase tracking-widest text-violet-600">%</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-violet-600">%</span>
                         </div>
                       </>
                     )}
@@ -174,7 +203,12 @@ export default function Home() {
                 {cardContent}
               </Link>
             ) : (
-              <div key={idx} className="block">
+              <div 
+                key={idx} 
+                className={`block ${isServiceCard ? 'cursor-pointer' : ''}`}
+                onClick={isServiceCard ? () => setShowIndicators(!showIndicators) : undefined}
+                title={isServiceCard ? "คลิกเพื่อแสดง/ซ่อน ตัวชี้วัดการแพทย์ทางไกล" : ""}
+              >
                 {cardContent}
               </div>
             );
@@ -182,19 +216,33 @@ export default function Home() {
         </div>
 
         {/* Unified Target Milestone Card with Connector */}
-        <div className="lg:col-span-12 relative">
-          {/* Visual Connector: Vertical Dashed Line from Service Card (idx 0) */}
-          <div className="absolute -top-10 left-[12.5%] w-px h-10 border-l-2 border-dashed border-red-400/30 hidden lg:block" />
+        {showIndicators && (
+        <div className="lg:col-span-12 relative mt-2">
+          {/* Visual Connector: Enhanced Vertical Flow Indicator */}
+          <div className="absolute -top-10 left-[12.5%] w-8 h-10 hidden lg:flex flex-col items-center justify-center z-10 -ml-4">
+            {/* Thick animated dashed line */}
+            <div className="h-full border-l-[3px] border-dashed border-red-400/80 animate-pulse" />
+            {/* Downward pointing arrow joining the target card */}
+            <div className="absolute -bottom-3.5 text-red-500 bg-white rounded-full p-0.5 shadow-sm border border-red-100">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+          </div>
           
-          <SoftCard className="p-6 bg-white/70 border-t-4 border-red-500 shadow-xl backdrop-blur-md overflow-hidden transition-all duration-500 hover:shadow-2xl">
+          <SoftCard className="p-6 bg-white/70 border-t-[3px] border-red-500 shadow-xl backdrop-blur-md overflow-hidden transition-all duration-500 hover:shadow-2xl">
             {/* Context Header */}
             <div className="flex items-center gap-3 mb-8 px-4 py-2 bg-red-50/30 rounded-2xl border border-red-100/50 w-fit">
               <div className="p-1.5 rounded-lg bg-red-500 text-white shadow-sm">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h5v5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2h-2z" />
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                  <line x1="10" y1="10" x2="14" y2="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
                 </svg>
               </div>
-              <h4 className="text-sm font-black text-red-600 uppercase tracking-widest">โครงการติดตามสถิติจากจังหวัด</h4>
+              <h4 className="text-sm font-black text-red-600 uppercase tracking-widest">ตัวชี้วัดการแพทย์ทางไกล</h4>
             </div>
 
             {/* Visual Multi-Milestone Progress Bar (Aligned to Column Centers) */}
@@ -258,9 +306,9 @@ export default function Home() {
             {/* Detailed Breakdown Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {[
-                { label: "เป้าหมาย 2%", target: targetData.target_2, color: "pink", icon: "🚀" },
-                { label: "เป้าหมาย 4%", target: targetData.target_4, color: "orange", icon: "⭐" },
-                { label: "เป้าหมาย 8%", target: targetData.target_8, color: "yellow", icon: "🔥" },
+                { label: "เป้าหมาย 2%", target: targetData.target_2, color: "pink", icon: "🥉" },
+                { label: "เป้าหมาย 4%", target: targetData.target_4, color: "orange", icon: "🥈" },
+                { label: "เป้าหมาย 8%", target: targetData.target_8, color: "yellow", icon: "🥇" },
                 { label: "เป้าหมาย 10%", target: targetData.target_10, color: "green", icon: "💎" },
                 { label: "เป้าหมาย 100%", target: targetData.target, color: "blue", icon: "🏆" },
               ].map((item, idx) => {
@@ -276,7 +324,7 @@ export default function Home() {
                     </div>
 
                     <div className="mb-3">
-                      <div className="text-[10px] font-bold text-gray-400 mb-0.5 uppercase tracking-[0.1em]">เป้าหมาย</div>
+                      <div className="text-[10px] font-bold text-gray-400 mb-0.5 uppercase tracking-[0.1em]">จำนวน</div>
                       <div className="text-xl font-black text-red-600 tracking-tighter">{item.target.toLocaleString()} <span className="text-[10px] font-bold">ครั้ง</span></div>
                     </div>
 
@@ -305,6 +353,7 @@ export default function Home() {
             </div>
           </SoftCard>
         </div>
+        )}
 
         {/* District Stats Section */}
         <div className="lg:col-span-12">
