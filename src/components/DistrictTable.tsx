@@ -12,14 +12,19 @@ interface DistrictStat {
     total_result: number;
 }
 
-export default function DistrictTable() {
+interface DistrictTableProps {
+    type?: string;
+}
+
+export default function DistrictTable({ type }: DistrictTableProps = {}) {
     const [stats, setStats] = useState<DistrictStat[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         // Fetch stats
-        fetch('/telemedicine/api/ampur-stats')
+        const url = type ? `/telemedicine/api/ampur-stats?type=${encodeURIComponent(type)}` : '/telemedicine/api/ampur-stats';
+        fetch(url)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {

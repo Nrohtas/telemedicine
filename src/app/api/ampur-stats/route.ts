@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const type = searchParams.get('type');
+
         // Query to get districts and count hospitals as a base
         // Using telemedicine database explicitly based on previous exploration
-        const query = `
+        let query = `
             SELECT 
                 a.amp_code, 
                 a.amp_name,
@@ -14,12 +17,15 @@ export async function GET() {
                 SUM(COALESCE(t.result, 0)) as total_result
             FROM ampur a
             LEFT JOIN hospital h ON a.amp_code = h.amp_code AND h.status = '1'
+            ${type ? 'LEFT JOIN hostype ht ON h.hostype = ht.hostype_new' : ''}
             LEFT JOIN telemedicine t ON h.hospcode = t.hospcode
+            ${type ? 'WHERE ht.hostype_list = ?' : ''}
             GROUP BY a.amp_code, a.amp_name
             ORDER BY a.amp_code ASC
         `;
 
-        const [rows]: any = await pool.query(query);
+        const params = type ? [type] : [];
+        const [rows]: any = await pool.query(query, params);
 
         const stats = rows.map((row: any) => ({
             amp_code: row.amp_code,

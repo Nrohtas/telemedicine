@@ -3,11 +3,19 @@ import pool from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const type = searchParams.get('type');
+
         const query = `
             SELECT 
-                (SELECT SUM(COALESCE(result, 0)) FROM telemedicine) as total_result,
+                (
+                    SELECT SUM(COALESCE(t.result, 0)) 
+                    FROM telemedicine t
+                    ${type ? 'INNER JOIN hospital h ON t.hospcode = h.hospcode INNER JOIN hostype ht ON h.hostype = ht.hostype_new' : ''}
+                    ${type ? 'WHERE ht.hostype_list = ?' : ''}
+                ) as total_result,
                 target as target, 
                 target_2 as target_2, 
                 target_4 as target_4, 
@@ -16,7 +24,8 @@ export async function GET() {
             FROM target
             LIMIT 1
         `;
-        const [rows]: any = await pool.query(query);
+        const params = type ? [type] : [];
+        const [rows]: any = await pool.query(query, params);
         console.log('Target API rows:', rows);
         
         if (rows.length === 0) {

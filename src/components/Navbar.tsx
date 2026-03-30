@@ -220,6 +220,18 @@ const Navbar = ({
                                 Dashboard
                             </SoftButton>
                         </Link>
+                        <Link href="/kpi" className="hover:opacity-80 transition-opacity">
+                            <SoftButton
+                                variant="nav"
+                                active={pathname.startsWith('/kpi')}
+                                className="flex items-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                                ตัวชี้วัด
+                            </SoftButton>
+                        </Link>
                         <Link
                             href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}` : ''}`}
                             className="hover:opacity-80 transition-opacity"
@@ -285,8 +297,8 @@ const Navbar = ({
                                 />
                             </div>
 
-                            {/* Month Filter - Hide on / and /hospital */}
-                            {pathname !== '/' && pathname !== '/hospital' && (
+                            {/* Month Filter - Hide on /, /kpi, and /hospital */}
+                            {pathname !== '/' && pathname !== '/kpi' && pathname !== '/hospital' && (
                                 <div className="min-w-[150px]">
                                     <SoftSelect
                                         label={
@@ -305,7 +317,7 @@ const Navbar = ({
                                 </div>
                             )}
 
-                            {pathname !== '/' && (
+                            {pathname !== '/' && pathname !== '/kpi' && (
                                 <>
                                     {/* District Filter */}
                                     <div className="min-w-[180px]">
