@@ -7,7 +7,7 @@ export async function GET() {
             SELECT file_time FROM (
                 SELECT file_time FROM fileupload
                 UNION
-                SELECT d_update as file_time FROM telemedicine
+                SELECT d_update as file_time FROM telemed
             ) AS combined_updates
             ORDER BY file_time DESC
             LIMIT 1

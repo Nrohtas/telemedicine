@@ -85,7 +85,7 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
                                     'from-indigo-400 to-indigo-600';
 
                         return (
-                            <Link key={stat.amp_code} href={`/hospital?amp_code=${stat.amp_code}`} className="block">
+                            <Link key={stat.amp_code} href={`/hospital?amp_code=${stat.amp_code}${type ? `&type=${encodeURIComponent(type)}` : ''}`} className="block">
                                 <SoftCard className="p-6 group hover:scale-[1.02] transition-all duration-500 cursor-pointer h-full relative overflow-hidden">
                                     {/* Decorative background for the card */}
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/30 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-indigo-100/40 transition-colors" />

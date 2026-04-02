@@ -21,17 +21,20 @@ export async function GET(request: Request) {
                 ht.hostype_name,
                 ht.hostype as hostype_level,
                 COALESCE(t.moph, 0) as moph,
-                COALESCE(t.buddycare, 0) as buddycare
+                COALESCE(t.buddycare, 0) as buddycare,
+                FLOOR(COALESCE(tg.op_30, 0)) as op_30
             FROM hospital h
             LEFT JOIN (
                 SELECT hostype_new, hostype_name, hostype_list, MAX(CASE WHEN hostype = 'รพช.' THEN 'รพ.' ELSE hostype END) as hostype
                 FROM hostype
                 GROUP BY hostype_new, hostype_name, hostype_list
             ) ht ON h.hostype_new = ht.hostype_new
-            LEFT JOIN telemedicine t ON h.hospcode = t.hospcode AND t.b_year = ?
+            LEFT JOIN telemed t ON h.hospcode = t.hospcode AND t.b_year = ?
+            LEFT JOIN target tg ON h.hospcode = tg.hospcode AND tg.b_year = ?
             WHERE h.status = '1' 
         `;
-        const params: any[] = [year];
+        const targetYear = (parseInt(year) - 1).toString();
+        const params: any[] = [year, targetYear];
 
         if (affiliation && affiliation !== 'ทั้งหมด') {
             query += " AND ht.hostype_name = ?";

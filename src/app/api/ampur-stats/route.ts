@@ -18,7 +18,7 @@ export async function GET(request: Request) {
             FROM ampur a
             LEFT JOIN hospital h ON a.amp_code = h.amp_code AND h.status = '1'
             ${type ? 'LEFT JOIN hostype ht ON h.hostype = ht.hostype_new' : ''}
-            LEFT JOIN telemedicine t ON h.hospcode = t.hospcode
+            LEFT JOIN telemed t ON h.hospcode = t.hospcode
             ${type ? 'WHERE ht.hostype_list = ?' : ''}
             GROUP BY a.amp_code, a.amp_name
             ORDER BY a.amp_code ASC

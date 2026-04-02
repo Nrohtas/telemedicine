@@ -7,6 +7,7 @@ export async function POST(request: NextRequest) {
         const formData = await request.formData();
         const file = formData.get('file') as File;
         const type = formData.get('type') as string || 'Telemedicine';
+        const date = formData.get('date') as string || null;
 
         if (!file) {
             return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
@@ -75,17 +76,35 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No valid data to import after extraction.' }, { status: 400 });
         }
 
-        const query = `
-            INSERT INTO telemedicine (id, hospcode, b_year, moph, buddycare, result)
+        const compareQuery = `
+            INSERT INTO telemed (id, hospcode, b_year, moph, buddycare, result, moph_date, buddy_care_date, result_date)
             VALUES ?
             ON DUPLICATE KEY UPDATE
+                moph_compare = VALUES(moph) - moph,
+                buddycare_compare = VALUES(buddycare) - buddycare,
+                result_compare = VALUES(result) - result,
+                percentage = CASE WHEN result > 0 THEN ((VALUES(result) - result) / result) * 100 ELSE 0 END,
+                moph_past = moph,
+                moph_past_date = moph_date,
+                buddycare_past = buddycare,
+                buddycare_past_date = buddy_care_date,
+                result_past = result,
+                result_past_date = result_date,
                 b_year = VALUES(b_year),
                 moph = VALUES(moph),
                 buddycare = VALUES(buddycare),
-                result = VALUES(result)
+                result = VALUES(result),
+                moph_date = VALUES(moph_date),
+                buddy_care_date = VALUES(buddy_care_date),
+                result_date = VALUES(result_date)
         `;
 
-        const [results]: any = await pool.query(query, [values]);
+        const compareValues = Object.values(aggregatedData).map((item: any) => {
+            const result = item.moph + item.buddycare;
+            return [item.id, item.hospcode, item.b_year, item.moph, item.buddycare, result, date, date, date];
+        });
+
+        const [results]: any = await pool.query(compareQuery, [compareValues]);
 
         // Log to fileupload table
         try {
