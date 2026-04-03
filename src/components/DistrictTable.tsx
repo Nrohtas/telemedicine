@@ -76,7 +76,12 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
         <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {(() => {
-                    const sortedStats = [...stats].sort((a, b) => (b.total_result || 0) - (a.total_result || 0));
+                    const sortedStats = [...stats].sort((a, b) => {
+                        const rateA = a.target_30 > 0 ? (a.total_result / a.target_30) : 0;
+                        const rateB = b.target_30 > 0 ? (b.total_result / b.target_30) : 0;
+                        if (rateB !== rateA) return rateB - rateA;
+                        return (b.total_result || 0) - (a.total_result || 0); // fallback to total result
+                    });
                     return sortedStats.map((stat) => {
                         const rank = sortedStats.findIndex(s => s.amp_code === stat.amp_code) + 1;
                         const diff = (stat.total_result || 0) - (stat.total_result_past || 0);
@@ -100,10 +105,23 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-col items-end">
-                                                <div className="bg-emerald-100/50 text-emerald-700 px-2 py-1 rounded-lg border border-emerald-200/50 shadow-sm flex flex-col items-center">
-                                                    <span className="text-[10px] font-black leading-none mb-0.5 opacity-60 uppercase tracking-tighter">คิดเป็น</span>
-                                                    <span className="text-sm font-black leading-none">{completionRate.toFixed(1)}%</span>
+                                            <div className="flex flex-col items-end gap-1">
+                                                <div className="flex gap-1.5 text-right">
+                                                    {/* Target Badge */}
+                                                    <div className="bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded-lg border border-rose-100/50 shadow-sm flex flex-col items-center min-w-[60px]">
+                                                        <span className="text-[8px] font-black leading-none mb-0.5 opacity-60 uppercase tracking-tighter">เป้าหมาย</span>
+                                                        <span className="text-[10px] font-black leading-none">{Math.round(stat.target_30).toLocaleString()}</span>
+                                                    </div>
+                                                    {/* Missing Badge */}
+                                                    <div className="bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-lg border border-amber-100/50 shadow-sm flex flex-col items-center min-w-[60px]">
+                                                        <span className="text-[8px] font-black leading-none mb-0.5 opacity-60 uppercase tracking-tighter">ขาดอีก</span>
+                                                        <span className="text-[10px] font-black leading-none">{Math.max(0, Math.round(stat.target_30) - stat.total_result).toLocaleString()}</span>
+                                                    </div>
+                                                    {/* Achievement Badge */}
+                                                    <div className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-lg border border-emerald-100/50 shadow-sm flex flex-col items-center min-w-[60px]">
+                                                        <span className="text-[8px] font-black leading-none mb-0.5 opacity-60 uppercase tracking-tighter">คิดเป็น</span>
+                                                        <span className="text-[10px] font-black leading-none">{completionRate.toFixed(2)}%</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

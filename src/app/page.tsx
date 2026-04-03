@@ -120,7 +120,7 @@ export default function Home() {
       <div className="px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
         {/* Stats Section Header */}
         <div className="lg:col-span-12 flex justify-between items-end mb-[-16px]">
-          <h3 className="text-2xl font-black text-nm-primary tracking-tight">ภาพรวมจังหวัด</h3>
+          <h3 className="text-2xl font-black text-[#1E1B4B] tracking-tight">ภาพรวมจังหวัด</h3>
           <LastUpdate />
         </div>
 
@@ -128,15 +128,15 @@ export default function Home() {
         <div className="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           {/* Main Column: Unified Performance Dashboard (Ultra-Compact Mode) */}
           <div className="lg:col-span-8">
-            <SoftCard className="p-4 h-full group transition-all duration-500 shadow-2xl border-t-4 border-red-500 bg-white/95 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between">
+            <SoftCard className="p-4 h-full group transition-all duration-500 shadow-2xl border-t-4 border-indigo-600 bg-white/95 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between">
               {/* Subtle Gradient Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-red-50/20 to-transparent opacity-50" />
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/20 to-transparent opacity-50" />
 
               <div className="relative z-10 space-y-3">
                 {/* Header: Identity & Comparison Inline */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-red-500 text-white shadow-xl shadow-red-200 ring-4 ring-red-50">
+                    <div className="p-2 rounded-xl bg-indigo-600 text-white shadow-xl shadow-indigo-200 ring-4 ring-indigo-50">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
                         <line x1="8" y1="21" x2="16" y2="21" />
@@ -144,7 +144,7 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-lg font-black text-red-600 tracking-tighter">การให้บริการการแพทย์ทางไกล</h3>
+                      <h3 className="text-lg font-black text-indigo-900 tracking-tighter">การให้บริการการแพทย์ทางไกล</h3>
                     </div>
                   </div>
                 </div>
@@ -160,7 +160,7 @@ export default function Home() {
                       <div className="flex flex-col items-start gap-1">
                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none whitespace-nowrap">ผลงาน ({formatDateThai(globalStats.prev_update_date)})</span>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-2xl font-black text-gray-500 tracking-tighter leading-none">{globalStats.total_result_past.toLocaleString()}</span>
+                          <span className="text-xl font-black text-gray-500 tracking-tighter leading-none">{globalStats.total_result_past.toLocaleString()}</span>
                           <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-none">ครั้ง</span>
                         </div>
                       </div>
@@ -175,7 +175,7 @@ export default function Home() {
                               {globalStats.total_services > globalStats.total_result_past ? '+' : '-'}{Math.abs(globalStats.total_services - globalStats.total_result_past).toLocaleString()}
                             </div>
                           )}
-                          <span className="text-4xl font-black text-indigo-700 tracking-tighter leading-none">{globalStats.total_services.toLocaleString()}</span>
+                          <span className="text-3xl font-black text-indigo-700 tracking-tighter leading-none">{globalStats.total_services.toLocaleString()}</span>
                           <span className="text-[9px] font-bold text-indigo-600 uppercase tracking-widest leading-none">ครั้ง</span>
                         </div>
                       </div>
@@ -187,7 +187,7 @@ export default function Home() {
                         style={{ width: `${globalStats.total_services > 0 ? (globalStats.total_result_past / globalStats.total_services) * 100 : 0}%` }}
                       />
                       <div
-                        className="absolute h-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-1000 ease-out"
+                        className="absolute h-full bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(16,185,129,0.2)]"
                         style={{
                           left: `${globalStats.total_services > 0 ? (globalStats.total_result_past / globalStats.total_services) * 100 : 0}%`,
                           width: `${globalStats.total_services > 0 ? (100 - (globalStats.total_result_past / globalStats.total_services) * 100) : 0}%`
@@ -253,9 +253,9 @@ export default function Home() {
                   {/* Section 3: Achievement KPI (Right - 17% width) */}
                   <div className="lg:col-span-2 bg-gradient-to-br from-teal-50 to-emerald-100 p-3 rounded-2xl text-emerald-900 shadow-sm flex flex-col justify-center items-center relative overflow-hidden border border-emerald-200/50">
                     <div className="absolute top-0 right-0 -mr-4 -mt-4 w-12 h-12 bg-white/40 rounded-full blur-xl" />
-                    <div className="text-[9px] font-black uppercase tracking-[0.15em] text-emerald-600/80 mb-1 text-center whitespace-nowrap">คิดเป็นผลงาน</div>
+                    <div className="text-[12px] font-black uppercase tracking-[0.15em] text-emerald-600/80 mb-1.5 text-center whitespace-nowrap">คิดเป็นผลงาน</div>
                     <div className="text-3xl font-black tracking-tighter leading-none text-emerald-700">
-                      {targetData.target_30 > 0 ? ((globalStats.total_services / targetData.target_30) * 100).toFixed(1) : 0}%
+                      {targetData.target_30 > 0 ? ((globalStats.total_services / targetData.target_30) * 100).toFixed(2) : 0}%
                     </div>
                   </div>
                 </div>
@@ -285,7 +285,6 @@ export default function Home() {
                   <span className="text-3xl font-black tracking-tighter text-[#006837] leading-none">{globalStats.total_moph.toLocaleString()}</span>
                   <span className="text-[9px] font-bold text-[#006837]/60 uppercase tracking-widest">ครั้ง</span>
                 </div>
-                <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5 block">หน่วยงานหลัก</div>
               </div>
             </SoftCard>
 
@@ -310,7 +309,6 @@ export default function Home() {
                   <span className="text-3xl font-black tracking-tighter text-[#00ADEF] leading-none">{globalStats.total_buddycare.toLocaleString()}</span>
                   <span className="text-[9px] font-bold text-[#00ADEF]/60 uppercase tracking-widest">ครั้ง</span>
                 </div>
-                <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5 block">สอน.บัดดี้</div>
               </div>
             </SoftCard>
           </div>
