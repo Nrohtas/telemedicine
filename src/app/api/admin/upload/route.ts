@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
         }
 
         const compareQuery = `
-            INSERT INTO telemed (id, hospcode, b_year, moph, buddycare, result, moph_date, buddy_care_date, result_date)
+            INSERT INTO telemed (id, hospcode, b_year, moph, buddycare, result, moph_date, buddycare_date, result_date)
             VALUES ?
             ON DUPLICATE KEY UPDATE
                 moph_compare = VALUES(moph) - moph,
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
                 moph_past = moph,
                 moph_past_date = moph_date,
                 buddycare_past = buddycare,
-                buddycare_past_date = buddy_care_date,
+                buddycare_past_date = buddycare_date,
                 result_past = result,
                 result_past_date = result_date,
                 b_year = VALUES(b_year),
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
                 buddycare = VALUES(buddycare),
                 result = VALUES(result),
                 moph_date = VALUES(moph_date),
-                buddy_care_date = VALUES(buddy_care_date),
+                buddycare_date = VALUES(buddycare_date),
                 result_date = VALUES(result_date)
         `;
 
