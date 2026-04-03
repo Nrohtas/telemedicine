@@ -14,7 +14,9 @@ export async function GET(request: Request) {
                 a.amp_name,
                 SUM(COALESCE(t.moph, 0)) as mohpromt_count,
                 SUM(COALESCE(t.buddycare, 0)) as sornbuddy_count,
-                SUM(COALESCE(t.result, 0)) as total_result
+                SUM(COALESCE(t.result, 0)) as total_result,
+                SUM(COALESCE(t.result_past, 0)) as total_result_past,
+                (SELECT SUM(COALESCE(tg.op_30, 0)) FROM target tg INNER JOIN hospital h2 ON tg.hospcode = h2.hospcode WHERE h2.amp_code = a.amp_code AND tg.b_year = '2568') as target_30
             FROM ampur a
             LEFT JOIN hospital h ON a.amp_code = h.amp_code AND h.status = '1'
             ${type ? 'LEFT JOIN hostype ht ON h.hostype = ht.hostype_new' : ''}
@@ -33,6 +35,8 @@ export async function GET(request: Request) {
             mohpromt_count: parseInt(row.mohpromt_count) || 0,
             sornbuddy_count: parseInt(row.sornbuddy_count) || 0,
             total_result: parseInt(row.total_result) || 0,
+            total_result_past: parseInt(row.total_result_past) || 0,
+            target_30: parseFloat(row.target_30) || 0,
         }));
 
         return NextResponse.json(stats);

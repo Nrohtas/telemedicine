@@ -149,48 +149,45 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Body Content: Comparison & Integration Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                  {/* Left Side: Result Comparison Scale (Inline Optimized) */}
-                  <div className="space-y-3">
-                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.25em]">เปรียบเทียบผลงานสะสม</div>
+                {/* Body Content: Volume | Gaps | Achievement */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
+                  {/* Section 1: Volume Comparison Scale (Left - 50% width) */}
+                  <div className="lg:col-span-6 space-y-3 px-4 flex flex-col justify-center border-r-0 lg:border-r border-gray-100">
+                    <div className="text-[9px] font-black text-slate-500 uppercase tracking-[0.25em]">ความคืบหน้าผลงาน</div>
 
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {/* Previous (Front) */}
+                      {/* Previous Results Group */}
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none whitespace-nowrap">ผลงาน ({formatDateThai(globalStats.prev_update_date)})</span>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-lg font-black text-gray-500 tracking-tighter leading-none">{globalStats.total_result_past.toLocaleString()}</span>
-                          <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">ครั้งก่อน ({formatDateThai(globalStats.prev_update_date)})</span>
+                          <span className="text-2xl font-black text-gray-500 tracking-tighter leading-none">{globalStats.total_result_past.toLocaleString()}</span>
+                          <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-none">ครั้ง</span>
                         </div>
-
-                        {/* Difference Badge (Middle) */}
-                        {globalStats.total_services !== globalStats.total_result_past && (
-                          <div className={`px-2 py-0.5 rounded-full text-[9px] font-black border ${globalStats.total_services > globalStats.total_result_past ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
-                            {globalStats.total_services > globalStats.total_result_past ? '+' : '-'}{Math.abs(globalStats.total_services - globalStats.total_result_past).toLocaleString()}
-                          </div>
-                        )}
                       </div>
 
-                      {/* Current (End Highlight) */}
-                      <div className="flex items-baseline justify-end gap-1">
-                        <span className="text-4xl font-black text-red-600 tracking-tighter leading-none">{globalStats.total_services.toLocaleString()}</span>
-                        <span className="text-[9px] font-bold text-red-500 uppercase tracking-widest leading-none">
-                          ล่าสุด<br />
-                          <span className="text-[7.5px] text-red-400 font-medium">({formatDateThai(globalStats.last_update_date)})</span>
-                        </span>
+                      {/* Current Highlight Group */}
+                      <div className="flex flex-col items-end gap-1 text-right">
+                        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-none whitespace-nowrap">ผลงาน ({formatDateThai(globalStats.last_update_date)})</span>
+                        <div className="flex items-baseline gap-2">
+                          {/* Difference Badge */}
+                          {globalStats.total_services !== globalStats.total_result_past && (
+                            <div className={`px-2 py-0.5 rounded-full text-[10px] font-black border leading-none ${globalStats.total_services > globalStats.total_result_past ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
+                              {globalStats.total_services > globalStats.total_result_past ? '+' : '-'}{Math.abs(globalStats.total_services - globalStats.total_result_past).toLocaleString()}
+                            </div>
+                          )}
+                          <span className="text-4xl font-black text-indigo-700 tracking-tighter leading-none">{globalStats.total_services.toLocaleString()}</span>
+                          <span className="text-[9px] font-bold text-indigo-600 uppercase tracking-widest leading-none">ครั้ง</span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Comparison Scale Bar */}
-                    <div className="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden relative shadow-inner ring-1 ring-white/50">
-                      {/* Base Value (Previous) */}
+                    <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden relative shadow-inner ring-1 ring-white/50">
                       <div
                         className="absolute h-full bg-gray-200 transition-all duration-1000 ease-out"
                         style={{ width: `${globalStats.total_services > 0 ? (globalStats.total_result_past / globalStats.total_services) * 100 : 0}%` }}
                       />
-                      {/* Growth Value (New) */}
                       <div
-                        className="absolute h-full bg-gradient-to-r from-red-500 to-rose-600 transition-all duration-1000 ease-out shadow-[0_0_6px_rgba(239,68,68,0.4)]"
+                        className="absolute h-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-1000 ease-out"
                         style={{
                           left: `${globalStats.total_services > 0 ? (globalStats.total_result_past / globalStats.total_services) * 100 : 0}%`,
                           width: `${globalStats.total_services > 0 ? (100 - (globalStats.total_result_past / globalStats.total_services) * 100) : 0}%`
@@ -199,42 +196,66 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Right Side: Goals Progress */}
-                  <div className="space-y-3 bg-gradient-to-br from-emerald-50/80 to-teal-50/30 p-3.5 rounded-2xl border border-emerald-100/60 shadow-sm flex flex-col justify-center">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <div className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] leading-none text-left">ผลงานคิดเป็น</div>
-                        <div className="text-3xl font-black text-emerald-600 tracking-tight leading-none">
-                          {targetData.target_30 > 0 ? ((globalStats.total_services / targetData.target_30) * 100).toFixed(1) : 0}%
-                        </div>
-                      </div>
+                  {/* Section 2: Goals & Missing Volume (Center - 33% width) */}
+                  <div className="lg:col-span-4 space-y-3 bg-gradient-to-br from-red-50/50 to-orange-50/20 p-3.5 rounded-2xl border border-red-100/50 flex flex-col justify-center shadow-sm">
+                    <div className="flex flex-col gap-2">
+                      {(() => {
+                        const displayTarget = Math.round(targetData.target_30);
+                        const missing = Math.max(0, displayTarget - globalStats.total_services);
+                        return (
+                          <>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <div className="p-1 rounded bg-red-100/50 text-[#FF6B6B]">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                                  </svg>
+                                </div>
+                                <div className="text-[10px] font-black text-[#FF6B6B] uppercase tracking-[0.2em] leading-none text-left">ผลงานขาดอีก</div>
+                              </div>
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-2xl font-black text-[#FF6B6B] tracking-tight leading-none">{missing.toLocaleString()}</span>
+                                <span className="text-[10px] font-bold text-[#FF6B6B]/70 uppercase tracking-widest leading-none">ครั้ง</span>
+                              </div>
+                            </div>
 
-                      <div className="space-y-1 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <div className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] leading-none">เป้าหมาย 30%</div>
-                          <div className="p-1 rounded-md bg-emerald-100 text-emerald-600">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                              <polyline points="22 4 12 14.01 9 11.01" />
-                            </svg>
-                          </div>
-                        </div>
-                        <div className="flex items-baseline justify-end gap-1 px-1">
-                          <div className="text-xl font-black text-emerald-900 tracking-tight leading-none">
-                            {targetData.target_30.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                          </div>
-                          <div className="text-[9px] font-bold text-emerald-600/70 uppercase tracking-widest">ครั้ง</div>
-                        </div>
-                      </div>
+                            <div className="h-[0.5px] w-full bg-red-200/30" />
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <div className="p-1 rounded bg-red-100 text-red-600">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <circle cx="12" cy="12" r="6" />
+                                    <circle cx="12" cy="12" r="2" />
+                                  </svg>
+                                </div>
+                                <div className="text-[10px] font-black text-red-600 uppercase tracking-[0.2em] leading-none text-left">เป้าหมาย (30%)</div>
+                              </div>
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-2xl font-black text-red-700 tracking-tight leading-none">{displayTarget.toLocaleString()}</span>
+                                <span className="text-[10px] font-bold text-red-600/70 uppercase tracking-widest leading-none">ครั้ง</span>
+                              </div>
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
 
-                    <div className="space-y-1 pt-1">
-                      <div className="h-2 w-full bg-emerald-100/50 rounded-full overflow-hidden shadow-inner ring-1 ring-emerald-50">
-                        <div
-                          className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-                          style={{ width: `${targetData.target_30 > 0 ? Math.min((globalStats.total_services / targetData.target_30) * 100, 100) : 0}%` }}
-                        />
-                      </div>
+                    <div className="h-1.5 w-full bg-red-100/20 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-red-500/60 transition-all duration-1000 ease-out"
+                        style={{ width: `${targetData.target_30 > 0 ? Math.min((globalStats.total_services / targetData.target_30) * 100, 100) : 0}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Section 3: Achievement KPI (Right - 17% width) */}
+                  <div className="lg:col-span-2 bg-gradient-to-br from-teal-50 to-emerald-100 p-3 rounded-2xl text-emerald-900 shadow-sm flex flex-col justify-center items-center relative overflow-hidden border border-emerald-200/50">
+                    <div className="absolute top-0 right-0 -mr-4 -mt-4 w-12 h-12 bg-white/40 rounded-full blur-xl" />
+                    <div className="text-[9px] font-black uppercase tracking-[0.15em] text-emerald-600/80 mb-1 text-center whitespace-nowrap">คิดเป็นผลงาน</div>
+                    <div className="text-3xl font-black tracking-tighter leading-none text-emerald-700">
+                      {targetData.target_30 > 0 ? ((globalStats.total_services / targetData.target_30) * 100).toFixed(1) : 0}%
                     </div>
                   </div>
                 </div>

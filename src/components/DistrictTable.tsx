@@ -10,6 +10,8 @@ interface DistrictStat {
     mohpromt_count: number;
     sornbuddy_count: number;
     total_result: number;
+    total_result_past: number;
+    target_30: number;
 }
 
 interface DistrictTableProps {
@@ -41,7 +43,7 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
                 setError('เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล');
                 setLoading(false);
             });
-    }, []);
+    }, [type]);
 
     if (loading) {
         return (
@@ -72,57 +74,67 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
 
     return (
         <div className="space-y-8">
-
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {(() => {
                     const sortedStats = [...stats].sort((a, b) => (b.total_result || 0) - (a.total_result || 0));
                     return sortedStats.map((stat) => {
                         const rank = sortedStats.findIndex(s => s.amp_code === stat.amp_code) + 1;
-                        const rankColor = rank === 1 ? 'from-amber-400 to-yellow-600' :
-                            rank === 2 ? 'from-slate-300 to-slate-500' :
-                                rank === 3 ? 'from-orange-300 to-orange-500' :
-                                    'from-indigo-400 to-indigo-600';
+                        const diff = (stat.total_result || 0) - (stat.total_result_past || 0);
+                        const completionRate = stat.target_30 > 0 ? (stat.total_result / stat.target_30) * 100 : 0;
 
                         return (
                             <Link key={stat.amp_code} href={`/hospital?amp_code=${stat.amp_code}${type ? `&type=${encodeURIComponent(type)}` : ''}`} className="block">
-                                <SoftCard className="p-6 group hover:scale-[1.02] transition-all duration-500 cursor-pointer h-full relative overflow-hidden">
+                                <SoftCard className="p-5 group hover:scale-[1.01] transition-all duration-500 cursor-pointer h-full relative overflow-hidden border-b-4 border-indigo-200">
                                     {/* Decorative background for the card */}
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/30 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-indigo-100/40 transition-colors" />
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-indigo-100/60 transition-colors" />
 
-                                    <div className="flex items-start justify-between mb-8 relative z-10">
-                                        <div>
-                                            <h4 className="font-black text-xl group-hover:text-nm-primary transition-colors">{stat.amp_name}</h4>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <p className="text-[10px] opacity-40 uppercase font-bold tracking-widest whitespace-nowrap">รหัส {stat.amp_code}</p>
-                                                <div className="w-px h-2 bg-slate-200" />
-                                                <p className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${rank === 1 ? 'text-orange-600' :
-                                                    rank <= 3 ? 'text-orange-400' :
-                                                        'text-slate-400 opacity-60'
-                                                    }`}>อันดับ {rank}</p>
+                                    <div className="flex flex-col gap-6 relative z-10">
+                                        {/* Header Row: Rank and Name */}
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white shadow-lg ${rank === 1 ? 'bg-amber-400' : rank === 2 ? 'bg-slate-400' : rank === 3 ? 'bg-orange-400' : 'bg-indigo-400'}`}>
+                                                    {rank}
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-black text-lg group-hover:text-nm-primary transition-colors leading-tight">{stat.amp_name}</h4>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex flex-col items-end">
+                                                <div className="bg-emerald-100/50 text-emerald-700 px-2 py-1 rounded-lg border border-emerald-200/50 shadow-sm flex flex-col items-center">
+                                                    <span className="text-[10px] font-black leading-none mb-0.5 opacity-60 uppercase tracking-tighter">คิดเป็น</span>
+                                                    <span className="text-sm font-black leading-none">{completionRate.toFixed(1)}%</span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3 bg-indigo-50/50 px-3 py-2 rounded-xl border border-indigo-100/50 group/total group-hover:bg-indigo-100/80 transition-all duration-500">
-                                            <div className="flex items-center gap-1 group-hover:scale-105 transition-transform">
-                                                <div className="w-5 h-5 rounded bg-white flex items-center justify-center shadow-sm">
-                                                    <svg width="12" height="12" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <circle cx="50" cy="22" r="14" fill="#006837" />
-                                                        <path d="M25 40H75V75C75 80 71 84 66 84H34C29 84 25 80 25 75V40Z" stroke="#F6D76E" strokeWidth="10" />
-                                                    </svg>
-                                                </div>
-                                                <span className="text-[10px] font-black text-indigo-300 group-hover:text-indigo-400">+</span>
-                                                <div className="w-5 h-5 rounded bg-white flex items-center justify-center shadow-sm">
-                                                    <svg width="12" height="12" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M10 45L50 15L90 45" stroke="#00ADEF" strokeWidth="12" strokeLinecap="round" />
-                                                        <path d="M25 55C25 55 25 85 50 85C75 85 75 60 75 60" stroke="#F6D76E" strokeWidth="10" fill="none" strokeLinecap="round" />
-                                                    </svg>
+
+                                        {/* Main Stats Row: Past -> Growth -> Latest */}
+                                        <div className="flex items-stretch bg-slate-100 rounded-xl overflow-hidden border border-slate-100 shadow-sm relative">
+                                            {/* Previous Stats (Left) */}
+                                            <div className="flex-1 bg-slate-50/80 p-3 flex flex-col gap-1 border-r border-slate-100">
+                                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">ครั้งก่อน</span>
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-xl font-black text-gray-500 tracking-tighter">{(stat.total_result_past || 0).toLocaleString()}</span>
+                                                    <span className="text-[8px] font-bold text-gray-400 uppercase">ครั้ง</span>
                                                 </div>
                                             </div>
-                                            <div className="flex items-baseline gap-2">
-                                                <span className="text-2xl font-black text-indigo-600 tabular-nums transition-colors">
-                                                    {(stat.total_result || 0).toLocaleString()}
-                                                </span>
-                                                <span className="text-[10px] font-bold text-indigo-400/60 uppercase transition-colors">ครั้ง</span>
+
+                                            {/* Growth Indicator (Center Overlap) */}
+                                            {diff !== 0 && (
+                                                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                                                    <div className={`px-2 py-0.5 rounded-full text-[10px] font-black border shadow-sm flex items-center justify-center whitespace-nowrap bg-white ${diff > 0 ? 'text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
+                                                        {diff > 0 ? '+' : ''}{diff.toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Latest Stats (Right) */}
+                                            <div className="flex-1 bg-white p-3 flex flex-col items-end gap-1 text-right">
+                                                <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest">ผลงานล่าสุด</span>
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-xl font-black text-indigo-700 tracking-tighter">{(stat.total_result || 0).toLocaleString()}</span>
+                                                    <span className="text-[8px] font-bold text-indigo-400 uppercase">ครั้ง</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

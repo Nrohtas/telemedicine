@@ -22,6 +22,12 @@ export async function GET(request: Request) {
                 ht.hostype as hostype_level,
                 COALESCE(t.moph, 0) as moph,
                 COALESCE(t.buddycare, 0) as buddycare,
+                COALESCE(t.moph_past, 0) as moph_past,
+                COALESCE(t.buddycare_past, 0) as buddycare_past,
+                t.moph_date,
+                t.moph_past_date,
+                t.buddycare_date,
+                t.buddycare_past_date,
                 FLOOR(COALESCE(tg.op_30, 0)) as op_30
             FROM hospital h
             LEFT JOIN (

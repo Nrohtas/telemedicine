@@ -19,6 +19,12 @@ interface Hospital {
     hostype_level: string;
     moph: number;
     buddycare: number;
+    moph_past: number;
+    buddycare_past: number;
+    moph_date?: string;
+    moph_past_date?: string;
+    buddycare_date?: string;
+    buddycare_past_date?: string;
     op_30: number;
 }
 
@@ -123,7 +129,8 @@ function HospitalDirectoryContent() {
                     "เป้าหมาย 30%": h.op_30,
                     "หมอพร้อม STATION": h.moph,
                     "สอน.บัดดี้": h.buddycare,
-                    "รวม": h.moph + h.buddycare
+                    "รวม": h.moph + h.buddycare,
+                    "ขาดอีก": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0
                 });
             });
 
@@ -142,7 +149,8 @@ function HospitalDirectoryContent() {
                 "เป้าหมาย 30%": districtTarget,
                 "หมอพร้อม STATION": districtMoph,
                 "สอน.บัดดี้": districtBuddy,
-                "รวม": districtMoph + districtBuddy
+                "รวม": districtMoph + districtBuddy,
+                "ขาดอีก": districtTarget > 0 ? Math.max(0, districtTarget - (districtMoph + districtBuddy)) : 0
             });
         });
 
@@ -162,7 +170,8 @@ function HospitalDirectoryContent() {
                 "เป้าหมาย 30%": grandTarget,
                 "หมอพร้อม STATION": grandMoph,
                 "สอน.บัดดี้": grandBuddy,
-                "รวม": grandMoph + grandBuddy
+                "รวม": grandMoph + grandBuddy,
+                "ขาดอีก": grandTarget > 0 ? Math.max(0, grandTarget - (grandMoph + grandBuddy)) : 0
             });
         }
 
@@ -187,6 +196,7 @@ function HospitalDirectoryContent() {
             { wch: 20 }, // หมอพร้อม STATION
             { wch: 15 }, // สอน.บัดดี้
             { wch: 10 }, // รวม
+            { wch: 15 }, // ขาดอีก
         ];
         ws['!cols'] = wscols;
 
@@ -222,6 +232,58 @@ function HospitalDirectoryContent() {
         if (text.includes('ศูนย์สุขภาพ')) return 'text-indigo-900';
         if (text.includes('นอกสังกัด')) return 'text-black';
         return 'text-slate-500';
+    };
+
+    const formatThaiDate = (dateStr: string | null | undefined) => {
+        if (!dateStr) return '';
+        try {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return '';
+            const day = date.getDate();
+            const monthShort = date.toLocaleDateString('th-TH', { month: 'short' });
+            return `${day} ${monthShort}`;
+        } catch {
+            return '';
+        }
+    };
+
+    const renderComparisonCell = (current: number, past: number, textClass: string) => {
+        const diff = current - past;
+        return (
+            <div className="flex flex-col items-end gap-0.5">
+                <div className="flex items-center gap-1.5">
+                    {diff > 0 && (
+                        <span className="text-[10px] font-bold px-1 rounded-sm bg-emerald-50 text-emerald-600">
+                            +{diff.toLocaleString()}
+                        </span>
+                    )}
+                    {diff < 0 && (
+                        <span className="text-[10px] font-bold px-1 rounded-sm bg-red-50 text-red-600">
+                            {diff.toLocaleString()}
+                        </span>
+                    )}
+                    <span className={textClass}>{current.toLocaleString()}</span>
+                </div>
+                <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap">เดิม {past.toLocaleString()}</span>
+            </div>
+        );
+    };
+
+    // Helper to get dates for header
+    const mophDate = data.flatMap(g => g.hospitals).find(h => h.moph_date)?.moph_date;
+    const mophPastDate = data.flatMap(g => g.hospitals).find(h => h.moph_past_date)?.moph_past_date;
+    const buddyDate = data.flatMap(g => g.hospitals).find(h => h.buddycare_date)?.buddycare_date;
+    const buddyPastDate = data.flatMap(g => g.hospitals).find(h => h.buddycare_past_date)?.buddycare_past_date;
+
+    const renderHeaderDate = (current?: string, past?: string) => {
+        if (!current && !past) return null;
+        return (
+            <div className="text-[9px] opacity-60 font-normal leading-tight mt-0.5">
+                {current && <span>ใหม่: {formatThaiDate(current)}</span>}
+                {current && past && <span className="mx-1">/</span>}
+                {past && <span>เดิม: {formatThaiDate(past)}</span>}
+            </div>
+        );
     };
 
     return (
@@ -297,10 +359,19 @@ function HospitalDirectoryContent() {
                                                     <th className="px-6 py-4 w-40 whitespace-nowrap">อำเภอ</th>
                                                     <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
                                                     <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
-                                                    <th className="px-6 py-4 w-32 text-right text-gray-500 whitespace-nowrap">เป้าหมาย 30%</th>
-                                                    <th className="px-6 py-4 w-32 text-right text-[#006837] whitespace-nowrap">หมอพร้อม STATION</th>
-                                                    <th className="px-6 py-4 w-32 text-right text-[#00ADEF] whitespace-nowrap">สอน.บัดดี้</th>
-                                                    <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">รวม</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-red-600 whitespace-nowrap">เป้าหมาย 30%</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-[#006837] whitespace-nowrap">
+                                                        หมอพร้อม STATION
+                                                        {renderHeaderDate(mophDate, mophPastDate)}
+                                                    </th>
+                                                    <th className="px-6 py-4 w-32 text-right text-[#00ADEF] whitespace-nowrap">
+                                                        สอน.บัดดี้
+                                                        {renderHeaderDate(buddyDate, buddyPastDate)}
+                                                    </th>
+                                                    <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">
+                                                        รวม
+                                                    </th>
+                                                    <th className="px-6 py-4 w-32 text-right text-[#FF6B6B] whitespace-nowrap">ขาดอีก</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-100">
@@ -337,16 +408,21 @@ function HospitalDirectoryContent() {
                                                                     })()}
                                                                 </td>
                                                                 <td className="px-6 py-3 text-right">
-                                                                    <span className="text-sm font-bold text-gray-400">{hospital.op_30.toLocaleString()}</span>
+                                                                    <span className="text-sm font-bold text-red-600">{hospital.op_30.toLocaleString()}</span>
                                                                 </td>
-                                                                <td className="px-6 py-3 text-right">
-                                                                    <span className="text-sm font-bold text-[#006837]">{hospital.moph.toLocaleString()}</span>
+                                                                <td className="px-6 py-3">
+                                                                    {renderComparisonCell(hospital.moph, hospital.moph_past, "text-sm font-bold text-[#006837]")}
                                                                 </td>
-                                                                <td className="px-6 py-3 text-right">
-                                                                    <span className="text-sm font-bold text-[#00ADEF]">{hospital.buddycare.toLocaleString()}</span>
+                                                                <td className="px-6 py-3">
+                                                                    {renderComparisonCell(hospital.buddycare, hospital.buddycare_past, "text-sm font-bold text-[#00ADEF]")}
                                                                 </td>
-                                                                <td className="px-6 py-3 text-right bg-indigo-50/30">
-                                                                    <span className="text-sm font-black text-indigo-700">{(hospital.moph + hospital.buddycare).toLocaleString()}</span>
+                                                                <td className="px-6 py-3 bg-indigo-50/30">
+                                                                    {renderComparisonCell(hospital.moph + hospital.buddycare, hospital.moph_past + hospital.buddycare_past, "text-sm font-black text-indigo-700")}
+                                                                </td>
+                                                                <td className="px-6 py-3 text-right bg-red-50/30">
+                                                                    <span className="text-sm font-bold text-[#FF6B6B]">
+                                                                        {(hospital.op_30 > 0 ? Math.max(0, hospital.op_30 - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
+                                                                    </span>
                                                                 </td>
                                                             </tr>
                                                         );
@@ -356,24 +432,39 @@ function HospitalDirectoryContent() {
                                                     <td colSpan={5} className="px-6 py-5 text-nm-primary text-right text-base">
                                                         รวมทั้งจังหวัด
                                                     </td>
-                                                    <td className="px-6 py-5 text-right font-bold text-gray-500">
+                                                    <td className="px-6 py-5 text-right font-bold text-red-600">
                                                         <span className="text-xl">
                                                             {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0).toLocaleString()}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-5 text-right">
-                                                        <span className="text-xl text-[#006837]">
-                                                            {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph, 0), 0).toLocaleString()}
-                                                        </span>
+                                                    <td className="px-6 py-5">
+                                                        {renderComparisonCell(
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph, 0), 0),
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph_past, 0), 0),
+                                                            "text-xl font-bold text-[#006837]"
+                                                        )}
                                                     </td>
-                                                    <td className="px-6 py-5 text-right">
-                                                        <span className="text-xl text-[#00ADEF]">
-                                                            {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare, 0), 0).toLocaleString()}
-                                                        </span>
+                                                    <td className="px-6 py-5">
+                                                        {renderComparisonCell(
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare, 0), 0),
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare_past, 0), 0),
+                                                            "text-xl font-bold text-[#00ADEF]"
+                                                        )}
                                                     </td>
-                                                    <td className="px-6 py-5 text-right bg-indigo-50/50">
-                                                        <span className="text-xl font-black text-indigo-700">
-                                                            {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0).toLocaleString()}
+                                                    <td className="px-6 py-5 bg-indigo-50/50">
+                                                        {renderComparisonCell(
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0),
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph_past + h.buddycare_past, 0), 0),
+                                                            "text-xl font-black text-indigo-700"
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-5 text-right bg-red-50/50">
+                                                        <span className="text-xl font-bold text-[#FF6B6B]">
+                                                            {(() => {
+                                                                const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0);
+                                                                const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
+                                                                return (target > 0 ? Math.max(0, target - current) : 0).toLocaleString();
+                                                            })()}
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -415,10 +506,19 @@ function HospitalDirectoryContent() {
                                                         <th className="px-6 py-4 whitespace-nowrap">ชื่อหน่วยบริการ</th>
                                                         <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
                                                         <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
-                                                        <th className="px-6 py-4 w-32 text-right text-gray-500 whitespace-nowrap">เป้าหมาย 30%</th>
-                                                        <th className="px-6 py-4 w-32 text-right text-[#006837] whitespace-nowrap">หมอพร้อม STATION</th>
-                                                        <th className="px-6 py-4 w-32 text-right text-[#00ADEF] whitespace-nowrap">สอน.บัดดี้</th>
-                                                        <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">รวม</th>
+                                                        <th className="px-6 py-4 w-32 text-right text-red-600 whitespace-nowrap">เป้าหมาย 30%</th>
+                                                        <th className="px-6 py-4 w-32 text-right text-[#006837] whitespace-nowrap">
+                                                            หมอพร้อม STATION
+                                                            {renderHeaderDate(mophDate, mophPastDate)}
+                                                        </th>
+                                                        <th className="px-6 py-4 w-32 text-right text-[#00ADEF] whitespace-nowrap">
+                                                            สอน.บัดดี้
+                                                            {renderHeaderDate(buddyDate, buddyPastDate)}
+                                                        </th>
+                                                        <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">
+                                                            รวม
+                                                        </th>
+                                                        <th className="px-6 py-4 w-32 text-right text-[#FF6B6B] whitespace-nowrap">ขาดอีก</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-100">
@@ -449,16 +549,21 @@ function HospitalDirectoryContent() {
                                                                     })()}
                                                                 </td>
                                                                 <td className="px-6 py-3 text-right">
-                                                                    <span className="text-sm font-bold text-gray-400">{hospital.op_30.toLocaleString()}</span>
+                                                                    <span className="text-sm font-bold text-[#FF6B6B]">{hospital.op_30.toLocaleString()}</span>
                                                                 </td>
-                                                                <td className="px-6 py-3 text-right">
-                                                                    <span className="text-sm font-bold text-[#006837]">{hospital.moph.toLocaleString()}</span>
+                                                                <td className="px-6 py-3">
+                                                                    {renderComparisonCell(hospital.moph, hospital.moph_past, "text-sm font-bold text-[#006837]")}
                                                                 </td>
-                                                                <td className="px-6 py-3 text-right">
-                                                                    <span className="text-sm font-bold text-[#00ADEF]">{hospital.buddycare.toLocaleString()}</span>
+                                                                <td className="px-6 py-3">
+                                                                    {renderComparisonCell(hospital.buddycare, hospital.buddycare_past, "text-sm font-bold text-[#00ADEF]")}
                                                                 </td>
-                                                                <td className="px-6 py-3 text-right bg-indigo-50/30">
-                                                                    <span className="text-sm font-black text-indigo-700">{(hospital.moph + hospital.buddycare).toLocaleString()}</span>
+                                                                <td className="px-6 py-3 bg-indigo-50/30">
+                                                                    {renderComparisonCell(hospital.moph + hospital.buddycare, hospital.moph_past + hospital.buddycare_past, "text-sm font-black text-indigo-700")}
+                                                                </td>
+                                                                <td className="px-6 py-3 text-right bg-red-50/30">
+                                                                    <span className="text-sm font-bold text-[#FF6B6B]">
+                                                                        {(hospital.op_30 > 0 ? Math.max(0, hospital.op_30 - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
+                                                                    </span>
                                                                 </td>
                                                             </tr>
                                                         );
@@ -469,23 +574,38 @@ function HospitalDirectoryContent() {
                                                             รวมทั้งหมด
                                                         </td>
                                                         <td className="px-6 py-4 text-right">
-                                                            <span className="text-base text-gray-500">
+                                                            <span className="text-base font-bold text-red-600">
                                                                 {group.hospitals.reduce((sum, h) => sum + h.op_30, 0).toLocaleString()}
                                                             </span>
                                                         </td>
-                                                        <td className="px-6 py-4 text-right">
-                                                            <span className="text-base text-[#006837]">
-                                                                {group.hospitals.reduce((sum, h) => sum + h.moph, 0).toLocaleString()}
-                                                            </span>
+                                                        <td className="px-6 py-4">
+                                                            {renderComparisonCell(
+                                                                group.hospitals.reduce((sum, h) => sum + h.moph, 0),
+                                                                group.hospitals.reduce((sum, h) => sum + h.moph_past, 0),
+                                                                "text-base font-bold text-[#006837]"
+                                                            )}
                                                         </td>
-                                                        <td className="px-6 py-4 text-right">
-                                                            <span className="text-base text-[#00ADEF]">
-                                                                {group.hospitals.reduce((sum, h) => sum + h.buddycare, 0).toLocaleString()}
-                                                            </span>
+                                                        <td className="px-6 py-4">
+                                                            {renderComparisonCell(
+                                                                group.hospitals.reduce((sum, h) => sum + h.buddycare, 0),
+                                                                group.hospitals.reduce((sum, h) => sum + h.buddycare_past, 0),
+                                                                "text-base font-bold text-[#00ADEF]"
+                                                            )}
                                                         </td>
-                                                        <td className="px-6 py-4 text-right bg-indigo-50/30">
-                                                            <span className="text-base font-black text-indigo-700">
-                                                                {group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0).toLocaleString()}
+                                                        <td className="px-6 py-4 bg-indigo-50/30">
+                                                            {renderComparisonCell(
+                                                                group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0),
+                                                                group.hospitals.reduce((sum, h) => sum + h.moph_past + h.buddycare_past, 0),
+                                                                "text-base font-black text-indigo-700"
+                                                            )}
+                                                        </td>
+                                                        <td className="px-6 py-4 text-right bg-red-50/30">
+                                                            <span className="text-base font-bold text-[#FF6B6B]">
+                                                                {(() => {
+                                                                    const target = group.hospitals.reduce((sum, h) => sum + h.op_30, 0);
+                                                                    const current = group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0);
+                                                                    return (target > 0 ? Math.max(0, target - current) : 0).toLocaleString();
+                                                                })()}
                                                             </span>
                                                         </td>
                                                     </tr>
