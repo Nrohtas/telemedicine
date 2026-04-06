@@ -144,7 +144,7 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-lg font-black text-indigo-900 tracking-tighter">การให้บริการการแพทย์ทางไกล</h3>
+                      <h3 className="text-lg font-black text-indigo-900 tracking-tighter">การให้บริการแพทย์ทางไกล</h3>
                     </div>
                   </div>
                 </div>
@@ -158,7 +158,7 @@ export default function Home() {
                     <div className="flex items-center justify-between">
                       {/* Previous Results Group */}
                       <div className="flex flex-col items-start gap-1">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none whitespace-nowrap">ผลงาน ({formatDateThai(globalStats.prev_update_date)})</span>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none whitespace-nowrap">ผลงานครั้งก่อน ({formatDateThai(globalStats.prev_update_date)})</span>
                         <div className="flex items-baseline gap-1">
                           <span className="text-xl font-black text-gray-500 tracking-tighter leading-none">{globalStats.total_result_past.toLocaleString()}</span>
                           <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-none">ครั้ง</span>
@@ -167,7 +167,7 @@ export default function Home() {
 
                       {/* Current Highlight Group */}
                       <div className="flex flex-col items-end gap-1 text-right">
-                        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-none whitespace-nowrap">ผลงาน ({formatDateThai(globalStats.last_update_date)})</span>
+                        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-none whitespace-nowrap">ผลงานล่าสุด ({formatDateThai(globalStats.last_update_date)})</span>
                         <div className="flex items-baseline gap-2">
                           {/* Difference Badge */}
                           {globalStats.total_services !== globalStats.total_result_past && (
