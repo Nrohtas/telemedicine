@@ -32,6 +32,8 @@ interface NavbarProps {
     onSignOut?: () => void;
     searchValue?: string;
     onSearchChange?: (value: string) => void;
+    selectedSort?: string;
+    onSortChange?: (value: string) => void;
 }
 
 const Navbar = ({
@@ -48,7 +50,9 @@ const Navbar = ({
     showSignOut = false,
     onSignOut,
     searchValue,
-    onSearchChange
+    onSearchChange,
+    selectedSort,
+    onSortChange
 }: NavbarProps) => {
     const pathname = usePathname();
     const [fiscalYear, setFiscalYear] = useState('');
@@ -368,13 +372,37 @@ const Navbar = ({
                                         />
                                     </div>
 
+                                    {/* Sort Filter */}
+                                    <div className="min-w-[150px]">
+                                        <SoftSelect
+                                            label={
+                                                <div className="flex items-center gap-1.5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                                                    </svg>
+                                                    <span>เรียงลำดับ</span>
+                                                </div>
+                                            }
+                                            options={[
+                                                { label: 'รหัสหน่วยบริการ', value: 'hospcode' },
+                                                { label: 'เป้าหมาย', value: 'target' },
+                                                { label: 'ยอดรวม', value: 'total' },
+                                                { label: '% (ผลงาน)', value: 'percent' },
+                                                { label: 'ขาดอีก', value: 'gap' },
+                                            ]}
+                                            value={selectedSort || 'percent'}
+                                            onChange={onSortChange || (() => { })}
+                                            className="w-full"
+                                        />
+                                    </div>
+
                                     {/* Search Box */}
-                                    <div className="min-w-[120px] flex flex-col gap-1 relative group">
+                                    <div className="w-28 flex flex-col gap-1 relative group">
                                         <label className="text-[10px] font-bold uppercase tracking-wider opacity-50 px-2 transition-opacity group-focus-within:opacity-80 flex items-center gap-1.5">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                             </svg>
-                                            <span>ค้นหาหน่วยบริการ</span>
+                                            <span>ค้นหา</span>
                                         </label>
                                         <div className="relative">
                                             <input

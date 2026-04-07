@@ -62,6 +62,7 @@ function HospitalDirectoryContent() {
     });
     const [selectedStation, setSelectedStation] = useState("ทั้งหมด");
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedSort, setSelectedSort] = useState("percent");
 
     useEffect(() => {
         fetch('/telemedicine/api/affiliations')
@@ -115,9 +116,24 @@ function HospitalDirectoryContent() {
         const exportRows: any[] = [];
         let index = 1;
 
-        filteredData.forEach(group => {
-            // Add Hospital Rows
-            group.hospitals.forEach(h => {
+        const sortHospitals = (hospitals: Hospital[]) => {
+            return [...hospitals].sort((a, b) => {
+                if (selectedSort === 'hospcode') return a.hospcode.localeCompare(b.hospcode);
+                if (selectedSort === 'target') return b.op_30 - a.op_30;
+                if (selectedSort === 'total') return (b.moph + b.buddycare) - (a.moph + a.buddycare);
+                if (selectedSort === 'gap') return (b.op_30 - (b.moph + b.buddycare)) - (a.op_30 - (a.moph + a.buddycare));
+
+                // Default: percent
+                const getPercent = (h: any) => h.op_30 > 0 ? ((h.moph + h.buddycare) / h.op_30 * 100) : 0;
+                return getPercent(b) - getPercent(a);
+            });
+        };
+
+        if (selectedDistrict === 'ทั้งหมด') {
+            const allHospitals = filteredData.flatMap(group => group.hospitals);
+            const sortedHospitals = sortHospitals(allHospitals);
+
+            sortedHospitals.forEach(h => {
                 const typeLabel = h.hostype_level || (h.hostype === '05' ? 'รพ.' : h.hostype === '06' ? 'รพท.' : h.hostype === '07' ? 'รพศ.' : 'รพ.สต.');
                 exportRows.push({
                     "ลำดับ": index++,
@@ -126,7 +142,7 @@ function HospitalDirectoryContent() {
                     "เป้าหมาย 30%": h.op_30,
                     "หมอพร้อม": h.moph,
                     "สอน.บัดดี้": h.buddycare,
-                    "รวม": h.moph + h.buddycare,
+                    "ยอดรวม": h.moph + h.buddycare,
                     "เปอร์เซ็นต์": h.op_30 > 0 ? ((h.moph + h.buddycare) / h.op_30 * 100).toFixed(2) : "0.00",
                     "ขาดอีก": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0,
                     "ตำบล": h.tmb_name || '-',
@@ -134,29 +150,51 @@ function HospitalDirectoryContent() {
                     "ประเภท": typeLabel
                 });
             });
+        } else {
+            filteredData.forEach(group => {
+                const sortedHospitals = sortHospitals(group.hospitals);
+                // Add Hospital Rows
+                sortedHospitals.forEach(h => {
+                    const typeLabel = h.hostype_level || (h.hostype === '05' ? 'รพ.' : h.hostype === '06' ? 'รพท.' : h.hostype === '07' ? 'รพศ.' : 'รพ.สต.');
+                    exportRows.push({
+                        "ลำดับ": index++,
+                        "รหัส": h.hospcode,
+                        "ชื่อหน่วยบริการ": h.hospname,
+                        "เป้าหมาย 30%": h.op_30,
+                        "หมอพร้อม": h.moph,
+                        "สอน.บัดดี้": h.buddycare,
+                        "รวม": h.moph + h.buddycare,
+                        "เปอร์เซ็นต์": h.op_30 > 0 ? ((h.moph + h.buddycare) / h.op_30 * 100).toFixed(2) : "0.00",
+                        "ขาดอีก": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0,
+                        "ตำบล": h.tmb_name || '-',
+                        "อำเภอ": h.amp_name,
+                        "ประเภท": typeLabel
+                    });
+                });
 
-            // Add District Summary Row (only if multiple districts or if it's the only district shown)
-            const districtMoph = group.hospitals.reduce((sum, h) => sum + h.moph, 0);
-            const districtBuddy = group.hospitals.reduce((sum, h) => sum + h.buddycare, 0);
-            const districtTarget = group.hospitals.reduce((sum, h) => sum + h.op_30, 0);
+                // Add District Summary Row
+                const districtMoph = group.hospitals.reduce((sum, h) => sum + h.moph, 0);
+                const districtBuddy = group.hospitals.reduce((sum, h) => sum + h.buddycare, 0);
+                const districtTarget = group.hospitals.reduce((sum, h) => sum + h.op_30, 0);
 
-            exportRows.push({
-                "ลำดับ": "",
-                "รหัส": "",
-                "ชื่อหน่วยบริการ": `รวมอำเภอ${group.amp_name}`,
-                "เป้าหมาย 30%": districtTarget,
-                "หมอพร้อม": districtMoph,
-                "สอน.บัดดี้": districtBuddy,
-                "รวม": districtMoph + districtBuddy,
-                "เปอร์เซ็นต์": districtTarget > 0 ? ((districtMoph + districtBuddy) / districtTarget * 100).toFixed(2) : "0.00",
-                "ขาดอีก": districtTarget > 0 ? Math.max(0, districtTarget - (districtMoph + districtBuddy)) : 0,
-                "ตำบล": "",
-                "อำเภอ": "",
-                "ประเภท": ""
+                exportRows.push({
+                    "ลำดับ": "",
+                    "รหัส": "",
+                    "ชื่อหน่วยบริการ": `รวมอำเภอ${group.amp_name}`,
+                    "เป้าหมาย 30%": districtTarget,
+                    "หมอพร้อม": districtMoph,
+                    "สอน.บัดดี้": districtBuddy,
+                    "ยอดรวม": districtMoph + districtBuddy,
+                    "เปอร์เซ็นต์": districtTarget > 0 ? ((districtMoph + districtBuddy) / districtTarget * 100).toFixed(2) : "0.00",
+                    "ขาดอีก": districtTarget > 0 ? Math.max(0, districtTarget - (districtMoph + districtBuddy)) : 0,
+                    "ตำบล": "",
+                    "อำเภอ": "",
+                    "ประเภท": ""
+                });
             });
-        });
+        }
 
-        // Add Grand Total Row if searching 'ทั้งหมด' or multiple districts
+        // Add Grand Total Row if multiple districts
         if (selectedDistrict === 'ทั้งหมด' || filteredData.length > 1) {
             const grandMoph = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph, 0), 0);
             const grandBuddy = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare, 0), 0);
@@ -169,7 +207,7 @@ function HospitalDirectoryContent() {
                 "เป้าหมาย 30%": grandTarget,
                 "หมอพร้อม": grandMoph,
                 "สอน.บัดดี้": grandBuddy,
-                "รวม": grandMoph + grandBuddy,
+                "ยอดรวม": grandMoph + grandBuddy,
                 "เปอร์เซ็นต์": grandTarget > 0 ? ((grandMoph + grandBuddy) / grandTarget * 100).toFixed(2) : "0.00",
                 "ขาดอีก": grandTarget > 0 ? Math.max(0, grandTarget - (grandMoph + grandBuddy)) : 0,
                 "ตำบล": "",
@@ -304,6 +342,8 @@ function HospitalDirectoryContent() {
                 showAllDistrict={true}
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
+                selectedSort={selectedSort}
+                onSortChange={setSelectedSort}
             />
 
             <div className="px-6 max-w-7xl mx-auto pt-6 flex justify-end items-center gap-3">
@@ -370,7 +410,7 @@ function HospitalDirectoryContent() {
                                                         {renderHeaderDate(buddyDate, buddyPastDate)}
                                                     </th>
                                                     <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">
-                                                        รวม
+                                                        ยอดรวม
                                                     </th>
                                                     <th className="px-6 py-4 w-32 text-right text-emerald-600 whitespace-nowrap">
                                                         <div className="flex items-center justify-end group">
@@ -392,7 +432,16 @@ function HospitalDirectoryContent() {
                                             <tbody className="divide-y divide-gray-100">
                                                 {filteredData
                                                     .flatMap(group => group.hospitals)
-                                                    .sort((a, b) => a.hospcode.localeCompare(b.hospcode))
+                                                    .sort((a, b) => {
+                                                        if (selectedSort === 'hospcode') return a.hospcode.localeCompare(b.hospcode);
+                                                        if (selectedSort === 'target') return b.op_30 - a.op_30;
+                                                        if (selectedSort === 'total') return (b.moph + b.buddycare) - (a.moph + a.buddycare);
+                                                        if (selectedSort === 'gap') return (b.op_30 - (b.moph + b.buddycare)) - (a.op_30 - (a.moph + a.buddycare));
+
+                                                        // Default: percent
+                                                        const getPercent = (h: any) => h.op_30 > 0 ? ((h.moph + h.buddycare) / h.op_30 * 100) : 0;
+                                                        return getPercent(b) - getPercent(a);
+                                                    })
                                                     .map((hospital) => {
                                                         const rowColor = getRowColor(hospital.hostype_name);
                                                         return (
@@ -544,7 +593,7 @@ function HospitalDirectoryContent() {
                                                             {renderHeaderDate(buddyDate, buddyPastDate)}
                                                         </th>
                                                         <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">
-                                                            รวม
+                                                            ยอดรวม
                                                         </th>
                                                         <th className="px-6 py-4 w-32 text-right text-emerald-600 whitespace-nowrap">
                                                             <div className="flex items-center justify-end group">
@@ -564,7 +613,18 @@ function HospitalDirectoryContent() {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-100">
-                                                    {group.hospitals.map((hospital) => {
+                                                    {[...group.hospitals]
+                                                        .sort((a, b) => {
+                                                            if (selectedSort === 'hospcode') return a.hospcode.localeCompare(b.hospcode);
+                                                            if (selectedSort === 'target') return b.op_30 - a.op_30;
+                                                            if (selectedSort === 'total') return (b.moph + b.buddycare) - (a.moph + a.buddycare);
+                                                            if (selectedSort === 'gap') return (b.op_30 - (b.moph + b.buddycare)) - (a.op_30 - (a.moph + a.buddycare));
+
+                                                            // Default: percent
+                                                            const getPercent = (h: any) => h.op_30 > 0 ? ((h.moph + h.buddycare) / h.op_30 * 100) : 0;
+                                                            return getPercent(b) - getPercent(a);
+                                                        })
+                                                        .map((hospital) => {
                                                         const rowColor = getRowColor(hospital.hostype_name);
                                                         return (
                                                             <tr key={hospital.hospcode} className="transition-colors duration-200">
