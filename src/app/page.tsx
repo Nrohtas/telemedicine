@@ -225,9 +225,8 @@ export default function Home() {
                               <div className="flex items-center gap-1.5">
                                 <div className="p-1 rounded bg-red-100 text-red-600">
                                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="12" r="10" />
-                                    <circle cx="12" cy="12" r="6" />
-                                    <circle cx="12" cy="12" r="2" />
+                                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+                                    <line x1="4" y1="22" x2="4" y2="15" />
                                   </svg>
                                 </div>
                                 <div className="text-[10px] font-black text-red-600 uppercase tracking-[0.2em] leading-none text-left">เป้าหมาย (30%)</div>
