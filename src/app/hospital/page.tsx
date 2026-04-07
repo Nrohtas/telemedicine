@@ -123,15 +123,15 @@ function HospitalDirectoryContent() {
                     "ลำดับ": index++,
                     "รหัส": h.hospcode,
                     "ชื่อหน่วยบริการ": h.hospname,
-                    "อำเภอ": h.amp_name,
-                    "ตำบล": h.tmb_name || '-',
-                    "ประเภท": typeLabel,
                     "เป้าหมาย 30%": h.op_30,
+                    "หมอพร้อม": h.moph,
                     "สอน.บัดดี้": h.buddycare,
-                    "หมอพร้อม STATION": h.moph,
                     "รวม": h.moph + h.buddycare,
                     "เปอร์เซ็นต์": h.op_30 > 0 ? ((h.moph + h.buddycare) / h.op_30 * 100).toFixed(2) : "0.00",
-                    "ขาดอีก": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0
+                    "ขาดอีก": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0,
+                    "ตำบล": h.tmb_name || '-',
+                    "อำเภอ": h.amp_name,
+                    "ประเภท": typeLabel
                 });
             });
 
@@ -144,15 +144,15 @@ function HospitalDirectoryContent() {
                 "ลำดับ": "",
                 "รหัส": "",
                 "ชื่อหน่วยบริการ": `รวมอำเภอ${group.amp_name}`,
-                "อำเภอ": "",
-                "ตำบล": "",
-                "ประเภท": "",
                 "เป้าหมาย 30%": districtTarget,
+                "หมอพร้อม": districtMoph,
                 "สอน.บัดดี้": districtBuddy,
-                "หมอพร้อม STATION": districtMoph,
                 "รวม": districtMoph + districtBuddy,
                 "เปอร์เซ็นต์": districtTarget > 0 ? ((districtMoph + districtBuddy) / districtTarget * 100).toFixed(2) : "0.00",
-                "ขาดอีก": districtTarget > 0 ? Math.max(0, districtTarget - (districtMoph + districtBuddy)) : 0
+                "ขาดอีก": districtTarget > 0 ? Math.max(0, districtTarget - (districtMoph + districtBuddy)) : 0,
+                "ตำบล": "",
+                "อำเภอ": "",
+                "ประเภท": ""
             });
         });
 
@@ -166,15 +166,15 @@ function HospitalDirectoryContent() {
                 "ลำดับ": "",
                 "รหัส": "",
                 "ชื่อหน่วยบริการ": "รวมทั้งจังหวัด",
-                "อำเภอ": "",
-                "ตำบล": "",
-                "ประเภท": "",
                 "เป้าหมาย 30%": grandTarget,
+                "หมอพร้อม": grandMoph,
                 "สอน.บัดดี้": grandBuddy,
-                "หมอพร้อม STATION": grandMoph,
                 "รวม": grandMoph + grandBuddy,
                 "เปอร์เซ็นต์": grandTarget > 0 ? ((grandMoph + grandBuddy) / grandTarget * 100).toFixed(2) : "0.00",
-                "ขาดอีก": grandTarget > 0 ? Math.max(0, grandTarget - (grandMoph + grandBuddy)) : 0
+                "ขาดอีก": grandTarget > 0 ? Math.max(0, grandTarget - (grandMoph + grandBuddy)) : 0,
+                "ตำบล": "",
+                "อำเภอ": "",
+                "ประเภท": ""
             });
         }
 
@@ -192,15 +192,15 @@ function HospitalDirectoryContent() {
             { wch: 8 },  // ลำดับ
             { wch: 10 }, // รหัส
             { wch: 40 }, // ชื่อหน่วยบริการ
-            { wch: 15 }, // อำเภอ
-            { wch: 15 }, // ตำบล
-            { wch: 15 }, // ประเภท
             { wch: 15 }, // เป้าหมาย 30%
+            { wch: 15 }, // หมอพร้อม
             { wch: 15 }, // สอน.บัดดี้
-            { wch: 20 }, // หมอพร้อม STATION
             { wch: 10 }, // รวม
             { wch: 12 }, // เปอร์เซ็นต์
             { wch: 15 }, // ขาดอีก
+            { wch: 15 }, // ตำบล
+            { wch: 15 }, // อำเภอ
+            { wch: 15 }, // ประเภท
         ];
         ws['!cols'] = wscols;
 
@@ -245,7 +245,8 @@ function HospitalDirectoryContent() {
             if (isNaN(date.getTime())) return '';
             const day = date.getDate();
             const monthShort = date.toLocaleDateString('th-TH', { month: 'short' });
-            return `${day} ${monthShort}`;
+            const yearThaiShort = (date.getFullYear() + 543).toString().slice(-2);
+            return `${day} ${monthShort} ${yearThaiShort}`;
         } catch {
             return '';
         }
@@ -268,7 +269,7 @@ function HospitalDirectoryContent() {
                     )}
                     <span className={textClass}>{current.toLocaleString()}</span>
                 </div>
-                <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap">เดิม {past.toLocaleString()}</span>
+                <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap opacity-60">({past.toLocaleString()})</span>
             </div>
         );
     };
@@ -282,10 +283,9 @@ function HospitalDirectoryContent() {
     const renderHeaderDate = (current?: string, past?: string) => {
         if (!current && !past) return null;
         return (
-            <div className="text-[9px] opacity-60 font-normal leading-tight mt-0.5">
-                {current && <span>ใหม่: {formatThaiDate(current)}</span>}
-                {current && past && <span className="mx-1">/</span>}
-                {past && <span>เดิม: {formatThaiDate(past)}</span>}
+            <div className="flex flex-col text-[8px] opacity-70 font-medium leading-none mt-1 space-y-0.5">
+                {current && <span className="whitespace-nowrap text-emerald-700/80">ล่าสุด: {formatThaiDate(current)}</span>}
+                {past && <span className="whitespace-nowrap text-slate-400">ครั้งก่อน: {formatThaiDate(past)}</span>}
             </div>
         );
     };
@@ -360,17 +360,14 @@ function HospitalDirectoryContent() {
                                                 <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
                                                     <th className="px-6 py-4 w-24 sticky left-0 z-10 bg-[#FDFBFF]/95 backdrop-blur-sm shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.05)]">รหัส</th>
                                                     <th className="px-6 py-4 whitespace-nowrap">ชื่อหน่วยบริการ</th>
-                                                    <th className="px-6 py-4 w-40 whitespace-nowrap">อำเภอ</th>
-                                                    <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
-                                                    <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
                                                     <th className="px-6 py-4 w-32 text-right text-red-600 whitespace-nowrap">เป้าหมาย 30%</th>
-                                                    <th className="px-6 py-4 w-32 text-right text-[#00ADEF] whitespace-nowrap">
+                                                    <th className="px-6 py-4 w-28 text-right text-[#006837] whitespace-nowrap">
+                                                        หมอพร้อม
+                                                        {renderHeaderDate(mophDate, mophPastDate)}
+                                                    </th>
+                                                    <th className="px-6 py-4 w-28 text-right text-[#00ADEF] whitespace-nowrap">
                                                         สอน.บัดดี้
                                                         {renderHeaderDate(buddyDate, buddyPastDate)}
-                                                    </th>
-                                                    <th className="px-6 py-4 w-32 text-right text-[#006837] whitespace-nowrap">
-                                                        หมอพร้อม STATION
-                                                        {renderHeaderDate(mophDate, mophPastDate)}
                                                     </th>
                                                     <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">
                                                         รวม
@@ -387,6 +384,9 @@ function HospitalDirectoryContent() {
                                                         </div>
                                                     </th>
                                                     <th className="px-6 py-4 w-32 text-right text-[#FF6B6B] whitespace-nowrap">ขาดอีก</th>
+                                                    <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
+                                                    <th className="px-6 py-4 w-32 whitespace-nowrap">อำเภอ</th>
+                                                    <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-100">
@@ -405,31 +405,15 @@ function HospitalDirectoryContent() {
                                                                         {hospital.hospname}
                                                                     </span>
                                                                 </td>
-                                                                <td className="px-6 py-3 text-sm opacity-70 font-bold whitespace-nowrap">
-                                                                    อ.{hospital.amp_name}
-                                                                </td>
-                                                                <td className="px-6 py-3 text-sm opacity-70 whitespace-nowrap">
-                                                                    ต.{hospital.tmb_name || '-'}
-                                                                </td>
-                                                                <td className="px-6 py-3 whitespace-nowrap">
-                                                                    {(() => {
-                                                                        const label = hospital.hostype_level || (hospital.hostype === '05' ? 'รพ.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.');
-                                                                        const colorClass = getHostColor(label);
-                                                                        return (
-                                                                            <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${colorClass.replace('text-', 'bg-')} ${colorClass} whitespace-nowrap`}>
-                                                                                {label}
-                                                                            </span>
-                                                                        );
-                                                                    })()}
-                                                                </td>
+
                                                                 <td className="px-6 py-3 text-right">
                                                                     <span className="text-sm font-bold text-red-600">{hospital.op_30.toLocaleString()}</span>
                                                                 </td>
                                                                 <td className="px-6 py-3">
-                                                                    {renderComparisonCell(hospital.buddycare, hospital.buddycare_past, "text-sm font-bold text-[#00ADEF]")}
+                                                                    {renderComparisonCell(hospital.moph, hospital.moph_past, "text-sm font-bold text-[#006837]")}
                                                                 </td>
                                                                 <td className="px-6 py-3">
-                                                                    {renderComparisonCell(hospital.moph, hospital.moph_past, "text-sm font-bold text-[#006837]")}
+                                                                    {renderComparisonCell(hospital.buddycare, hospital.buddycare_past, "text-sm font-bold text-[#00ADEF]")}
                                                                 </td>
                                                                 <td className="px-6 py-3 bg-indigo-50/30">
                                                                     {renderComparisonCell(hospital.moph + hospital.buddycare, hospital.moph_past + hospital.buddycare_past, "text-sm font-black text-indigo-700")}
@@ -444,12 +428,29 @@ function HospitalDirectoryContent() {
                                                                         {(hospital.op_30 > 0 ? Math.max(0, hospital.op_30 - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
                                                                     </span>
                                                                 </td>
+                                                                <td className="px-6 py-3 text-sm opacity-70 whitespace-nowrap">
+                                                                    ต.{hospital.tmb_name || '-'}
+                                                                </td>
+                                                                <td className="px-6 py-3 text-sm opacity-70 font-bold whitespace-nowrap">
+                                                                    อ.{hospital.amp_name}
+                                                                </td>
+                                                                <td className="px-6 py-3 whitespace-nowrap">
+                                                                    {(() => {
+                                                                        const label = hospital.hostype_level || (hospital.hostype === '05' ? 'รพ.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.');
+                                                                        const colorClass = getHostColor(label);
+                                                                        return (
+                                                                            <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${colorClass.replace('text-', 'bg-')} ${colorClass} whitespace-nowrap`}>
+                                                                                {label}
+                                                                            </span>
+                                                                        );
+                                                                    })()}
+                                                                </td>
                                                             </tr>
                                                         );
                                                     })}
                                                 {/* Unified Summary Row */}
                                                 <tr className="bg-nm-primary/10 font-bold border-t-2 border-nm-primary/30">
-                                                    <td colSpan={5} className="px-6 py-5 text-nm-primary text-right text-base">
+                                                    <td colSpan={3} className="px-6 py-5 text-nm-primary text-right text-base">
                                                         รวมทั้งจังหวัด
                                                     </td>
                                                     <td className="px-6 py-5 text-right font-bold text-red-600">
@@ -459,16 +460,16 @@ function HospitalDirectoryContent() {
                                                     </td>
                                                     <td className="px-6 py-5">
                                                         {renderComparisonCell(
-                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare, 0), 0),
-                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare_past, 0), 0),
-                                                            "text-xl font-bold text-[#00ADEF]"
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph, 0), 0),
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph_past, 0), 0),
+                                                            "text-xl font-bold text-[#006837]"
                                                         )}
                                                     </td>
                                                     <td className="px-6 py-5">
                                                         {renderComparisonCell(
-                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph, 0), 0),
-                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph_past, 0), 0),
-                                                            "text-xl font-bold text-[#006837]"
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare, 0), 0),
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare_past, 0), 0),
+                                                            "text-xl font-bold text-[#00ADEF]"
                                                         )}
                                                     </td>
                                                     <td className="px-6 py-5 bg-indigo-50/50">
@@ -533,16 +534,14 @@ function HospitalDirectoryContent() {
                                                     <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
                                                         <th className="px-6 py-4 w-24 sticky left-0 z-10 bg-[#FDFBFF]/95 backdrop-blur-sm shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.05)]">รหัส</th>
                                                         <th className="px-6 py-4 whitespace-nowrap">ชื่อหน่วยบริการ</th>
-                                                        <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
-                                                        <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
                                                         <th className="px-6 py-4 w-32 text-right text-red-600 whitespace-nowrap">เป้าหมาย 30%</th>
-                                                        <th className="px-6 py-4 w-32 text-right text-[#00ADEF] whitespace-nowrap">
+                                                        <th className="px-6 py-4 w-28 text-right text-[#006837] whitespace-nowrap">
+                                                            หมอพร้อม
+                                                            {renderHeaderDate(mophDate, mophPastDate)}
+                                                        </th>
+                                                        <th className="px-6 py-4 w-28 text-right text-[#00ADEF] whitespace-nowrap">
                                                             สอน.บัดดี้
                                                             {renderHeaderDate(buddyDate, buddyPastDate)}
-                                                        </th>
-                                                        <th className="px-6 py-4 w-32 text-right text-[#006837] whitespace-nowrap">
-                                                            หมอพร้อม STATION
-                                                            {renderHeaderDate(mophDate, mophPastDate)}
                                                         </th>
                                                         <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">
                                                             รวม
@@ -559,6 +558,9 @@ function HospitalDirectoryContent() {
                                                             </div>
                                                         </th>
                                                         <th className="px-6 py-4 w-32 text-right text-[#FF6B6B] whitespace-nowrap">ขาดอีก</th>
+                                                        <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
+                                                        <th className="px-6 py-4 w-32 whitespace-nowrap">อำเภอ</th>
+                                                        <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-100">
@@ -574,28 +576,14 @@ function HospitalDirectoryContent() {
                                                                         {hospital.hospname}
                                                                     </span>
                                                                 </td>
-                                                                <td className="px-6 py-3 text-sm opacity-70 whitespace-nowrap">
-                                                                    ต.{hospital.tmb_name || '-'}
-                                                                </td>
-                                                                <td className="px-6 py-3 whitespace-nowrap">
-                                                                    {(() => {
-                                                                        const label = hospital.hostype_level || (hospital.hostype === '05' ? 'รพ.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.');
-                                                                        const colorClass = getHostColor(label);
-                                                                        return (
-                                                                            <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${colorClass.replace('text-', 'bg-')} ${colorClass} whitespace-nowrap`}>
-                                                                                {label}
-                                                                            </span>
-                                                                        );
-                                                                    })()}
-                                                                </td>
                                                                 <td className="px-6 py-3 text-right">
-                                                                    <span className="text-sm font-bold text-[#FF6B6B]">{hospital.op_30.toLocaleString()}</span>
-                                                                </td>
-                                                                <td className="px-6 py-3">
-                                                                    {renderComparisonCell(hospital.buddycare, hospital.buddycare_past, "text-sm font-bold text-[#00ADEF]")}
+                                                                    <span className="text-sm font-bold text-red-600">{hospital.op_30.toLocaleString()}</span>
                                                                 </td>
                                                                 <td className="px-6 py-3">
                                                                     {renderComparisonCell(hospital.moph, hospital.moph_past, "text-sm font-bold text-[#006837]")}
+                                                                </td>
+                                                                <td className="px-6 py-3">
+                                                                    {renderComparisonCell(hospital.buddycare, hospital.buddycare_past, "text-sm font-bold text-[#00ADEF]")}
                                                                 </td>
                                                                 <td className="px-6 py-3 bg-indigo-50/30">
                                                                     {renderComparisonCell(hospital.moph + hospital.buddycare, hospital.moph_past + hospital.buddycare_past, "text-sm font-black text-indigo-700")}
@@ -610,12 +598,29 @@ function HospitalDirectoryContent() {
                                                                         {(hospital.op_30 > 0 ? Math.max(0, hospital.op_30 - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
                                                                     </span>
                                                                 </td>
+                                                                <td className="px-6 py-3 text-sm opacity-70 whitespace-nowrap">
+                                                                    ต.{hospital.tmb_name || '-'}
+                                                                </td>
+                                                                <td className="px-6 py-3 text-sm opacity-70 font-bold whitespace-nowrap">
+                                                                    อ.{hospital.amp_name}
+                                                                </td>
+                                                                <td className="px-6 py-3 whitespace-nowrap">
+                                                                    {(() => {
+                                                                        const label = hospital.hostype_level || (hospital.hostype === '05' ? 'รพ.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.');
+                                                                        const colorClass = getHostColor(label);
+                                                                        return (
+                                                                            <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${colorClass.replace('text-', 'bg-')} ${colorClass} whitespace-nowrap`}>
+                                                                                {label}
+                                                                            </span>
+                                                                        );
+                                                                    })()}
+                                                                </td>
                                                             </tr>
                                                         );
                                                     })}
                                                     {/* Summary Row */}
                                                     <tr className="bg-nm-primary/5 font-bold border-t-2 border-nm-primary/20">
-                                                        <td colSpan={4} className="px-6 py-4 text-nm-primary text-right">
+                                                        <td colSpan={2} className="px-6 py-4 text-nm-primary text-right">
                                                             รวมทั้งหมด
                                                         </td>
                                                         <td className="px-6 py-4 text-right">
@@ -625,16 +630,16 @@ function HospitalDirectoryContent() {
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             {renderComparisonCell(
-                                                                group.hospitals.reduce((sum, h) => sum + h.buddycare, 0),
-                                                                group.hospitals.reduce((sum, h) => sum + h.buddycare_past, 0),
-                                                                "text-base font-bold text-[#00ADEF]"
+                                                                group.hospitals.reduce((sum, h) => sum + h.moph, 0),
+                                                                group.hospitals.reduce((sum, h) => sum + h.moph_past, 0),
+                                                                "text-base font-bold text-[#006837]"
                                                             )}
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             {renderComparisonCell(
-                                                                group.hospitals.reduce((sum, h) => sum + h.moph, 0),
-                                                                group.hospitals.reduce((sum, h) => sum + h.moph_past, 0),
-                                                                "text-base font-bold text-[#006837]"
+                                                                group.hospitals.reduce((sum, h) => sum + h.buddycare, 0),
+                                                                group.hospitals.reduce((sum, h) => sum + h.buddycare_past, 0),
+                                                                "text-base font-bold text-[#00ADEF]"
                                                             )}
                                                         </td>
                                                         <td className="px-6 py-4 bg-indigo-50/30">

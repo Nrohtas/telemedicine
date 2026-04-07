@@ -93,7 +93,7 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
                                     {/* Decorative background for the card */}
                                     <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-indigo-100/60 transition-colors" />
 
-                                    <div className="flex flex-col gap-6 relative z-10">
+                                    <div className="flex flex-col gap-4 relative z-10">
                                         {/* Header Row: Rank and Name */}
                                         <div className="flex items-start justify-between">
                                             <div className="flex items-center gap-3">
@@ -105,22 +105,47 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-col items-end gap-1">
-                                                <div className="flex gap-1.5 text-right">
-                                                    {/* Target Badge */}
-                                                    <div className="bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded-lg border border-rose-100/50 shadow-sm flex flex-col items-center min-w-[60px]">
-                                                        <span className="text-[8px] font-black leading-none mb-0.5 opacity-60 uppercase tracking-tighter">เป้าหมาย</span>
-                                                        <span className="text-[10px] font-black leading-none">{Math.round(stat.target_30).toLocaleString()}</span>
+                                            <div className="flex flex-col items-end">
+                                                {/* Container to sync width of badges and ratio bar */}
+                                                <div className="inline-flex flex-col gap-1.5">
+                                                    {/* Shift platforms to top corner in a compact way */}
+                                                    <div className="flex gap-2">
+                                                        {/* MOPH Badge */}
+                                                        <div className="bg-emerald-50/50 text-[#006837] px-2 py-1.5 rounded-xl border border-emerald-100/50 flex flex-col items-center gap-0.5 shadow-sm min-w-[54px]">
+                                                            <div className="flex items-center gap-1">
+                                                                <svg width="12" height="12" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <circle cx="50" cy="22" r="14" fill="#006837" />
+                                                                    <path d="M25 40H75V75C75 80 71 84 66 84H34C29 84 25 80 25 75V40Z" stroke="#F6D76E" strokeWidth="10" />
+                                                                </svg>
+                                                                <span className="text-[12px] font-black leading-none">{(stat.mohpromt_count || 0).toLocaleString()}</span>
+                                                            </div>
+                                                            <span className="text-[7px] font-black uppercase tracking-tighter opacity-70">MOPH</span>
+                                                        </div>
+                                                        
+                                                        {/* SORN Badge */}
+                                                        <div className="bg-sky-50/50 text-[#00ADEF] px-2 py-1.5 rounded-xl border border-sky-100/50 flex flex-col items-center gap-0.5 shadow-sm min-w-[54px]">
+                                                            <div className="flex items-center gap-1">
+                                                                <svg width="12" height="12" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M10 45L50 15L90 45" stroke="#00ADEF" strokeWidth="12" strokeLinecap="round" />
+                                                                    <circle cx="75" cy="62" r="8" fill="#0060A9" />
+                                                                </svg>
+                                                                <span className="text-[12px] font-black leading-none">{(stat.sornbuddy_count || 0).toLocaleString()}</span>
+                                                            </div>
+                                                            <span className="text-[7px] font-black uppercase tracking-tighter opacity-70">สอน.บัดดี้</span>
+                                                        </div>
                                                     </div>
-                                                    {/* Missing Badge */}
-                                                    <div className="bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-lg border border-amber-100/50 shadow-sm flex flex-col items-center min-w-[60px]">
-                                                        <span className="text-[8px] font-black leading-none mb-0.5 opacity-60 uppercase tracking-tighter">ขาดอีก</span>
-                                                        <span className="text-[10px] font-black leading-none">{Math.max(0, Math.round(stat.target_30) - stat.total_result).toLocaleString()}</span>
-                                                    </div>
-                                                    {/* Achievement Badge */}
-                                                    <div className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-lg border border-emerald-100/50 shadow-sm flex flex-col items-center min-w-[60px]">
-                                                        <span className="text-[8px] font-black leading-none mb-0.5 opacity-60 uppercase tracking-tighter">คิดเป็น</span>
-                                                        <span className="text-[10px] font-black leading-none">{completionRate.toFixed(2)}%</span>
+                                                    {/* Ratio Bar synced to width */}
+                                                    <div className="w-full space-y-1">
+                                                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                                                            <div
+                                                                className="h-full bg-[#006837] transition-all duration-1000 ease-out"
+                                                                style={{ width: `${stat.total_result > 0 ? ((stat.mohpromt_count || 0) / stat.total_result) * 100 : 0}%` }}
+                                                            ></div>
+                                                            <div
+                                                                className="h-full bg-[#00ADEF] transition-all duration-1000 ease-out"
+                                                                style={{ width: `${stat.total_result > 0 ? ((stat.sornbuddy_count || 0) / stat.total_result) * 100 : 0}%` }}
+                                                            ></div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -137,10 +162,10 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
                                                 </div>
                                             </div>
 
-                                            {/* Growth Indicator (Center Overlap) */}
+                                            {/* Growth Indicator (Center Overlap) - Expanded for visibility */}
                                             {diff !== 0 && (
                                                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-                                                    <div className={`px-2 py-0.5 rounded-full text-[10px] font-black border shadow-sm flex items-center justify-center whitespace-nowrap bg-white ${diff > 0 ? 'text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
+                                                    <div className={`px-3 py-1 rounded-full text-[12px] font-black border-2 shadow-md flex items-center justify-center whitespace-nowrap bg-white ${diff > 0 ? 'text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
                                                         {diff > 0 ? '+' : ''}{diff.toLocaleString()}
                                                     </div>
                                                 </div>
@@ -156,60 +181,34 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div className="space-y-6 relative z-10">
-                                        {/* Platforms Grid */}
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {/* Mohpromt Cardlet */}
-                                            <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100/50 flex flex-col items-center text-center space-y-2">
-                                                <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center p-1">
-                                                    <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <circle cx="50" cy="22" r="14" fill="#006837" />
-                                                        <path d="M25 40H75V75C75 80 71 84 66 84H34C29 84 25 80 25 75V40Z" stroke="#F6D76E" strokeWidth="10" />
-                                                        <rect x="40" y="52" width="20" height="7" fill="#A5A7AA" />
-                                                        <rect x="46.5" y="46" width="7" height="19" fill="#A5A7AA" />
-                                                    </svg>
-                                                </div>
-                                                <div>
-                                                    <p className="text-[9px] font-black text-emerald-800/60 uppercase tracking-tighter">หมอพร้อม STATION</p>
-                                                    <p className="text-lg font-black text-[#006837]">{(stat.mohpromt_count || 0).toLocaleString()} <span className="text-[10px] opacity-40">ครั้ง</span></p>
-                                                </div>
+                                    {/* Spacing gap between rows - reduced as requested */}
+                                    <div className="mt-2 space-y-6 relative z-10">
+                                        {/* Main Highlight Row: Missing, Target, Percent - 3-column Grid */}
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {/* Missing Box */}
+                                            <div className="bg-gradient-to-br from-amber-50 to-white p-3 rounded-2xl border border-amber-100 shadow-sm flex flex-col items-center justify-center text-center">
+                                                <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-1">ขาดอีก</span>
+                                                <span className="text-xl font-black text-amber-700 leading-none">{Math.max(0, Math.round(stat.target_30) - stat.total_result).toLocaleString()}</span>
+                                                <span className="text-[8px] font-bold text-amber-400 uppercase mt-1">ครั้ง</span>
                                             </div>
 
-                                            {/* Sorn Buddy Cardlet */}
-                                            <div className="p-4 rounded-2xl bg-sky-50/50 border border-sky-100/50 flex flex-col items-center text-center space-y-2">
-                                                <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center p-1">
-                                                    <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M10 45L50 15L90 45" stroke="#00ADEF" strokeWidth="12" strokeLinecap="round" />
-                                                        <rect x="40" y="32" width="20" height="7" fill="#A5A7AA" />
-                                                        <rect x="46.5" y="26" width="7" height="19" fill="#A5A7AA" />
-                                                        <path d="M25 55C25 55 25 85 50 85C75 85 75 60 75 60" stroke="#F6D76E" strokeWidth="10" fill="none" strokeLinecap="round" />
-                                                        <circle cx="75" cy="62" r="8" fill="#0060A9" />
-                                                    </svg>
-                                                </div>
-                                                <div>
-                                                    <p className="text-[9px] font-black text-sky-800/60 uppercase tracking-tighter">สอน.บัดดี้</p>
-                                                    <p className="text-lg font-black text-[#00ADEF]">{(stat.sornbuddy_count || 0).toLocaleString()} <span className="text-[10px] opacity-40">ครั้ง</span></p>
+                                            {/* Target Box */}
+                                            <div className="bg-gradient-to-br from-rose-50 to-white p-3 rounded-2xl border border-rose-100 shadow-sm flex flex-col items-center justify-center text-center">
+                                                <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-1">เป้าหมาย</span>
+                                                <span className="text-xl font-black text-rose-700 leading-none">{Math.round(stat.target_30).toLocaleString()}</span>
+                                                <span className="text-[8px] font-bold text-rose-400 uppercase mt-1">ครั้ง</span>
+                                            </div>
+
+                                            {/* Completion Box */}
+                                            <div className="bg-gradient-to-br from-emerald-50 to-white p-3 rounded-2xl border border-emerald-100 shadow-sm flex flex-col items-center justify-center text-center">
+                                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-1">คิดเป็น</span>
+                                                <span className="text-xl font-black text-emerald-700 leading-none">{completionRate.toFixed(2)}%</span>
+                                                <div className="w-full h-1 bg-emerald-100 rounded-full mt-2 overflow-hidden">
+                                                    <div className="h-full bg-emerald-500" style={{ width: `${Math.min(completionRate, 100)}%` }}></div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* Composite Progress Bar */}
-                                        <div className="space-y-2">
-                                            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex">
-                                                <div
-                                                    className="h-full bg-[#006837] transition-all duration-1000 ease-out"
-                                                    style={{ width: `${stat.total_result > 0 ? ((stat.mohpromt_count || 0) / stat.total_result) * 100 : 0}%` }}
-                                                ></div>
-                                                <div
-                                                    className="h-full bg-[#00ADEF] transition-all duration-1000 ease-out"
-                                                    style={{ width: `${stat.total_result > 0 ? ((stat.sornbuddy_count || 0) / stat.total_result) * 100 : 0}%` }}
-                                                ></div>
-                                            </div>
-                                            <div className="flex justify-center text-[8px] font-bold uppercase tracking-widest opacity-40 mt-1">
-                                                <span className="tracking-[0.2em] bg-white/60 px-2 py-0.5 rounded-full backdrop-blur-sm text-[7px] text-slate-500 font-black">RATIO</span>
-                                            </div>
-                                        </div>
                                     </div>
                                 </SoftCard>
                             </Link>
