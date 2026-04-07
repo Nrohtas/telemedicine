@@ -31,7 +31,7 @@ export default function LastUpdate() {
                     <img src="/telemedicine/looker-studio.png" alt="Looker Studio Logo" className="w-[18px] h-[18px] object-contain opacity-80 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div className="flex items-center">
-                    <span className="font-bold text-slate-500 group-hover:text-slate-700 text-[9px] uppercase tracking-wider transition-colors">Source Telemedicine</span>
+                    <span className="font-bold text-slate-500 group-hover:text-slate-700 text-[9px] transition-colors">ที่มา : กองสนับสนุนระบบสุขภาพปฐมภูมิ</span>
                 </div>
             </a>
 
