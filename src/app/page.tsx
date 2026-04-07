@@ -171,7 +171,7 @@ export default function Home() {
                         <div className="flex items-baseline gap-2">
                           {/* Difference Badge */}
                           {globalStats.total_services !== globalStats.total_result_past && (
-                            <div className={`px-2 py-0.5 rounded-full text-[10px] font-black border leading-none ${globalStats.total_services > globalStats.total_result_past ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
+                            <div className={`px-2.5 py-1 rounded-full text-[13px] font-black border leading-none shadow-sm ${globalStats.total_services > globalStats.total_result_past ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
                               {globalStats.total_services > globalStats.total_result_past ? '+' : '-'}{Math.abs(globalStats.total_services - globalStats.total_result_past).toLocaleString()}
                             </div>
                           )}
