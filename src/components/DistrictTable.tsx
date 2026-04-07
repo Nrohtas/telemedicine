@@ -187,14 +187,29 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
                                         <div className="grid grid-cols-3 gap-2">
                                             {/* Missing Box */}
                                             <div className="bg-gradient-to-br from-amber-50 to-white p-3 rounded-2xl border border-amber-100 shadow-sm flex flex-col items-center justify-center text-center">
-                                                <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-1">ขาดอีก</span>
+                                                <div className="flex items-center gap-1 mb-1">
+                                                    <div className="p-0.5 rounded bg-amber-100/50 text-amber-600">
+                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                                                        </svg>
+                                                    </div>
+                                                    <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest">ขาดอีก</span>
+                                                </div>
                                                 <span className="text-xl font-black text-amber-700 leading-none">{Math.max(0, Math.round(stat.target_30) - stat.total_result).toLocaleString()}</span>
                                                 <span className="text-[8px] font-bold text-amber-400 uppercase mt-1">ครั้ง</span>
                                             </div>
 
                                             {/* Target Box */}
                                             <div className="bg-gradient-to-br from-rose-50 to-white p-3 rounded-2xl border border-rose-100 shadow-sm flex flex-col items-center justify-center text-center">
-                                                <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-1">เป้าหมาย</span>
+                                                <div className="flex items-center gap-1 mb-1">
+                                                    <div className="p-0.5 rounded bg-rose-100 text-rose-600">
+                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                                            <polyline points="22 4 12 14.01 9 11.01" />
+                                                        </svg>
+                                                    </div>
+                                                    <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest">เป้าหมาย</span>
+                                                </div>
                                                 <span className="text-xl font-black text-rose-700 leading-none">{Math.round(stat.target_30).toLocaleString()}</span>
                                                 <span className="text-[8px] font-bold text-rose-400 uppercase mt-1">ครั้ง</span>
                                             </div>
