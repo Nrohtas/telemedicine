@@ -57,6 +57,7 @@ const Navbar = ({
     const pathname = usePathname();
     const [fiscalYear, setFiscalYear] = useState('');
     const [month, setMonth] = useState('ทั้งหมด');
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // Internal state for backward compatibility
     const [internalDistrict, setInternalDistrict] = useState('เลือกอำเภอ');
@@ -189,10 +190,10 @@ const Navbar = ({
     ];
 
     return (
-        <nav className="p-6">
-            <SoftCard className="px-8 py-6 flex flex-col gap-8">
-                {/* Header and Navigation Row */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-gray-100 pb-8">
+        <nav className="p-3 md:p-6">
+            <SoftCard className="px-4 md:px-8 py-5 md:py-6 flex flex-col gap-4 md:gap-8">
+                {/* Header Row: Brand */}
+                <div className="flex items-center justify-between gap-6 border-b border-gray-100 pb-6">
                     {/* Brand Section */}
                     <div className="flex items-center gap-3 md:gap-5 min-w-0">
                         <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 overflow-hidden border-2 border-green-700/20">
@@ -210,55 +211,130 @@ const Navbar = ({
                         </div>
                     </div>
 
-                    {/* Navigation Menu */}
-                    <div className="flex flex-wrap items-center gap-3 ml-auto">
-                        <Link href="/" className="hover:opacity-80 transition-opacity">
+                    {/* Mobile Menu Toggle (Hamburger) */}
+                    <button
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className="md:hidden p-2.5 nm-card rounded-xl text-nm-primary active:nm-inset transition-all"
+                        aria-label="Toggle Menu"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            {isMenuOpen ? (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                            ) : (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+                            )}
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Mobile Menu Content (Dropdown) */}
+                {isMenuOpen && (
+                    <div className="md:hidden flex flex-col gap-3 py-4 border-b border-gray-50 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <Link href="/" onClick={() => setIsMenuOpen(false)}>
                             <SoftButton
                                 variant="nav"
                                 active={pathname === '/'}
-                                className="flex items-center gap-2"
+                                className="flex items-center justify-center gap-3 w-full py-3"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
-                                Dashboard
+                                <span className="text-xs font-black uppercase tracking-widest">Dashboard</span>
                             </SoftButton>
                         </Link>
                         <Link
                             href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}` : ''}`}
-                            className="hover:opacity-80 transition-opacity"
+                            onClick={() => setIsMenuOpen(false)}
                         >
                             <SoftButton
                                 variant="nav"
                                 active={pathname === '/hospital'}
-                                className="flex items-center gap-2"
+                                className="flex items-center justify-center gap-3 w-full py-3"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                 </svg>
-                                หน่วยบริการ
+                                <span className="text-xs font-black uppercase tracking-widest">หน่วยบริการ</span>
                             </SoftButton>
                         </Link>
-                        <Link href="/admin" className="hover:opacity-80 transition-opacity">
+                        <Link href="/admin" onClick={() => setIsMenuOpen(false)}>
                             <SoftButton
                                 variant="nav"
                                 active={pathname.startsWith('/admin')}
-                                className="flex items-center gap-2"
+                                className="flex items-center justify-center gap-3 w-full py-3"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                 </svg>
-                                Admin
+                                <span className="text-xs font-black uppercase tracking-widest">Admin</span>
+                            </SoftButton>
+                        </Link>
+                        {showSignOut && (
+                            <button
+                                onClick={() => { onSignOut?.(); setIsMenuOpen(false); }}
+                                className="flex items-center justify-center gap-3 w-full py-3 nm-card rounded-xl text-rose-500 font-black uppercase tracking-widest text-[10px] active:nm-inset transition-all mt-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                Sign Out Account
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {/* Sub-Header Row: Desktop Navigation Menu */}
+                <div className="hidden md:flex items-center justify-end gap-3 md:gap-4 border-t md:border-t-0 border-gray-50 md:pt-0">
+                    {/* Navigation Menu (Buttons Only) */}
+                    <div className="flex items-center justify-center gap-2 md:gap-3 w-full md:w-auto">
+                        <Link href="/" className="hover:opacity-80 transition-opacity w-[calc(50%-4px)] sm:w-auto">
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/'}
+                                className="flex items-center justify-center gap-2 w-full"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                <span>Dashboard</span>
+                            </SoftButton>
+                        </Link>
+                        <Link
+                            href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}` : ''}`}
+                            className="hover:opacity-80 transition-opacity w-[calc(50%-4px)] sm:w-auto"
+                        >
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/hospital'}
+                                className="flex items-center justify-center gap-2 w-full"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                <span>หน่วยบริการ</span>
+                            </SoftButton>
+                        </Link>
+
+                        <Link href="/admin" className="hover:opacity-80 transition-opacity w-full sm:w-auto">
+                            <SoftButton
+                                variant="nav"
+                                active={pathname.startsWith('/admin')}
+                                className="flex items-center justify-center gap-2 w-full"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                <span>Admin</span>
                             </SoftButton>
                         </Link>
 
                         {showSignOut && (
                             <button
                                 onClick={onSignOut}
-                                className="group px-4 py-2 bg-indigo-50 text-indigo-400 hover:text-rose-500 hover:bg-rose-50 border border-indigo-100 hover:border-rose-100 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] transition-all flex items-center gap-2 active:scale-95 ml-2"
+                                className="group px-4 py-2 bg-indigo-50 text-indigo-400 hover:text-rose-500 hover:bg-rose-50 border border-indigo-100 hover:border-rose-100 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] transition-all flex items-center justify-center gap-2 active:scale-95 w-full md:w-auto md:ml-2"
                             >
                                 Sign Out
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 group-hover:translate-x-1 transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                 </svg>
                             </button>
@@ -268,153 +344,143 @@ const Navbar = ({
 
                 {/* Filters Row */}
                 {showFilters && (
-                    <div className="flex flex-wrap items-center gap-6 justify-end">
+                    <div className="flex flex-wrap items-center gap-3 md:gap-6 justify-center md:justify-end pt-4 border-t border-gray-100">
                         {/* Filters Group */}
-                        <div className="flex flex-wrap items-center gap-6 justify-end flex-1">
-                            {/* Fiscal Year Filter */}
-                            <div className="min-w-[140px]">
-                                <SoftSelect
-                                    label={
-                                        <div className="flex items-center gap-1.5">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                            <span>ปีงบประมาณ</span>
-                                        </div>
-                                    }
-                                    options={fiscalYearOptions}
-                                    value={fiscalYear}
-                                    onChange={setFiscalYear}
-                                    className="w-full"
-                                />
-                            </div>
-
-                            {/* Month Filter - Hide on /, /kpi, and /hospital */}
-                            {pathname !== '/' && pathname !== '/kpi' && pathname !== '/hospital' && (
-                                <div className="min-w-[150px]">
-                                    <SoftSelect
-                                        label={
-                                            <div className="flex items-center gap-1.5">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                <span>เดือน</span>
-                                            </div>
-                                        }
-                                        options={monthOptions}
-                                        value={month}
-                                        onChange={setMonth}
-                                        className="w-full"
-                                    />
-                                </div>
-                            )}
-
+                        <div className="flex flex-wrap items-center gap-2 md:gap-6 justify-center md:justify-end flex-1">
+                            {/* Filter Groups Segmented into 2-Column Rows on Mobile */}
                             {pathname !== '/' && pathname !== '/kpi' && (
-                                <>
-                                    {/* District Filter */}
-                                    <div className="min-w-[180px]">
-                                        <SoftSelect
-                                            label={
-                                                <div className="flex items-center gap-1.5">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    </svg>
-                                                    <span>อำเภอ</span>
-                                                </div>
-                                            }
-                                            options={districtOptions}
-                                            value={district}
-                                            onChange={setDistrict}
-                                            className="w-full"
-                                        />
-                                    </div>
+                                <div className="flex flex-col gap-4 w-full md:flex-row md:items-center md:gap-6 md:justify-end">
+                                    {/* Group 1: Year & District */}
+                                    <div className="grid grid-cols-2 gap-2 w-full md:flex md:w-auto md:gap-6">
+                                        {/* Fiscal Year Filter */}
+                                        <div className="min-w-0 md:min-w-[140px]">
+                                            <SoftSelect
+                                                label={
+                                                    <div className="flex items-center gap-1.5">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                        <span>ปีงบประมาณ</span>
+                                                    </div>
+                                                }
+                                                options={fiscalYearOptions}
+                                                value={fiscalYear}
+                                                onChange={setFiscalYear}
+                                                className="w-full"
+                                            />
+                                        </div>
 
-                                    {/* Type Filter */}
-                                    <div className="min-w-[180px]">
-                                        <SoftSelect
-                                            label={
-                                                <div className="flex items-center gap-1.5">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                                                    </svg>
-                                                    <span>ประเภท</span>
-                                                </div>
-                                            }
-                                            options={[
-                                                { label: 'ทั้งหมด', value: 'ทั้งหมด' },
-                                                ...types.map(t => ({ label: t, value: t }))
-                                            ]}
-                                            value={selectedType || 'ทั้งหมด'}
-                                            onChange={onTypeChange || (() => { })}
-                                            className="w-full"
-                                        />
-                                    </div>
-
-                                    {/* Affiliation Filter */}
-                                    <div className="min-w-[180px]">
-                                        <SoftSelect
-                                            label={
-                                                <div className="flex items-center gap-1.5">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                                    </svg>
-                                                    <span>สังกัด</span>
-                                                </div>
-                                            }
-                                            options={[
-                                                { label: 'ทั้งหมด', value: 'ทั้งหมด' },
-                                                ...affiliations.map(a => ({ label: a, value: a }))
-                                            ]}
-                                            value={selectedAffiliation || 'ทั้งหมด'}
-                                            onChange={onAffiliationChange || (() => { })}
-                                            className="w-full"
-                                        />
-                                    </div>
-
-                                    {/* Sort Filter */}
-                                    <div className="min-w-[150px]">
-                                        <SoftSelect
-                                            label={
-                                                <div className="flex items-center gap-1.5">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-                                                    </svg>
-                                                    <span>เรียงลำดับ</span>
-                                                </div>
-                                            }
-                                            options={[
-                                                { label: 'รหัสหน่วยบริการ', value: 'hospcode' },
-                                                { label: 'เป้าหมาย', value: 'target' },
-                                                { label: 'ยอดรวม', value: 'total' },
-                                                { label: '% (ผลงาน)', value: 'percent' },
-                                                { label: 'ขาดอีก', value: 'gap' },
-                                            ]}
-                                            value={selectedSort || 'percent'}
-                                            onChange={onSortChange || (() => { })}
-                                            className="w-full"
-                                        />
-                                    </div>
-
-                                    {/* Search Box */}
-                                    <div className="w-28 flex flex-col gap-1 relative group">
-                                        <label className="text-[10px] font-bold uppercase tracking-wider opacity-50 px-2 transition-opacity group-focus-within:opacity-80 flex items-center gap-1.5">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
-                                            <span>ค้นหา</span>
-                                        </label>
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                placeholder="ค้นหา..."
-                                                value={searchValue || ''}
-                                                onChange={(e) => onSearchChange?.(e.target.value)}
-                                                className="w-full px-4 py-2 bg-transparent nm-card rounded-xl text-sm font-bold text-nm-primary placeholder:text-nm-primary/20 outline-none transition-all focus:nm-inset"
+                                        {/* District Filter */}
+                                        <div className="min-w-0 md:min-w-[180px]">
+                                            <SoftSelect
+                                                label={
+                                                    <div className="flex items-center gap-1.5">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        </svg>
+                                                        <span>อำเภอ</span>
+                                                    </div>
+                                                }
+                                                options={districtOptions}
+                                                value={district}
+                                                onChange={setDistrict}
+                                                className="w-full"
                                             />
                                         </div>
                                     </div>
-                                </>
+
+                                    {/* Group 2: Type & Affiliation */}
+                                    <div className="grid grid-cols-2 gap-2 w-full md:flex md:w-auto md:gap-6">
+                                        {/* Type Filter */}
+                                        <div className="min-w-0 md:min-w-[180px]">
+                                            <SoftSelect
+                                                label={
+                                                    <div className="flex items-center gap-1.5">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                                        </svg>
+                                                        <span>ประเภท</span>
+                                                    </div>
+                                                }
+                                                options={[
+                                                    { label: 'ทั้งหมด', value: 'ทั้งหมด' },
+                                                    ...types.map(t => ({ label: t, value: t }))
+                                                ]}
+                                                value={selectedType || 'ทั้งหมด'}
+                                                onChange={onTypeChange || (() => { })}
+                                                className="w-full"
+                                            />
+                                        </div>
+
+                                        {/* Affiliation Filter */}
+                                        <div className="min-w-0 md:min-w-[180px]">
+                                            <SoftSelect
+                                                label={
+                                                    <div className="flex items-center gap-1.5">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                        </svg>
+                                                        <span>สังกัด</span>
+                                                    </div>
+                                                }
+                                                options={[
+                                                    { label: 'ทั้งหมด', value: 'ทั้งหมด' },
+                                                    ...affiliations.map(a => ({ label: a, value: a }))
+                                                ]}
+                                                value={selectedAffiliation || 'ทั้งหมด'}
+                                                onChange={onAffiliationChange || (() => { })}
+                                                className="w-full"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Group 3: Sort & Search */}
+                                    <div className="grid grid-cols-2 gap-2 w-full md:flex md:w-auto md:gap-6">
+                                        {/* Sort Filter */}
+                                        <div className="min-w-0 md:min-w-[150px]">
+                                            <SoftSelect
+                                                label={
+                                                    <div className="flex items-center gap-1.5">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                                                        </svg>
+                                                        <span>เรียงลำดับ</span>
+                                                    </div>
+                                                }
+                                                options={[
+                                                    { label: 'รหัสหน่วยบริการ', value: 'hospcode' },
+                                                    { label: 'เป้าหมาย', value: 'target' },
+                                                    { label: 'ยอดรวม', value: 'total' },
+                                                    { label: '% (ผลงาน)', value: 'percent' },
+                                                    { label: 'ขาดอีก', value: 'gap' },
+                                                ]}
+                                                value={selectedSort || 'percent'}
+                                                onChange={onSortChange || (() => { })}
+                                                className="w-full"
+                                            />
+                                        </div>
+
+                                        {/* Search Box */}
+                                        <div className="flex flex-col gap-1 relative group w-full md:w-28">
+                                            <label className="text-[10px] font-bold uppercase tracking-wider opacity-50 px-2 transition-opacity group-focus-within:opacity-80 flex items-center gap-1.5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                </svg>
+                                                <span>ค้นหา</span>
+                                            </label>
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    placeholder="ค้นหา..."
+                                                    value={searchValue || ''}
+                                                    onChange={(e) => onSearchChange?.(e.target.value)}
+                                                    className="w-full px-4 py-2 bg-transparent nm-card rounded-xl text-sm font-bold text-nm-primary placeholder:text-nm-primary/20 outline-none transition-all focus:nm-inset h-[38px]"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             )}
                         </div>
                     </div>

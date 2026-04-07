@@ -119,9 +119,9 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
                                                                 </svg>
                                                                 <span className="text-[12px] font-black leading-none">{(stat.mohpromt_count || 0).toLocaleString()}</span>
                                                             </div>
-                                                            <span className="text-[7px] font-black uppercase tracking-tighter opacity-70">MOPH</span>
+                                                            <span className="text-[7px] font-black uppercase tracking-tighter opacity-70">หมอพร้อม</span>
                                                         </div>
-                                                        
+
                                                         {/* SORN Badge */}
                                                         <div className="bg-sky-50/50 text-[#00ADEF] px-2 py-1.5 rounded-xl border border-sky-100/50 flex flex-col items-center gap-0.5 shadow-sm min-w-[54px]">
                                                             <div className="flex items-center gap-1">

@@ -119,8 +119,8 @@ export default function Home() {
 
       <div className="px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
         {/* Stats Section Header */}
-        <div className="lg:col-span-12 flex justify-between items-end mb-[-16px]">
-          <h3 className="text-2xl font-black text-[#1E1B4B] tracking-tight">ภาพรวมจังหวัด</h3>
+        <div className="lg:col-span-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0 mb-[-8px] sm:mb-[-16px]">
+          <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">ภาพรวมจังหวัด</h3>
           <LastUpdate />
         </div>
 
@@ -157,26 +157,26 @@ export default function Home() {
 
                     <div className="flex items-center justify-between">
                       {/* Previous Results Group */}
-                      <div className="flex flex-col items-start gap-1">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none whitespace-nowrap">ผลงานครั้งก่อน ({formatDateThai(globalStats.prev_update_date)})</span>
+                      <div className="flex flex-col items-start gap-0.5">
+                        <span className="text-[8px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest leading-tight">ผลงานครั้งก่อน<br className="sm:hidden" />({formatDateThai(globalStats.prev_update_date)})</span>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-xl font-black text-gray-500 tracking-tighter leading-none">{globalStats.total_result_past.toLocaleString()}</span>
-                          <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-none">ครั้ง</span>
+                          <span className="text-lg sm:text-xl font-black text-gray-500 tracking-tighter leading-none">{globalStats.total_result_past.toLocaleString()}</span>
+                          <span className="text-[7px] sm:text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-none">ครั้ง</span>
                         </div>
                       </div>
 
                       {/* Current Highlight Group */}
-                      <div className="flex flex-col items-end gap-1 text-right">
-                        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-none whitespace-nowrap">ผลงานล่าสุด ({formatDateThai(globalStats.last_update_date)})</span>
-                        <div className="flex items-baseline gap-2">
+                      <div className="flex flex-col items-end gap-0.5 text-right">
+                        <span className="text-[8px] sm:text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-tight">ผลงานล่าสุด<br className="sm:hidden" />({formatDateThai(globalStats.last_update_date)})</span>
+                        <div className="flex items-baseline gap-1.5 sm:gap-2">
                           {/* Difference Badge */}
                           {globalStats.total_services !== globalStats.total_result_past && (
-                            <div className={`px-2.5 py-1 rounded-full text-[13px] font-black border leading-none shadow-sm ${globalStats.total_services > globalStats.total_result_past ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
+                            <div className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-[13px] font-black border leading-none shadow-sm ${globalStats.total_services > globalStats.total_result_past ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
                               {globalStats.total_services > globalStats.total_result_past ? '+' : '-'}{Math.abs(globalStats.total_services - globalStats.total_result_past).toLocaleString()}
                             </div>
                           )}
-                          <span className="text-3xl font-black text-indigo-700 tracking-tighter leading-none">{globalStats.total_services.toLocaleString()}</span>
-                          <span className="text-[9px] font-bold text-indigo-600 uppercase tracking-widest leading-none">ครั้ง</span>
+                          <span className="text-2xl sm:text-3xl font-black text-indigo-700 tracking-tighter leading-none">{globalStats.total_services.toLocaleString()}</span>
+                          <span className="text-[8px] sm:text-[9px] font-bold text-indigo-600 uppercase tracking-widest leading-none">ครั้ง</span>
                         </div>
                       </div>
                     </div>
