@@ -9,6 +9,7 @@ import DistrictTable from "@/components/DistrictTable";
 import Footer from "@/components/Footer";
 import LastUpdate from "@/components/LastUpdate";
 import CircularProgress from "@/components/ui/CircularProgress";
+import LiquidProgress from "@/components/ui/LiquidProgress";
 
 export default function Home() {
   const [selectedDistrict, setSelectedDistrict] = useState("เลือกอำเภอ");
@@ -255,23 +256,22 @@ export default function Home() {
                     <div className="absolute inset-0 bg-emerald-50/25 rounded-2xl -z-10 blur-sm border border-emerald-100/30" />
 
                     <div className="relative group cursor-pointer transition-transform hover:scale-105 duration-500">
-                      <CircularProgress
+                      <LiquidProgress
                         value={targetData.target_30 > 0 ? (globalStats.total_services / targetData.target_30) * 100 : 0}
-                        size={110}
-                        strokeWidth={10}
+                        size={120}
                         color="#059669" // emerald-600
                         bgColor="#E1EFEA"
                       >
                         <div className="flex flex-col items-center">
-                          <span className="text-[10px] font-black text-emerald-600/60 uppercase tracking-tighter leading-none mb-1">ผลงาน</span>
+                          <span className="text-[10px] font-black text-emerald-900/40 uppercase tracking-tighter leading-none mb-1">ผลงาน</span>
                           <div className="flex items-baseline leading-none">
-                            <span className="text-3xl font-black text-emerald-700 tracking-tighter">
+                            <span className="text-3xl font-black text-emerald-900 tracking-tighter">
                               {targetData.target_30 > 0 ? ((globalStats.total_services / targetData.target_30) * 100).toFixed(1) : 0}
                             </span>
-                            <span className="text-xs font-black text-emerald-700/60">%</span>
+                            <span className="text-sm font-black text-emerald-900/60">%</span>
                           </div>
                         </div>
-                      </CircularProgress>
+                      </LiquidProgress>
 
                       {/* Pulse effect if near 100% or just for WOW */}
                       <div className="absolute inset-0 rounded-full border-4 border-emerald-400 opacity-0 group-hover:animate-ping duration-700" />
