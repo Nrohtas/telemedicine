@@ -9,6 +9,42 @@ import DistrictTable from "@/components/DistrictTable";
 import Footer from "@/components/Footer";
 import LastUpdate from "@/components/LastUpdate";
 
+const CircularProgress = ({ value, size = 80, strokeWidth = 8, color = "currentColor", bgColor = "rgba(0,0,0,0.05)", children }: { value: number, size?: number, strokeWidth?: number, color?: string, bgColor?: string, children?: React.ReactNode }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (value / 100) * circumference;
+
+  return (
+    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+      <svg className="transform -rotate-90" width={size} height={size}>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={bgColor}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={color}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={circumference}
+          style={{ strokeDashoffset: offset }}
+          strokeLinecap="round"
+          className="transition-all duration-1000 ease-out"
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+        {children}
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const [selectedDistrict, setSelectedDistrict] = useState("เลือกอำเภอ");
   const [globalStats, setGlobalStats] = useState({
@@ -151,8 +187,8 @@ export default function Home() {
 
                 {/* Body Content: Volume | Gaps | Achievement */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
-                  {/* Section 1: Volume Comparison Scale (Left - 50% width) */}
-                  <div className="lg:col-span-6 space-y-3 px-4 flex flex-col justify-center border-r-0 lg:border-r border-gray-100">
+                  {/* Section 1: Volume Comparison Scale (Left - Expanded to 6 cols) */}
+                  <div className="lg:col-span-6 space-y-4 px-5 flex flex-col justify-center border-r-0 lg:border-r border-gray-100">
                     <div className="text-[9px] font-black text-slate-500 uppercase tracking-[0.25em]">ความคืบหน้าผลงาน</div>
 
                     <div className="flex items-center justify-between">
@@ -168,15 +204,15 @@ export default function Home() {
                       {/* Current Highlight Group */}
                       <div className="flex flex-col items-end gap-0.5 text-right">
                         <span className="text-[8px] sm:text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-tight">ผลงานล่าสุด<br className="sm:hidden" />({formatDateThai(globalStats.last_update_date)})</span>
-                        <div className="flex items-baseline gap-1.5 sm:gap-2">
+                        <div className="flex items-baseline gap-2">
                           {/* Difference Badge */}
                           {globalStats.total_services !== globalStats.total_result_past && (
-                            <div className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-[13px] font-black border leading-none shadow-sm ${globalStats.total_services > globalStats.total_result_past ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
+                            <div className={`px-2 py-1 rounded-full text-[13px] font-black border leading-none shadow-sm ${globalStats.total_services > globalStats.total_result_past ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
                               {globalStats.total_services > globalStats.total_result_past ? '+' : '-'}{Math.abs(globalStats.total_services - globalStats.total_result_past).toLocaleString()}
                             </div>
                           )}
-                          <span className="text-2xl sm:text-3xl font-black text-indigo-700 tracking-tighter leading-none">{globalStats.total_services.toLocaleString()}</span>
-                          <span className="text-[8px] sm:text-[9px] font-bold text-indigo-600 uppercase tracking-widest leading-none">ครั้ง</span>
+                          <span className="text-4xl sm:text-5xl font-black text-indigo-700 tracking-tighter leading-none">{globalStats.total_services.toLocaleString()}</span>
+                          <span className="text-[9px] sm:text-[10px] font-black text-indigo-600 uppercase tracking-widest leading-none">ครั้ง</span>
                         </div>
                       </div>
                     </div>
@@ -196,8 +232,8 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Section 2: Goals & Missing Volume (Center - 33% width) */}
-                  <div className="lg:col-span-4 space-y-3 bg-gradient-to-br from-red-50/50 to-orange-50/20 p-3.5 rounded-2xl border border-red-100/50 flex flex-col justify-center shadow-sm">
+                  {/* Section 2: Goals & Missing Volume (Center - Expanded to 4 cols) */}
+                  <div className="lg:col-span-4 space-y-4 bg-gradient-to-br from-red-50/50 to-orange-50/20 p-4 rounded-2xl border border-red-100/50 flex flex-col justify-center shadow-sm">
                     <div className="flex flex-col gap-2">
                       {(() => {
                         const displayTarget = Math.round(targetData.target_30);
@@ -207,15 +243,15 @@ export default function Home() {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-1.5">
                                 <div className="p-1 rounded bg-red-100/50 text-[#FF6B6B]">
-                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                                   </svg>
                                 </div>
-                                <div className="text-[10px] font-black text-[#FF6B6B] uppercase tracking-[0.2em] leading-none text-left">ผลงานขาดอีก</div>
+                                <div className="text-[11px] font-black text-[#FF6B6B] uppercase tracking-[0.2em] leading-none text-left">ผลงานขาดอีก</div>
                               </div>
                               <div className="flex items-baseline gap-1">
-                                <span className="text-2xl font-black text-[#FF6B6B] tracking-tight leading-none">{missing.toLocaleString()}</span>
-                                <span className="text-[10px] font-bold text-[#FF6B6B]/70 uppercase tracking-widest leading-none">ครั้ง</span>
+                                <span className="text-3xl font-black text-[#FF6B6B] tracking-tight leading-none">{missing.toLocaleString()}</span>
+                                <span className="text-[11px] font-bold text-[#FF6B6B]/70 uppercase tracking-widest leading-none">ครั้ง</span>
                               </div>
                             </div>
 
@@ -249,12 +285,31 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Section 3: Achievement KPI (Right - 17% width) */}
-                  <div className="lg:col-span-2 bg-gradient-to-br from-teal-50 to-emerald-100 p-3 rounded-2xl text-emerald-900 shadow-sm flex flex-col justify-center items-center relative overflow-hidden border border-emerald-200/50">
-                    <div className="absolute top-0 right-0 -mr-4 -mt-4 w-12 h-12 bg-white/40 rounded-full blur-xl" />
-                    <div className="text-[12px] font-black uppercase tracking-[0.15em] text-emerald-600/80 mb-1.5 text-center whitespace-nowrap">คิดเป็นผลงาน</div>
-                    <div className="text-3xl font-black tracking-tighter leading-none text-emerald-700">
-                      {targetData.target_30 > 0 ? ((globalStats.total_services / targetData.target_30) * 100).toFixed(2) : 0}%
+                  {/* Section 3: Achievement KPI (Right - 2 cols) */}
+                  <div className="lg:col-span-2 flex flex-col justify-center items-center relative py-2">
+                    <div className="absolute inset-0 bg-emerald-50/25 rounded-2xl -z-10 blur-sm border border-emerald-100/30" />
+                    
+                    <div className="relative group cursor-pointer transition-transform hover:scale-105 duration-500">
+                      <CircularProgress
+                        value={targetData.target_30 > 0 ? (globalStats.total_services / targetData.target_30) * 100 : 0}
+                        size={90}
+                        strokeWidth={8}
+                        color="#059669" // emerald-600
+                        bgColor="#E1EFEA"
+                      >
+                        <div className="flex flex-col items-center">
+                          <span className="text-[10px] font-black text-emerald-600/60 uppercase tracking-tighter leading-none mb-1">ผลงาน</span>
+                          <div className="flex items-baseline leading-none">
+                            <span className="text-2xl font-black text-emerald-700 tracking-tighter">
+                              {targetData.target_30 > 0 ? ((globalStats.total_services / targetData.target_30) * 100).toFixed(1) : 0}
+                            </span>
+                            <span className="text-[10px] font-black text-emerald-700/60">%</span>
+                          </div>
+                        </div>
+                      </CircularProgress>
+                      
+                      {/* Pulse effect if near 100% or just for WOW */}
+                      <div className="absolute inset-0 rounded-full border-4 border-emerald-400 opacity-0 group-hover:animate-ping duration-700" />
                     </div>
                   </div>
                 </div>
