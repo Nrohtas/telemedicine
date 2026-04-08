@@ -176,7 +176,7 @@ export default function Home() {
                           {/* Difference Badge - Improved placement */}
                           {globalStats.total_services !== globalStats.total_result_past && (
                             <div className={`px-2.5 py-1 rounded-lg text-[13px] font-black border shadow-sm ${globalStats.total_services > globalStats.total_result_past ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
-                              {globalStats.total_services > globalStats.total_result_past ? '↑' : '↓'} {Math.abs(globalStats.total_services - globalStats.total_result_past).toLocaleString()}
+                              {globalStats.total_services > globalStats.total_result_past ? '+' : '-'}{Math.abs(globalStats.total_services - globalStats.total_result_past).toLocaleString()}
                             </div>
                           )}
                           <div className="flex items-baseline gap-1.5">
