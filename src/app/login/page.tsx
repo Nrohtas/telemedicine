@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import SoftCard from '@/components/ui/SoftCard';
 import SoftButton from '@/components/ui/SoftButton';
 
-export default function LoginPage() {
+function LoginContent() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loginMethod, setLoginMethod] = useState<'moph' | 'local'>('moph');
@@ -75,7 +75,7 @@ export default function LoginPage() {
                         />
                     </div>
                     <h1 className="text-2xl font-black text-foreground tracking-tight mb-1 text-center">Admin</h1>
-                    <p className="text-gray-400 font-medium text-center text-sm italic">MOPH Telemedicine</p>
+                    <p className="text-slate-400 font-medium text-center text-sm italic">MOPH Telemedicine</p>
                 </div>
 
                 <SoftCard className="p-8 border-t-4 border-[#006837]">
@@ -176,7 +176,7 @@ export default function LoginPage() {
                     <button
                         type="button"
                         onClick={() => router.push('/')}
-                        className="text-xs font-bold text-gray-400 hover:text-nm-primary flex items-center gap-2 transition-colors uppercase tracking-widest"
+                        className="text-xs font-bold text-gray-400 hover:text-emerald-600 flex items-center gap-2 transition-colors uppercase tracking-widest"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -188,3 +188,16 @@ export default function LoginPage() {
         </main>
     );
 }
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-background flex items-center justify-center p-6 italic text-slate-400 text-xs font-black uppercase tracking-widest">
+                Loading Application...
+            </div>
+        }>
+            <LoginContent />
+        </Suspense>
+    );
+}
+
