@@ -76,7 +76,7 @@ const TopImprovers = () => {
                         </svg>
                     </div>
                     <div className="flex flex-col">
-                        <h2 className="text-lg md:text-xl font-black text-blue-700 tracking-tight leading-none">10 อันดับ หน่วยบริการประจำสัปดาห์</h2>
+                        <h2 className="text-lg md:text-xl font-black text-blue-700 tracking-tight leading-none">10 อันดับ หน่วยบริการ</h2>
                         <p className="text-[10px] md:text-xs font-black text-emerald-600 uppercase tracking-[0.27em] mt-2 opacity-80 text-justify">ที่ให้บริการแพทย์ทางไกลมากที่สุด</p>
                     </div>
                 </div>

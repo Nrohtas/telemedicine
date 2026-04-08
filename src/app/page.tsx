@@ -156,7 +156,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
                   {/* Section 1: Volume Comparison Scale (Left - Expanded to 6 cols) */}
                   <div className="lg:col-span-6 space-y-4 px-5 flex flex-col justify-center border-r-0 lg:border-r border-gray-100">
-                    <div className="text-[9px] font-black text-slate-500 uppercase tracking-[0.25em]">ความคืบหน้าผลงาน</div>
+                    <div className="text-[9px] font-black text-slate-500 uppercase tracking-[0.25em]">ความก้าวหน้าผลงาน</div>
 
                     <div className="flex items-center justify-between">
                       {/* Previous Results Group */}
