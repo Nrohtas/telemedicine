@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import LastUpdate from "@/components/LastUpdate";
 import CircularProgress from "@/components/ui/CircularProgress";
 import LiquidProgress from "@/components/ui/LiquidProgress";
+import TopImprovers from "@/components/TopImprovers";
 
 export default function Home() {
   const [selectedDistrict, setSelectedDistrict] = useState("เลือกอำเภอ");
@@ -392,6 +393,11 @@ export default function Home() {
         {/* District Stats Section */}
         <div className="lg:col-span-12">
           <DistrictTable />
+        </div>
+
+        {/* Top Improvers Section (Added) */}
+        <div className="lg:col-span-12 mt-8">
+          <TopImprovers />
         </div>
       </div>
       <Footer />

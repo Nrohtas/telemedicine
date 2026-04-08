@@ -196,7 +196,7 @@ const Navbar = ({
                 <div className="flex items-center justify-between gap-6 border-b border-gray-100 pb-6">
                     {/* Brand Section */}
                     <div className="flex items-center gap-3 md:gap-5 min-w-0">
-                        <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 overflow-hidden border-2 border-green-700/20">
+                        <div className="w-10 h-10 md:w-14 md:h-14 flex items-center justify-center shrink-0 overflow-hidden">
                             <img
                                 src="/telemedicine/logo-moph.png"
                                 alt="Ministry of Public Health Logo"
