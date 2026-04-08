@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import SoftCard from './ui/SoftCard';
+import CircularProgress from './ui/CircularProgress';
 
 interface DistrictStat {
     amp_code: string;
@@ -214,13 +215,23 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
                                                 <span className="text-[8px] font-bold text-rose-400 uppercase mt-1">ครั้ง</span>
                                             </div>
 
-                                            {/* Completion Box */}
-                                            <div className="bg-gradient-to-br from-emerald-50 to-white p-3 rounded-2xl border border-emerald-100 shadow-sm flex flex-col items-center justify-center text-center">
-                                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-1">คิดเป็น</span>
-                                                <span className="text-xl font-black text-emerald-700 leading-none">{completionRate.toFixed(2)}%</span>
-                                                <div className="w-full h-1 bg-emerald-100 rounded-full mt-2 overflow-hidden">
-                                                    <div className="h-full bg-emerald-500" style={{ width: `${Math.min(completionRate, 100)}%` }}></div>
-                                                </div>
+                                            {/* Completion Circle (No outer border/bg, larger size) */}
+                                            <div className="flex flex-col items-center justify-center overflow-hidden h-full">
+                                                <CircularProgress
+                                                    value={completionRate}
+                                                    size={80}
+                                                    strokeWidth={7}
+                                                    color="#059669"
+                                                    bgColor="#E1EFEA"
+                                                >
+                                                    <div className="flex flex-col items-center">
+                                                        <span className="text-[8px] font-black text-emerald-600/60 uppercase tracking-tighter leading-none mb-0.5">ผลงาน</span>
+                                                        <div className="flex items-baseline leading-none">
+                                                            <span className="text-lg font-black text-emerald-700 tracking-tighter">{Math.round(completionRate)}</span>
+                                                            <span className="text-[8px] font-black text-emerald-700/60">%</span>
+                                                        </div>
+                                                    </div>
+                                                </CircularProgress>
                                             </div>
                                         </div>
 

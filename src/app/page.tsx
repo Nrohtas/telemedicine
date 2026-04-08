@@ -8,42 +8,7 @@ import SoftButton from "@/components/ui/SoftButton";
 import DistrictTable from "@/components/DistrictTable";
 import Footer from "@/components/Footer";
 import LastUpdate from "@/components/LastUpdate";
-
-const CircularProgress = ({ value, size = 80, strokeWidth = 8, color = "currentColor", bgColor = "rgba(0,0,0,0.05)", children }: { value: number, size?: number, strokeWidth?: number, color?: string, bgColor?: string, children?: React.ReactNode }) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (value / 100) * circumference;
-
-  return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
-      <svg className="transform -rotate-90" width={size} height={size}>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke={bgColor}
-          strokeWidth={strokeWidth}
-          fill="transparent"
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke={color}
-          strokeWidth={strokeWidth}
-          fill="transparent"
-          strokeDasharray={circumference}
-          style={{ strokeDashoffset: offset }}
-          strokeLinecap="round"
-          className="transition-all duration-1000 ease-out"
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        {children}
-      </div>
-    </div>
-  );
-};
+import CircularProgress from "@/components/ui/CircularProgress";
 
 export default function Home() {
   const [selectedDistrict, setSelectedDistrict] = useState("เลือกอำเภอ");
@@ -288,7 +253,7 @@ export default function Home() {
                   {/* Section 3: Achievement KPI (Right - 2 cols) */}
                   <div className="lg:col-span-2 flex flex-col justify-center items-center relative py-2">
                     <div className="absolute inset-0 bg-emerald-50/25 rounded-2xl -z-10 blur-sm border border-emerald-100/30" />
-                    
+
                     <div className="relative group cursor-pointer transition-transform hover:scale-105 duration-500">
                       <CircularProgress
                         value={targetData.target_30 > 0 ? (globalStats.total_services / targetData.target_30) * 100 : 0}
@@ -307,7 +272,7 @@ export default function Home() {
                           </div>
                         </div>
                       </CircularProgress>
-                      
+
                       {/* Pulse effect if near 100% or just for WOW */}
                       <div className="absolute inset-0 rounded-full border-4 border-emerald-400 opacity-0 group-hover:animate-ping duration-700" />
                     </div>
@@ -317,51 +282,101 @@ export default function Home() {
             </SoftCard>
           </div>
 
-          {/* Secondary Column: Provder Stack */}
-          <div className="lg:col-span-4 flex flex-col gap-3">
-            {/* Card 2: MOPH STATION */}
-            <SoftCard className="p-3 h-full group transition-all duration-300 shadow-xl border-t-2 border-[#006837] flex flex-col justify-center">
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-emerald-50 text-[#006837] shadow-inner ring-2 ring-emerald-50/50">
-                    <svg width="18" height="18" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="50" cy="22" r="14" fill="#006837" />
-                      <path d="M25 40H75V75C75 80 71 84 66 84H34C29 84 25 80 25 75V40Z" stroke="#F6D76E" strokeWidth="10" />
-                      <rect x="40" y="52" width="20" height="7" fill="#A5A7AA" />
-                      <rect x="46.5" y="46" width="7" height="19" fill="#A5A7AA" />
-                    </svg>
-                  </div>
-                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#006837]">หมอพร้อม STATION</span>
-                </div>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-3xl font-black tracking-tighter text-[#006837] leading-none">{globalStats.total_moph.toLocaleString()}</span>
-                  <span className="text-[9px] font-bold text-[#006837]/60 uppercase tracking-widest">ครั้ง</span>
-                </div>
-              </div>
-            </SoftCard>
+          {/* Secondary Column: Unified Platform Distribution */}
+          <div className="lg:col-span-4 flex flex-col">
+            <SoftCard className="p-4 h-full group transition-all duration-300 shadow-xl border-t-4 border-slate-700 bg-white/95 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+              {/* Decorative Background */}
+              <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px]" />
 
-            {/* Card 3: SORN BUDDY */}
-            <SoftCard className="p-3 h-full group transition-all duration-300 shadow-xl border-t-2 border-[#00ADEF] flex flex-col justify-center">
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-sky-50 text-[#00ADEF] shadow-inner ring-2 ring-sky-50/50">
-                    <svg width="18" height="18" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10 45L50 15L90 45" stroke="#00ADEF" strokeWidth="12" strokeLinecap="round" />
-                      <rect x="40" y="32" width="20" height="7" fill="#A5A7AA" />
-                      <rect x="46.5" y="26" width="7" height="19" fill="#A5A7AA" />
-                      <path d="M25 55C25 55 25 85 50 85C75 85 75 60 75 60" stroke="#F6D76E" strokeWidth="10" fill="none" strokeLinecap="round" />
-                      <circle cx="75" cy="62" r="8" fill="#0060A9" />
-                    </svg>
+              <div className="relative z-10 w-full mb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-slate-100 text-slate-800">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10" />
+                        <line x1="12" y1="20" x2="12" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="14" />
+                      </svg>
+                    </div>
+                    <h3 className="text-[11px] font-black text-slate-800 uppercase tracking-widest leading-none">Platform</h3>
                   </div>
-                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#00ADEF]">สอน.บัดดี้</span>
+                  <div className="px-2 py-1 bg-slate-50 border border-slate-100 rounded-lg">
+                    <span className="text-[10px] font-black text-slate-400">รวม : {(globalStats.total_moph + globalStats.total_buddycare).toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-3xl font-black tracking-tighter text-[#00ADEF] leading-none">{globalStats.total_buddycare.toLocaleString()}</span>
-                  <span className="text-[9px] font-bold text-[#00ADEF]/60 uppercase tracking-widest">ครั้ง</span>
+
+              {/* Main Scale Comparison Row */}
+              <div className="relative flex flex-col gap-4 py-1">
+                {/* MOPH Section */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2.5 rounded-2xl bg-emerald-50 text-[#006837] shadow-inner ring-1 ring-emerald-100/50 flex-shrink-0">
+                      <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="22" r="14" fill="#006837" />
+                        <path d="M25 40H75V75C75 80 71 84 66 84H34C29 84 25 80 25 75V40Z" stroke="#F6D76E" strokeWidth="10" />
+                        <rect x="40" y="52" width="20" height="7" fill="#A5A7AA" />
+                        <rect x="46.5" y="46" width="7" height="19" fill="#A5A7AA" />
+                      </svg>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <span className="text-[11px] font-black text-emerald-900 uppercase tracking-tight mb-1">หมอพร้อม STATION</span>
+                      <div className="flex items-baseline gap-1 leading-none">
+                        <span className="text-xl font-black text-[#006837] tracking-tighter">{(globalStats.total_moph).toLocaleString()}</span>
+                        <span className="text-[8px] font-bold text-[#006837]/40 uppercase">ครั้ง</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end leading-none">
+                    <span className="text-xl font-black text-[#006837] tracking-tighter">
+                      {globalStats.total_moph + globalStats.total_buddycare > 0 ? ((globalStats.total_moph / (globalStats.total_moph + globalStats.total_buddycare)) * 100).toFixed(1) : 0}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* The Horizontal Scale (Stacked Bar) */}
+                <div className="relative py-2">
+                  <div className="h-4 w-full bg-slate-100 rounded-xl overflow-hidden flex shadow-inner border border-slate-200/50">
+                    <div
+                      className="h-full bg-gradient-to-r from-emerald-700 to-[#006837] transition-all duration-1000 ease-out relative group/bar"
+                      style={{ width: `${globalStats.total_moph + globalStats.total_buddycare > 0 ? (globalStats.total_moph / (globalStats.total_moph + globalStats.total_buddycare) * 100) : 0}%` }}
+                    >
+                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/bar:opacity-100 transition-opacity" />
+                    </div>
+                    <div
+                      className="h-full bg-gradient-to-r from-[#00ADEF] to-sky-600 transition-all duration-1000 ease-out relative group/bar"
+                      style={{ width: `${globalStats.total_moph + globalStats.total_buddycare > 0 ? (globalStats.total_buddycare / (globalStats.total_moph + globalStats.total_buddycare) * 100) : 0}%` }}
+                    >
+                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/bar:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* SORN Section */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2.5 rounded-2xl bg-sky-50 text-[#00ADEF] shadow-inner ring-1 ring-sky-100/50 flex-shrink-0">
+                      <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 45L50 15L90 45" stroke="#00ADEF" strokeWidth="12" strokeLinecap="round" />
+                        <rect x="40" y="32" width="20" height="7" fill="#A5A7AA" />
+                        <rect x="46.5" y="26" width="7" height="19" fill="#A5A7AA" />
+                        <path d="M25 55C25 55 25 85 50 85C75 85 75 60 75 60" stroke="#F6D76E" strokeWidth="10" fill="none" strokeLinecap="round" />
+                        <circle cx="75" cy="62" r="8" fill="#0060A9" />
+                      </svg>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <span className="text-[11px] font-black text-sky-900 uppercase tracking-tight mb-1">สอน.บัดดี้</span>
+                      <div className="flex items-baseline gap-1 leading-none">
+                        <span className="text-xl font-black text-[#00ADEF] tracking-tighter">{(globalStats.total_buddycare).toLocaleString()}</span>
+                        <span className="text-[8px] font-bold text-[#00ADEF]/40 uppercase">ครั้ง</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end leading-none">
+                    <span className="text-xl font-black text-[#00ADEF] tracking-tighter">
+                      {globalStats.total_moph + globalStats.total_buddycare > 0 ? ((globalStats.total_buddycare / (globalStats.total_moph + globalStats.total_buddycare)) * 100).toFixed(1) : 0}%
+                    </span>
+                  </div>
                 </div>
               </div>
             </SoftCard>
