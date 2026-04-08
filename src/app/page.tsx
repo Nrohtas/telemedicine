@@ -233,7 +233,7 @@ export default function Home() {
                                 <div className="text-[10px] font-black text-red-600 uppercase tracking-[0.2em] leading-none text-left">เป้าหมาย (30%)</div>
                               </div>
                               <div className="flex items-baseline gap-1">
-                                <span className="text-2xl font-black text-red-700 tracking-tight leading-none">{displayTarget.toLocaleString()}</span>
+                                <span className="text-3xl font-black text-red-700 tracking-tight leading-none">{displayTarget.toLocaleString()}</span>
                                 <span className="text-[10px] font-bold text-red-600/70 uppercase tracking-widest leading-none">ครั้ง</span>
                               </div>
                             </div>
@@ -257,18 +257,18 @@ export default function Home() {
                     <div className="relative group cursor-pointer transition-transform hover:scale-105 duration-500">
                       <CircularProgress
                         value={targetData.target_30 > 0 ? (globalStats.total_services / targetData.target_30) * 100 : 0}
-                        size={90}
-                        strokeWidth={8}
+                        size={110}
+                        strokeWidth={10}
                         color="#059669" // emerald-600
                         bgColor="#E1EFEA"
                       >
                         <div className="flex flex-col items-center">
                           <span className="text-[10px] font-black text-emerald-600/60 uppercase tracking-tighter leading-none mb-1">ผลงาน</span>
                           <div className="flex items-baseline leading-none">
-                            <span className="text-2xl font-black text-emerald-700 tracking-tighter">
+                            <span className="text-3xl font-black text-emerald-700 tracking-tighter">
                               {targetData.target_30 > 0 ? ((globalStats.total_services / targetData.target_30) * 100).toFixed(1) : 0}
                             </span>
-                            <span className="text-[10px] font-black text-emerald-700/60">%</span>
+                            <span className="text-xs font-black text-emerald-700/60">%</span>
                           </div>
                         </div>
                       </CircularProgress>
