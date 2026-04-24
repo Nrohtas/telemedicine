@@ -191,12 +191,12 @@ const Navbar = ({
 
     return (
         <nav className="p-3 md:p-6">
-            <SoftCard className="px-4 md:px-8 py-5 md:py-6 flex flex-col gap-4 md:gap-8">
-                {/* Header Row: Brand */}
-                <div className="flex items-center justify-between gap-6 border-b border-gray-100 pb-6">
+            <SoftCard className="px-4 md:px-8 py-5 md:py-6 flex flex-col gap-4">
+                {/* Header Row: Brand and Desktop Navigation */}
+                <div className="flex items-center justify-between gap-4 md:gap-6 border-b border-gray-100 pb-5">
                     {/* Brand Section */}
-                    <div className="flex items-center gap-3 md:gap-5 min-w-0">
-                        <div className="w-10 h-10 md:w-14 md:h-14 flex items-center justify-center shrink-0 overflow-hidden">
+                    <div className="flex items-center gap-3 md:gap-4 min-w-0">
+                        <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center shrink-0 overflow-hidden">
                             <img
                                 src="/telemedicine/logo-moph.png"
                                 alt="Ministry of Public Health Logo"
@@ -204,17 +204,86 @@ const Navbar = ({
                             />
                         </div>
                         <div className="flex flex-col min-w-0">
-                            <h1 className="text-lg md:text-2xl font-black text-purple-950 tracking-tight truncate leading-tight">สำนักงานสาธารณสุขจังหวัดพิษณุโลก</h1>
-                            <p className="text-[10px] md:text-[13px] font-black uppercase mt-0.5 md:mt-1 tracking-widest md:tracking-[0.12em] whitespace-normal md:whitespace-nowrap drop-shadow-sm leading-snug">
+                            <h1 className="text-base md:text-lg lg:text-xl font-black text-purple-950 tracking-tight truncate leading-tight">สำนักงานสาธารณสุขจังหวัดพิษณุโลก</h1>
+                            <p className="text-[10px] md:text-[11px] lg:text-[12px] font-black uppercase mt-0.5 tracking-widest md:tracking-[0.12em] whitespace-normal md:whitespace-nowrap drop-shadow-sm leading-snug">
                                 <span className="text-gray-500">Dashboard</span> <span className="text-[#006837]">Telemedicine</span> <span className="text-gray-400 mx-1">:</span> <span className="text-[#00ADEF]">การแพทย์ทางไกล</span>
                             </p>
                         </div>
                     </div>
 
+                    {/* Desktop Navigation Menu */}
+                    <div className="hidden lg:flex items-center justify-end gap-2 lg:gap-3 shrink-0">
+                        <Link href="/" className="hover:opacity-80 transition-opacity">
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/'}
+                                className="flex items-center justify-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                <span>Dashboard</span>
+                            </SoftButton>
+                        </Link>
+                        <Link
+                            href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}` : ''}`}
+                            className="hover:opacity-80 transition-opacity"
+                        >
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/hospital'}
+                                className="flex items-center justify-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                <span>หน่วยบริการ</span>
+                            </SoftButton>
+                        </Link>
+
+                        <Link href="/daily" className="hover:opacity-80 transition-opacity">
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/daily'}
+                                className="flex items-center justify-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3v18h18M7 15l3-3 3 2 5-7" />
+                                </svg>
+                                <span>Daily</span>
+                            </SoftButton>
+                        </Link>
+
+                        <Link href="/admin" className="hover:opacity-80 transition-opacity">
+                            <SoftButton
+                                variant="nav"
+                                active={pathname.startsWith('/admin')}
+                                className="flex items-center justify-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                <span>Admin</span>
+                            </SoftButton>
+                        </Link>
+
+                        {showSignOut && (
+                            <button
+                                onClick={onSignOut}
+                                className="group px-4 py-2 bg-indigo-50 text-indigo-400 hover:text-rose-500 hover:bg-rose-50 border border-indigo-100 hover:border-rose-100 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] transition-all flex items-center justify-center gap-2 active:scale-95"
+                            >
+                                Sign Out
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 group-hover:translate-x-1 transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+
                     {/* Mobile Menu Toggle (Hamburger) */}
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="md:hidden p-2.5 nm-card rounded-xl text-nm-primary active:nm-inset transition-all"
+                        className="lg:hidden p-2.5 nm-card rounded-xl text-nm-primary active:nm-inset transition-all"
                         aria-label="Toggle Menu"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -229,7 +298,7 @@ const Navbar = ({
 
                 {/* Mobile Menu Content (Dropdown) */}
                 {isMenuOpen && (
-                    <div className="md:hidden flex flex-col gap-3 py-4 border-b border-gray-50 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="lg:hidden flex flex-col gap-3 py-4 border-b border-gray-50 animate-in fade-in slide-in-from-top-4 duration-300">
                         <Link href="/" onClick={() => setIsMenuOpen(false)}>
                             <SoftButton
                                 variant="nav"
@@ -257,6 +326,18 @@ const Navbar = ({
                                 <span className="text-xs font-black uppercase tracking-widest">หน่วยบริการ</span>
                             </SoftButton>
                         </Link>
+                        <Link href="/daily" onClick={() => setIsMenuOpen(false)}>
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/daily'}
+                                className="flex items-center justify-center gap-3 w-full py-3"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3v18h18M7 15l3-3 3 2 5-7" />
+                                </svg>
+                                <span className="text-xs font-black uppercase tracking-widest">Daily</span>
+                            </SoftButton>
+                        </Link>
                         <Link href="/admin" onClick={() => setIsMenuOpen(false)}>
                             <SoftButton
                                 variant="nav"
@@ -282,65 +363,6 @@ const Navbar = ({
                         )}
                     </div>
                 )}
-
-                {/* Sub-Header Row: Desktop Navigation Menu */}
-                <div className="hidden md:flex items-center justify-end gap-3 md:gap-4 border-t md:border-t-0 border-gray-50 md:pt-0">
-                    {/* Navigation Menu (Buttons Only) */}
-                    <div className="flex items-center justify-center gap-2 md:gap-3 w-full md:w-auto">
-                        <Link href="/" className="hover:opacity-80 transition-opacity w-[calc(50%-4px)] sm:w-auto">
-                            <SoftButton
-                                variant="nav"
-                                active={pathname === '/'}
-                                className="flex items-center justify-center gap-2 w-full"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                                <span>Dashboard</span>
-                            </SoftButton>
-                        </Link>
-                        <Link
-                            href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}` : ''}`}
-                            className="hover:opacity-80 transition-opacity w-[calc(50%-4px)] sm:w-auto"
-                        >
-                            <SoftButton
-                                variant="nav"
-                                active={pathname === '/hospital'}
-                                className="flex items-center justify-center gap-2 w-full"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                </svg>
-                                <span>หน่วยบริการ</span>
-                            </SoftButton>
-                        </Link>
-
-                        <Link href="/admin" className="hover:opacity-80 transition-opacity w-full sm:w-auto">
-                            <SoftButton
-                                variant="nav"
-                                active={pathname.startsWith('/admin')}
-                                className="flex items-center justify-center gap-2 w-full"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                </svg>
-                                <span>Admin</span>
-                            </SoftButton>
-                        </Link>
-
-                        {showSignOut && (
-                            <button
-                                onClick={onSignOut}
-                                className="group px-4 py-2 bg-indigo-50 text-indigo-400 hover:text-rose-500 hover:bg-rose-50 border border-indigo-100 hover:border-rose-100 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] transition-all flex items-center justify-center gap-2 active:scale-95 w-full md:w-auto md:ml-2"
-                            >
-                                Sign Out
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 group-hover:translate-x-1 transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                </svg>
-                            </button>
-                        )}
-                    </div>
-                </div>
 
                 {/* Filters Row */}
                 {showFilters && (

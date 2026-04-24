@@ -3,11 +3,17 @@
 import React, { useState, useEffect } from "react";
 import { formatThaiDate } from "@/utils/date";
 
-export default function LastUpdate() {
+interface LastUpdateProps {
+    showLogo?: boolean;
+    type?: string;
+}
+
+export default function LastUpdate({ showLogo = true, type }: LastUpdateProps) {
     const [lastUpdate, setLastUpdate] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch('/telemedicine/api/last-update')
+        const url = type ? `/telemedicine/api/last-update?type=${type}` : '/telemedicine/api/last-update';
+        fetch(url)
             .then(res => res.json())
             .then(data => {
                 if (data.lastUpdate) {
@@ -15,25 +21,22 @@ export default function LastUpdate() {
                 }
             })
             .catch(err => console.error('Error fetching last update:', err));
-    }, []);
+    }, [type]);
 
     if (!lastUpdate) return null;
 
     return (
         <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1.5 sm:gap-4 mb-2 md:mb-1">
-            <a
-                href="https://lookerstudio.google.com/u/0/reporting/33f2a1d7-2f28-43b1-85ea-6cf3e8d579ac/page/p_q5mrcvqeyd"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-2 hover:bg-slate-100 px-3 h-[22px] rounded-full transition-all duration-300 cursor-pointer"
-            >
-                <div className="flex items-center justify-center w-[18px]">
-                    <img src="/telemedicine/looker-studio.png" alt="Looker Studio Logo" className="w-[18px] h-[18px] object-contain opacity-80 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <div className="flex items-center">
-                    <span className="font-bold text-slate-500 group-hover:text-slate-700 text-[9px] transition-colors whitespace-nowrap">ที่มา : กองสนับสนุนระบบสุขภาพปฐมภูมิ</span>
-                </div>
-            </a>
+            {showLogo && (
+                <a
+                    href="https://lookerstudio.google.com/u/0/reporting/33f2a1d7-2f28-43b1-85ea-6cf3e8d579ac/page/p_q5mrcvqeyd"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-center w-8 h-8 hover:bg-slate-100 rounded-full transition-all duration-300 cursor-pointer"
+                >
+                    <img src="/telemedicine/looker-studio.png" alt="Looker Studio Logo" className="w-5 h-5 object-contain opacity-80 group-hover:opacity-100 transition-opacity" />
+                </a>
+            )}
 
             <div className="flex items-center gap-1.5 px-3 sm:px-0 text-center sm:text-left">
                 <span className="relative flex h-1.5 w-1.5 shrink-0">

@@ -4,33 +4,36 @@ import { verifyJWT } from '@/lib/auth';
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    // console.log('Middleware pathname:', pathname);
 
-    // Define public routes
-    const isPublicApiRoute = pathname.startsWith('/api') && (
-        pathname.startsWith('/api/login') ||
-        pathname.startsWith('/api/register') ||
-        pathname.startsWith('/api/auth') ||
+    const checkPath = pathname.startsWith('/telemedicine') ? pathname.slice(13) : pathname;
+
+    const isPublicApiRoute = checkPath.startsWith('/api') && (
+        checkPath.startsWith('/api/login') ||
+        checkPath.startsWith('/api/register') ||
+        checkPath.startsWith('/api/auth') ||
+        checkPath.startsWith('/api/visit-type-daily') ||
         (request.method === 'GET' && (
-            pathname.startsWith('/api/hospital-directory') ||
-            pathname.startsWith('/api/affiliations') ||
-            pathname.startsWith('/api/hospital-types') ||
-            pathname.startsWith('/api/districts') ||
-            pathname.startsWith('/api/hospitals') ||
-            pathname.startsWith('/api/months') ||
-            pathname.startsWith('/api/fiscal-years') ||
-            pathname.startsWith('/api/ampur-stats') ||
-            pathname.startsWith('/api/last-update') ||
-            pathname.startsWith('/api/global-stats') ||
-            pathname.startsWith('/api/top-improvers') ||
-            pathname.startsWith('/api/updates') ||
-            pathname.startsWith('/api/target')
+            checkPath.startsWith('/api/hospital-directory') ||
+            checkPath.startsWith('/api/affiliations') ||
+            checkPath.startsWith('/api/hospital-types') ||
+            checkPath.startsWith('/api/districts') ||
+            checkPath.startsWith('/api/hospitals') ||
+            checkPath.startsWith('/api/months') ||
+            checkPath.startsWith('/api/fiscal-years') ||
+            checkPath.startsWith('/api/ampur-stats') ||
+            checkPath.startsWith('/api/last-update') ||
+            checkPath.startsWith('/api/global-stats') ||
+            checkPath.startsWith('/api/top-improvers') ||
+            checkPath.startsWith('/api/updates') ||
+            checkPath.startsWith('/api/target')
         ))
     );
 
-    // Protect /admin routes and private /api routes
-    if (pathname.startsWith('/admin') || (pathname.startsWith('/api') && !isPublicApiRoute)) {
-        // Check for token in cookie or Authorization header
+    const isProtected = pathname.startsWith('/admin') || 
+                        pathname.startsWith('/telemedicine/admin') || 
+                        (pathname.includes('/api') && !isPublicApiRoute);
+
+    if (isProtected) {
         let token = request.cookies.get('token')?.value;
 
         if (!token) {
@@ -41,7 +44,7 @@ export async function middleware(request: NextRequest) {
         }
 
         if (!token) {
-            if (pathname.startsWith('/api')) {
+            if (pathname.includes('/api')) {
                 return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
             }
             const loginUrl = request.nextUrl.clone();
@@ -49,11 +52,10 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(loginUrl);
         }
 
-        // Verify token
         const payload = await verifyJWT(token);
 
         if (!payload) {
-            if (pathname.startsWith('/api')) {
+            if (pathname.includes('/api')) {
                 return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
             }
             const loginUrl = request.nextUrl.clone();
