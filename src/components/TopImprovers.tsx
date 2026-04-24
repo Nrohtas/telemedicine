@@ -16,7 +16,12 @@ interface Improver {
     target: number;
 }
 
-const TopImprovers = () => {
+interface TopImproversProps {
+    source?: string;
+}
+
+const TopImprovers = ({ source }: TopImproversProps = {}) => {
+
     const [data, setData] = useState<{ hospitals: Improver[], primaryCare: Improver[] }>({ hospitals: [], primaryCare: [] });
     const [isLoading, setIsLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
@@ -32,7 +37,9 @@ const TopImprovers = () => {
         setMounted(true);
         const fetchImprovers = async () => {
             try {
-                const res = await fetch('/telemedicine/api/top-improvers', { cache: 'no-store' });
+                const url = source ? `/telemedicine/api/top-improvers?source=${encodeURIComponent(source)}` : '/telemedicine/api/top-improvers';
+                const res = await fetch(url, { cache: 'no-store' });
+
                 if (!res.ok) throw new Error('Fetch failed');
                 const result = await res.json();
                 if (result.hospitals && result.primaryCare) {

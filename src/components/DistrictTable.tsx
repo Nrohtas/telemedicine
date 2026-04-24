@@ -17,17 +17,27 @@ interface DistrictStat {
 
 interface DistrictTableProps {
     type?: string;
+    source?: string;
 }
 
-export default function DistrictTable({ type }: DistrictTableProps = {}) {
+
+export default function DistrictTable({ type, source }: DistrictTableProps = {}) {
     const [stats, setStats] = useState<DistrictStat[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         // Fetch stats
-        const url = type ? `/telemedicine/api/ampur-stats?type=${encodeURIComponent(type)}` : '/telemedicine/api/ampur-stats';
+        let url = '/telemedicine/api/ampur-stats';
+        const params = new URLSearchParams();
+        if (type) params.append('type', type);
+        if (source) params.append('source', source);
+        
+        const queryString = params.toString();
+        if (queryString) url += `?${queryString}`;
+
         fetch(url)
+
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -44,7 +54,8 @@ export default function DistrictTable({ type }: DistrictTableProps = {}) {
                 setError('เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล');
                 setLoading(false);
             });
-    }, [type]);
+    }, [type, source]);
+
 
     if (loading) {
         return (
