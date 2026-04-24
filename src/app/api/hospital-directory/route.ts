@@ -28,7 +28,7 @@ export async function GET(request: Request) {
                 t.moph_past_date,
                 t.buddycare_date,
                 t.buddycare_past_date,
-                FLOOR(COALESCE(tg.op_30, 0)) as op_30
+                CEILING(COALESCE(tg.op_30, 0)) as op_30
             FROM hospital h
             LEFT JOIN (
                 SELECT hostype_new, hostype_name, hostype_list, MAX(CASE WHEN hostype = 'รพช.' THEN 'รพ.' ELSE hostype END) as hostype

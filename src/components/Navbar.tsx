@@ -225,6 +225,19 @@ const Navbar = ({
                                 <span>Dashboard</span>
                             </SoftButton>
                         </Link>
+                        <Link href="/daily" className="hover:opacity-80 transition-opacity">
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/daily'}
+                                className="flex items-center justify-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3v18h18M7 15l3-3 3 2 5-7" />
+                                </svg>
+                                <span>Daily</span>
+                            </SoftButton>
+                        </Link>
+
                         <Link
                             href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}` : ''}`}
                             className="hover:opacity-80 transition-opacity"
@@ -238,19 +251,6 @@ const Navbar = ({
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                 </svg>
                                 <span>หน่วยบริการ</span>
-                            </SoftButton>
-                        </Link>
-
-                        <Link href="/daily" className="hover:opacity-80 transition-opacity">
-                            <SoftButton
-                                variant="nav"
-                                active={pathname === '/daily'}
-                                className="flex items-center justify-center gap-2"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3v18h18M7 15l3-3 3 2 5-7" />
-                                </svg>
-                                <span>Daily</span>
                             </SoftButton>
                         </Link>
 
@@ -311,6 +311,18 @@ const Navbar = ({
                                 <span className="text-xs font-black uppercase tracking-widest">Dashboard</span>
                             </SoftButton>
                         </Link>
+                        <Link href="/daily" onClick={() => setIsMenuOpen(false)}>
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/daily'}
+                                className="flex items-center justify-center gap-3 w-full py-3"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3v18h18M7 15l3-3 3 2 5-7" />
+                                </svg>
+                                <span className="text-xs font-black uppercase tracking-widest">Daily</span>
+                            </SoftButton>
+                        </Link>
                         <Link
                             href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}` : ''}`}
                             onClick={() => setIsMenuOpen(false)}
@@ -324,18 +336,6 @@ const Navbar = ({
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                 </svg>
                                 <span className="text-xs font-black uppercase tracking-widest">หน่วยบริการ</span>
-                            </SoftButton>
-                        </Link>
-                        <Link href="/daily" onClick={() => setIsMenuOpen(false)}>
-                            <SoftButton
-                                variant="nav"
-                                active={pathname === '/daily'}
-                                className="flex items-center justify-center gap-3 w-full py-3"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3v18h18M7 15l3-3 3 2 5-7" />
-                                </svg>
-                                <span className="text-xs font-black uppercase tracking-widest">Daily</span>
                             </SoftButton>
                         </Link>
                         <Link href="/admin" onClick={() => setIsMenuOpen(false)}>

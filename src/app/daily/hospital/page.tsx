@@ -75,7 +75,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
       h.hospname,
       h.amp_code,
       h.amp_name,
-      FLOOR(COALESCE(p.target, 0)) AS platform_target,
+      COALESCE(p.target, 0) AS platform_target,
       COALESCE(p.result, 0) AS platform_result,
       CASE
         WHEN COALESCE(p.target, 0) > 0
@@ -127,6 +127,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
         COALESCE(SUM(visit_type_3), 0) AS visit_type_3,
         COALESCE(SUM(visit_type_5), 0) AS visit_type_5
       FROM visit_type_daily
+      WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
       GROUP BY hoscode
     ) vtd ON vtd.hoscode = h.hospcode
     WHERE h.amp_code = ?
@@ -183,6 +184,8 @@ export default async function DailyHospitalPage({
   const platformTotalPercent = totals.platform_target > 0 ? (totals.platform_result / totals.platform_target) * 100 : 0;
   const totalPercent = totals.total > 0 ? (totals.visit_type_5 / totals.total) * 100 : 0;
   const totalDiffPlatformHis = totals.visit_type_5 - totals.platform_result;
+  const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ข้อมูลระหว่าง 23 มีนาคม 2569 - ${rows.length > 0 ? formatThaiDate(rows[0].latest_date || new Date().toISOString()) : "-"
+    }`;
 
   const getSortUrl = (column: string) => {
     const nextOrder = sortBy === column && sortOrder === "ASC" ? "DESC" : "ASC";
@@ -238,6 +241,11 @@ export default async function DailyHospitalPage({
           </div>
 
           <div className="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-xl shadow-slate-900/5">
+            <div className="border-b border-slate-100 bg-white px-5 py-3">
+              <p className="text-sm font-bold text-emerald-800 md:text-base">
+                {reportPeriodLabel}
+              </p>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1400px] divide-y divide-slate-100">
                 <thead className="bg-slate-50">
@@ -255,9 +263,9 @@ export default async function DailyHospitalPage({
                     <th className="border-l-2 border-indigo-300 bg-indigo-50 px-5 py-3 text-indigo-700" colSpan={3}>
                       (1) ผลงานบนแพลตฟอร์ม
                       <div className="text-[10px] font-bold opacity-80 mt-0.5">
-                        <a 
-                          href="https://datastudio.google.com/u/0/reporting/33f2a1d7-2f28-43b1-85ea-6cf3e8d579ac/page/p_q5mrcvqeyd" 
-                          target="_blank" 
+                        <a
+                          href="https://datastudio.google.com/u/0/reporting/33f2a1d7-2f28-43b1-85ea-6cf3e8d579ac/page/p_q5mrcvqeyd"
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="hover:underline"
                         >
@@ -267,9 +275,9 @@ export default async function DailyHospitalPage({
                     </th>
                     <th className="border-l-2 border-emerald-300 bg-emerald-50 px-5 py-3 text-emerald-700" colSpan={5}>
                       (2) ผลงานใน HIS (
-                      <a 
-                        href="https://hdc.moph.go.th/plk/public/standard-report-detail/2d85d6ec39840f8051854b028fa13073" 
-                        target="_blank" 
+                      <a
+                        href="https://hdc.moph.go.th/plk/public/standard-report-detail/2d85d6ec39840f8051854b028fa13073"
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="hover:underline hover:text-emerald-900 font-black"
                       >
@@ -343,7 +351,7 @@ export default async function DailyHospitalPage({
                           {row.hospname}
                         </Link>
                       </td>
-                      <NumberCell value={row.platform_target} className="border-l-2 border-indigo-200 bg-indigo-50/20" />
+                      <NumberCell value={Math.round(row.platform_target)} className="border-l-2 border-indigo-200 bg-indigo-50/20" />
                       <NumberCell value={row.platform_result} strong className="bg-indigo-50/20" />
                       <PercentCell value={row.platform_percent} className="bg-indigo-50/20" />
                       <NumberCell value={row.visit_type_2} className="border-l-2 border-emerald-200 bg-emerald-50/20" />
@@ -362,20 +370,23 @@ export default async function DailyHospitalPage({
                     </tr>
                   )}
                 </tbody>
-                <tfoot className="bg-slate-900 text-white">
-                  <tr>
-                    <td className="px-5 py-4 font-black" colSpan={2}>
-                      รวม
+                <tfoot className="sticky bottom-0 z-10 bg-white border-t-2 border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
+                  <tr className="text-center">
+                    <td className="px-5 py-5 text-left font-black bg-slate-50" colSpan={2}>
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-1.5 rounded-full bg-slate-400"></div>
+                        <span className="text-base font-black text-slate-700">รวม</span>
+                      </div>
                     </td>
-                    <NumberCell value={totals.platform_target} footer className="border-l-2 border-indigo-300 bg-indigo-950/30" />
-                    <NumberCell value={totals.platform_result} footer className="bg-indigo-950/30" />
-                    <PercentCell value={platformTotalPercent} footer className="bg-indigo-950/30" />
-                    <NumberCell value={totals.visit_type_2} footer className="border-l-2 border-emerald-300 bg-emerald-950/25" />
-                    <NumberCell value={totals.visit_type_3} footer />
+                    <NumberCell value={Math.round(totals.platform_target)} footer className="bg-indigo-50/50 text-blue-700 font-black" />
+                    <NumberCell value={totals.platform_result} footer className="bg-indigo-50/50 text-blue-700 font-black" />
+                    <PercentCell value={platformTotalPercent} footer className="bg-indigo-50/50 text-blue-700 font-black" />
+                    <NumberCell value={totals.visit_type_2} footer className="bg-emerald-50/50 text-emerald-700 font-black" />
+                    <NumberCell value={totals.visit_type_3} footer className="bg-emerald-50/50 text-emerald-700 font-black" />
                     <TelemedicineBadgeCell value={totals.visit_type_5} footer />
-                    <NumberCell value={totals.total} footer compact />
-                    <PercentCell value={totalPercent} footer />
-                    <DiffCell value={totalDiffPlatformHis} footer className="border-l-2 border-amber-300 bg-amber-950/25" />
+                    <NumberCell value={totals.total} footer compact className="bg-slate-50/50 text-slate-700 font-black" />
+                    <PercentCell value={totalPercent} footer className="bg-slate-50/50 text-slate-700 font-black" />
+                    <DiffCell value={totalDiffPlatformHis} footer className="bg-amber-50/50 text-amber-700 font-black" />
                   </tr>
                 </tfoot>
               </table>
@@ -395,20 +406,21 @@ function NumberCell({
   footer = false,
   compact = false,
   className = "",
+  showDecimal = false,
 }: {
   value: number;
   strong?: boolean;
   footer?: boolean;
   compact?: boolean;
   className?: string;
+  showDecimal?: boolean;
 }) {
   const baseClassName = footer
-    ? `px-5 py-4 text-right text-[11px] ${compact ? "font-normal text-slate-200" : "font-black"}`
-    : `whitespace-nowrap px-5 py-4 text-right ${
-        compact ? "text-[11px] font-normal text-slate-500" : strong ? "text-[13px] font-black text-slate-950" : "text-[13px] font-bold text-slate-700"
-      }`;
+    ? `px-5 py-4 text-right text-[11px] ${compact ? "font-normal text-slate-600" : "font-black"}`
+    : `whitespace-nowrap px-5 py-2.5 text-right ${compact ? "text-[11px] font-normal text-slate-500" : strong ? "text-[13px] font-black text-slate-950" : "text-[13px] font-bold text-slate-700"
+    }`;
 
-  return <td className={`${baseClassName} ${className}`}>{numberFormat.format(value)}</td>;
+  return <td className={`${baseClassName} ${className}`}>{showDecimal ? percentFormat.format(value) : numberFormat.format(value)}</td>;
 }
 
 function TelemedicineBadgeCell({
@@ -419,11 +431,11 @@ function TelemedicineBadgeCell({
   footer?: boolean;
 }) {
   return (
-    <td className="whitespace-nowrap px-5 py-4 text-right">
+    <td className={`whitespace-nowrap px-5 text-right ${footer ? "py-4 bg-emerald-50/50" : "py-2.5"}`}>
       <span
         className={
           footer
-            ? "inline-flex min-w-20 justify-center rounded-full bg-emerald-500 px-4 py-1.5 text-[15px] font-black text-white"
+            ? "inline-flex min-w-20 justify-center rounded-full bg-emerald-100 px-4 py-1.5 text-[15px] font-black text-emerald-800 ring-1 ring-emerald-200"
             : "inline-flex min-w-20 justify-center rounded-full bg-emerald-50 px-4 py-1.5 text-[15px] font-black text-emerald-700 ring-1 ring-emerald-200 group-hover:bg-emerald-100"
         }
       >
@@ -443,11 +455,11 @@ function PercentCell({
   className?: string;
 }) {
   return (
-    <td className={`whitespace-nowrap px-5 text-right text-[11px] ${footer ? "py-4 font-black" : "py-4"} ${className}`}>
+    <td className={`whitespace-nowrap px-5 text-right text-[11px] ${footer ? "py-4 font-black" : "py-2.5"} ${className}`}>
       <span
         className={
           footer
-            ? "text-white"
+            ? ""
             : "rounded-full bg-slate-50 px-3 py-1 font-black text-slate-700 ring-1 ring-slate-100 group-hover:bg-white"
         }
       >
@@ -467,14 +479,13 @@ function DiffCell({
   className?: string;
 }) {
   const colorClass = value > 0 ? "text-emerald-700" : value < 0 ? "text-rose-600" : "text-slate-500";
-  const footerColorClass = value > 0 ? "text-emerald-300" : value < 0 ? "text-rose-300" : "text-slate-200";
+  const footerColorClass = value > 0 ? "text-emerald-700" : value < 0 ? "text-rose-700" : "text-slate-600";
   const sign = value > 0 ? "+" : "";
 
   return (
-    <td className={`whitespace-nowrap px-5 text-right text-[11px] ${footer ? "py-4 font-black" : "py-4 font-black"} ${className}`}>
-      <span className={footer ? footerColorClass : colorClass}>
-        {sign}
-        {numberFormat.format(value)}
+    <td className={`whitespace-nowrap px-5 text-right text-[11px] ${footer ? "py-4 font-black" : "py-2.5 font-black"} ${className}`}>
+      <span className={footer ? "" : colorClass}>
+        {sign}{numberFormat.format(value)}
       </span>
     </td>
   );

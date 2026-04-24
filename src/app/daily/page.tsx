@@ -66,7 +66,7 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
     SELECT
       a.amp_code,
       a.amp_name,
-      FLOOR(COALESCE(SUM(p.target_raw), 0)) AS platform_target,
+      COALESCE(SUM(p.target_raw), 0) AS platform_target,
       COALESCE(SUM(p.result), 0) AS platform_result,
       CASE
         WHEN COALESCE(SUM(p.target_raw), 0) > 0
@@ -114,6 +114,7 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
         COALESCE(SUM(visit_type_3), 0) AS visit_type_3,
         COALESCE(SUM(visit_type_5), 0) AS visit_type_5
       FROM visit_type_daily
+      WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
       GROUP BY hoscode
     ) vtd ON vtd.hoscode = h.hospcode
     GROUP BY a.amp_code, a.amp_name, latest.latest_date
@@ -162,7 +163,7 @@ export default async function DailyPage({
   const platformTotalPercent = totals.platform_target > 0 ? (totals.platform_result / totals.platform_target) * 100 : 0;
   const totalPercent = totals.total > 0 ? (totals.visit_type_5 / totals.total) * 100 : 0;
   const totalDiffPlatformHis = totals.visit_type_5 - totals.platform_result;
-  const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ระหว่าง 23 มีนาคม 2569 - ${formatCurrentThaiDate()}`;
+  const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ข้อมูลระหว่าง 23 มีนาคม 2569 - ${formatCurrentThaiDate()}`;
 
   const getSortUrl = (column: string) => {
     const nextOrder = sortBy === column && sortOrder === "ASC" ? "DESC" : "ASC";
@@ -179,141 +180,146 @@ export default async function DailyPage({
       <Navbar showFilters={false} />
 
       <section className="px-3 md:px-6 mt-2 md:mt-3">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0 mb-3 px-1">
-            <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">สรุปรายอำเภอ</h3>
-            <LastUpdate showLogo={false} type="daily" />
-          </div>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0 mb-3 px-1">
+          <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">สรุปรายอำเภอ</h3>
+          <LastUpdate showLogo={false} type="daily" />
+        </div>
 
-          <div className="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-xl shadow-slate-900/5">
-            <div className="border-b border-slate-100 bg-white px-5 py-3">
-              <p className="text-sm font-bold text-emerald-800 md:text-base">
-                {reportPeriodLabel}
-              </p>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[1280px] divide-y divide-slate-100">
-                <thead className="bg-slate-50">
-                  <tr className="border-b border-slate-200 text-center text-[13px] font-black text-slate-600">
-                    <th className="px-5 py-3 text-left" rowSpan={2}>
-                      <Link href={getSortUrl("amp_name")} scroll={false} className="hover:text-emerald-600">
-                        อำเภอ <SortIcon column="amp_name" />
-                      </Link>
-                    </th>
-                    <th className="border-l-2 border-indigo-300 bg-indigo-50 px-5 py-3 text-indigo-700" colSpan={3}>
-                      (1) ผลงานบนแพลตฟอร์ม
-                      <div className="text-[10px] font-bold opacity-80 mt-0.5">
-                        <a 
-                          href="https://datastudio.google.com/u/0/reporting/33f2a1d7-2f28-43b1-85ea-6cf3e8d579ac/page/p_q5mrcvqeyd" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="hover:underline"
-                        >
-                          หมอพร้อม Station + สอน.บัดดี้
-                        </a>
-                      </div>
-                    </th>
-                    <th className="border-l-2 border-emerald-300 bg-emerald-50 px-5 py-3 text-emerald-700" colSpan={5}>
-                      (2) ผลงานใน HIS (
-                      <a 
-                        href="https://hdc.moph.go.th/plk/public/standard-report-detail/2d85d6ec39840f8051854b028fa13073" 
-                        target="_blank" 
+        <div className="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-xl shadow-slate-900/5">
+          <div className="border-b border-slate-100 bg-white px-5 py-3">
+            <p className="text-sm font-bold text-emerald-800 md:text-base">
+              {reportPeriodLabel}
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[1280px] divide-y divide-slate-100">
+              <thead className="bg-slate-50">
+                <tr className="border-b border-slate-200 text-center text-[13px] font-black text-slate-600">
+                  <th className="px-5 py-3 text-left" rowSpan={2}>
+                    <Link href={getSortUrl("amp_name")} scroll={false} className="hover:text-emerald-600">
+                      อำเภอ <SortIcon column="amp_name" />
+                    </Link>
+                  </th>
+                  <th className="border-l-2 border-indigo-300 bg-indigo-50 px-5 py-3 text-indigo-700" colSpan={3}>
+                    (1) ผลงานบนแพลตฟอร์ม
+                    <div className="text-[10px] font-bold opacity-80 mt-0.5">
+                      <a
+                        href="https://datastudio.google.com/u/0/reporting/33f2a1d7-2f28-43b1-85ea-6cf3e8d579ac/page/p_q5mrcvqeyd"
+                        target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:underline hover:text-emerald-900 font-black"
+                        className="hover:underline"
                       >
-                        HDC
+                        หมอพร้อม Station + สอน.บัดดี้
                       </a>
-                      )
-                    </th>
-                    <th className="border-l-2 border-amber-300 bg-amber-50 px-5 py-3 text-amber-700" colSpan={1}>
-                      (2) ลบ (1)
-                    </th>
+                    </div>
+                  </th>
+                  <th className="border-l-2 border-emerald-300 bg-emerald-50 px-5 py-3 text-emerald-700" colSpan={5}>
+                    (2) ผลงานใน HIS (
+                    <a
+                      href="https://hdc.moph.go.th/plk/public/standard-report-detail/2d85d6ec39840f8051854b028fa13073"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline hover:text-emerald-900 font-black"
+                    >
+                      HDC
+                    </a>
+                    )
+                  </th>
+                  <th className="border-l-2 border-amber-300 bg-amber-50 px-5 py-3 text-amber-700" colSpan={1}>
+                    (2) ลบ (1)
+                  </th>
+                </tr>
+                <tr className="border-b border-slate-200 text-left text-[13px] font-black uppercase tracking-[0.08em] text-slate-500">
+                  <th className="border-l-2 border-indigo-300 bg-indigo-50/70 px-5 py-3 text-right">
+                    <Link href={getSortUrl("platform_target")} scroll={false} className="hover:text-indigo-700">
+                      เป้าหมาย <SortIcon column="platform_target" />
+                    </Link>
+                  </th>
+                  <th className="bg-indigo-50/70 px-5 py-3 text-right">
+                    <Link href={getSortUrl("platform_result")} scroll={false} className="hover:text-indigo-700">
+                      ผลงาน <SortIcon column="platform_result" />
+                    </Link>
+                  </th>
+                  <th className="bg-indigo-50/70 px-5 py-3 text-right">
+                    <Link href={getSortUrl("platform_percent")} scroll={false} className="hover:text-indigo-700">
+                      ร้อยละ <SortIcon column="platform_percent" />
+                    </Link>
+                  </th>
+                  <th className="border-l-2 border-emerald-300 bg-emerald-50/70 px-5 py-3 text-right">
+                    <Link href={getSortUrl("visit_type_2")} scroll={false} className="hover:text-emerald-600">
+                      มาตามนัด(2) <SortIcon column="visit_type_2" />
+                    </Link>
+                  </th>
+                  <th className="bg-emerald-50/70 px-5 py-3 text-right">
+                    <Link href={getSortUrl("visit_type_3")} scroll={false} className="hover:text-emerald-600">
+                      รับส่งต่อ(3) <SortIcon column="visit_type_3" />
+                    </Link>
+                  </th>
+                  <th className="bg-emerald-50/70 px-5 py-3 text-right">
+                    <Link href={getSortUrl("visit_type_5")} scroll={false} className="hover:text-emerald-600">
+                      แพทย์ทางไกล(5) <SortIcon column="visit_type_5" />
+                    </Link>
+                  </th>
+                  <th className="bg-emerald-50/70 px-5 py-3 text-right">
+                    <Link href={getSortUrl("total")} scroll={false} className="hover:text-emerald-600">
+                      2+3+5 <SortIcon column="total" />
+                    </Link>
+                  </th>
+                  <th className="bg-emerald-50/70 px-5 py-3 text-right">
+                    <Link href={getSortUrl("percent")} scroll={false} className="hover:text-emerald-600">
+                      ร้อยละ <SortIcon column="percent" />
+                    </Link>
+                  </th>
+                  <th className="border-l-2 border-amber-300 bg-amber-50/70 px-5 py-3 text-right">
+                    <Link href={getSortUrl("diff_platform_his")} scroll={false} className="hover:text-amber-700">
+                      ผลต่าง <SortIcon column="diff_platform_his" />
+                    </Link>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {rows.map((row) => (
+                  <tr key={row.amp_code} className="group hover:bg-slate-50">
+                    <td className="whitespace-nowrap px-5 py-2.5">
+                      <Link
+                        href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}`}
+                        className="font-black text-slate-900 underline-offset-4 group-hover:text-emerald-700 group-hover:underline"
+                      >
+                        {row.amp_name}
+                      </Link>
+                    </td>
+                    <NumberCell value={Math.round(row.platform_target)} className="border-l-2 border-indigo-200 bg-indigo-50/20" />
+                    <NumberCell value={row.platform_result} strong className="bg-indigo-50/20" />
+                    <PercentCell value={row.platform_percent} className="bg-indigo-50/20" />
+                    <NumberCell value={row.visit_type_2} className="border-l-2 border-emerald-200 bg-emerald-50/20" />
+                    <NumberCell value={row.visit_type_3} />
+                    <TelemedicineBadgeCell value={row.visit_type_5} />
+                    <NumberCell value={row.total} compact />
+                    <PercentCell value={row.percent} />
+                    <DiffCell value={row.diff_platform_his} className="border-l-2 border-amber-200 bg-amber-50/25" />
                   </tr>
-                  <tr className="border-b border-slate-200 text-left text-[13px] font-black uppercase tracking-[0.08em] text-slate-500">
-                    <th className="border-l-2 border-indigo-300 bg-indigo-50/70 px-5 py-3 text-right">
-                      <Link href={getSortUrl("platform_target")} scroll={false} className="hover:text-indigo-700">
-                        เป้าหมาย <SortIcon column="platform_target" />
-                      </Link>
-                    </th>
-                    <th className="bg-indigo-50/70 px-5 py-3 text-right">
-                      <Link href={getSortUrl("platform_result")} scroll={false} className="hover:text-indigo-700">
-                        ผลงาน <SortIcon column="platform_result" />
-                      </Link>
-                    </th>
-                    <th className="bg-indigo-50/70 px-5 py-3 text-right">
-                      <Link href={getSortUrl("platform_percent")} scroll={false} className="hover:text-indigo-700">
-                        ร้อยละ <SortIcon column="platform_percent" />
-                      </Link>
-                    </th>
-                    <th className="border-l-2 border-emerald-300 bg-emerald-50/70 px-5 py-3 text-right">
-                      <Link href={getSortUrl("visit_type_2")} scroll={false} className="hover:text-emerald-600">
-                        มาตามนัด(2) <SortIcon column="visit_type_2" />
-                      </Link>
-                    </th>
-                    <th className="bg-emerald-50/70 px-5 py-3 text-right">
-                      <Link href={getSortUrl("visit_type_3")} scroll={false} className="hover:text-emerald-600">
-                        รับส่งต่อ(3) <SortIcon column="visit_type_3" />
-                      </Link>
-                    </th>
-                    <th className="bg-emerald-50/70 px-5 py-3 text-right">
-                      <Link href={getSortUrl("visit_type_5")} scroll={false} className="hover:text-emerald-600">
-                        แพทย์ทางไกล(5) <SortIcon column="visit_type_5" />
-                      </Link>
-                    </th>
-                    <th className="bg-emerald-50/70 px-5 py-3 text-right">
-                      <Link href={getSortUrl("total")} scroll={false} className="hover:text-emerald-600">
-                        2+3+5 <SortIcon column="total" />
-                      </Link>
-                    </th>
-                    <th className="bg-emerald-50/70 px-5 py-3 text-right">
-                      <Link href={getSortUrl("percent")} scroll={false} className="hover:text-emerald-600">
-                        ร้อยละ <SortIcon column="percent" />
-                      </Link>
-                    </th>
-                    <th className="border-l-2 border-amber-300 bg-amber-50/70 px-5 py-3 text-right">
-                      <Link href={getSortUrl("diff_platform_his")} scroll={false} className="hover:text-amber-700">
-                        ผลต่าง <SortIcon column="diff_platform_his" />
-                      </Link>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {rows.map((row) => (
-                    <tr key={row.amp_code} className="group hover:bg-slate-50">
-                      <td className="whitespace-nowrap px-5 py-2.5">
-                        <Link
-                          href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}`}
-                          className="font-black text-slate-900 underline-offset-4 group-hover:text-emerald-700 group-hover:underline"
-                        >
-                          {row.amp_name}
-                        </Link>
-                      </td>
-                      <NumberCell value={row.platform_target} className="border-l-2 border-indigo-200 bg-indigo-50/20" />
-                      <NumberCell value={row.platform_result} strong className="bg-indigo-50/20" />
-                      <PercentCell value={row.platform_percent} className="bg-indigo-50/20" />
-                      <NumberCell value={row.visit_type_2} className="border-l-2 border-emerald-200 bg-emerald-50/20" />
-                      <NumberCell value={row.visit_type_3} />
-                      <TelemedicineBadgeCell value={row.visit_type_5} />
-                      <NumberCell value={row.total} compact />
-                      <PercentCell value={row.percent} />
-                      <DiffCell value={row.diff_platform_his} className="border-l-2 border-amber-200 bg-amber-50/25" />
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot className="bg-slate-900 text-white">
-                  <tr>
-                    <td className="px-5 py-4 font-black">รวมทั้งจังหวัด</td>
-                    <NumberCell value={totals.platform_target} footer className="border-l-2 border-indigo-300 bg-indigo-950/30" />
-                    <NumberCell value={totals.platform_result} footer className="bg-indigo-950/30" />
-                    <PercentCell value={platformTotalPercent} footer className="bg-indigo-950/30" />
-                    <NumberCell value={totals.visit_type_2} footer className="border-l-2 border-emerald-300 bg-emerald-950/25" />
-                    <NumberCell value={totals.visit_type_3} footer />
+                ))}
+              </tbody>
+                <tfoot className="sticky bottom-0 z-10 bg-white border-t-2 border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
+                  <tr className="text-center">
+                    <td className="px-5 py-5 text-left font-black bg-slate-50">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-1.5 rounded-full bg-slate-400"></div>
+                        <span className="text-base font-black text-slate-700">รวมทั้งจังหวัด</span>
+                      </div>
+                    </td>
+                    <NumberCell value={Math.round(totals.platform_target)} footer className="bg-indigo-50/50 text-blue-700 font-black" />
+                    <NumberCell value={totals.platform_result} footer className="bg-indigo-50/50 text-blue-700 font-black" />
+                    <PercentCell value={platformTotalPercent} footer className="bg-indigo-50/50 text-blue-700 font-black" />
+                    <NumberCell value={totals.visit_type_2} footer className="bg-emerald-50/50 text-emerald-700 font-black" />
+                    <NumberCell value={totals.visit_type_3} footer className="bg-emerald-50/50 text-emerald-700 font-black" />
                     <TelemedicineBadgeCell value={totals.visit_type_5} footer />
-                    <NumberCell value={totals.total} footer compact />
-                    <PercentCell value={totalPercent} footer />
-                    <DiffCell value={totalDiffPlatformHis} footer className="border-l-2 border-amber-300 bg-amber-950/25" />
+                    <NumberCell value={totals.total} footer compact className="bg-slate-50/50 text-slate-700 font-black" />
+                    <PercentCell value={totalPercent} footer className="bg-slate-50/50 text-slate-700 font-black" />
+                    <DiffCell value={totalDiffPlatformHis} footer className="bg-amber-50/50 text-amber-700 font-black" />
                   </tr>
                 </tfoot>
-              </table>
+            </table>
           </div>
         </div>
       </section>
@@ -329,20 +335,21 @@ function NumberCell({
   footer = false,
   compact = false,
   className = "",
+  showDecimal = false,
 }: {
   value: number;
   strong?: boolean;
   footer?: boolean;
   compact?: boolean;
   className?: string;
+  showDecimal?: boolean;
 }) {
   const baseClassName = footer
-    ? `px-5 py-4 text-right text-[11px] ${compact ? "font-normal text-slate-200" : "font-black"}`
-    : `whitespace-nowrap px-5 py-2.5 text-right ${
-        compact ? "text-[11px] font-normal text-slate-500" : strong ? "text-[13px] font-black text-slate-950" : "text-[13px] font-bold text-slate-700"
-      }`;
+    ? `px-5 py-4 text-right text-[11px] ${compact ? "font-normal text-slate-600" : "font-black"}`
+    : `whitespace-nowrap px-5 py-2.5 text-right ${compact ? "text-[11px] font-normal text-slate-500" : strong ? "text-[13px] font-black text-slate-950" : "text-[13px] font-bold text-slate-700"
+    }`;
 
-  return <td className={`${baseClassName} ${className}`}>{numberFormat.format(value)}</td>;
+  return <td className={`${baseClassName} ${className}`}>{showDecimal ? percentFormat.format(value) : numberFormat.format(value)}</td>;
 }
 
 function TelemedicineBadgeCell({
@@ -353,11 +360,11 @@ function TelemedicineBadgeCell({
   footer?: boolean;
 }) {
   return (
-    <td className={`whitespace-nowrap px-5 text-right ${footer ? "py-4" : "py-2.5"}`}>
+    <td className={`whitespace-nowrap px-5 text-right ${footer ? "py-4 bg-emerald-50/50" : "py-2.5"}`}>
       <span
         className={
           footer
-            ? "inline-flex min-w-20 justify-center rounded-full bg-emerald-500 px-4 py-1.5 text-[15px] font-black text-white"
+            ? "inline-flex min-w-20 justify-center rounded-full bg-emerald-100 px-4 py-1.5 text-[15px] font-black text-emerald-800 ring-1 ring-emerald-200"
             : "inline-flex min-w-20 justify-center rounded-full bg-emerald-50 px-4 py-1.5 text-[15px] font-black text-emerald-700 ring-1 ring-emerald-200 group-hover:bg-emerald-100"
         }
       >
@@ -381,7 +388,7 @@ function PercentCell({
       <span
         className={
           footer
-            ? "text-white"
+            ? ""
             : "rounded-full bg-slate-50 px-3 py-1 font-black text-slate-700 ring-1 ring-slate-100 group-hover:bg-white"
         }
       >
@@ -401,7 +408,7 @@ function DiffCell({
   className?: string;
 }) {
   const colorClass = value > 0 ? "text-emerald-700" : value < 0 ? "text-rose-600" : "text-slate-500";
-  const footerColorClass = value > 0 ? "text-emerald-300" : value < 0 ? "text-rose-300" : "text-slate-200";
+  const footerColorClass = value > 0 ? "text-emerald-700" : value < 0 ? "text-rose-700" : "text-slate-600";
   const sign = value > 0 ? "+" : "";
 
   return (

@@ -33,7 +33,7 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
       "ชื่อหน่วยบริการ": row.hospname,
       "สังกัด": row.hostype_name || '-',
       "ประเภท": row.hostype_level || '-',
-      "เป้าหมาย (1)": row.platform_target,
+      "เป้าหมาย (1)": Math.round(row.platform_target),
       "ผลงานแพลตฟอร์ม (1)": row.platform_result,
       "ร้อยละ (1)": row.platform_percent.toFixed(2),
       "มาตามนัด (2)": row.visit_type_2,
@@ -73,7 +73,7 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
       "ชื่อหน่วยบริการ": "รวมทั้งหมด",
       "สังกัด": "",
       "ประเภท": "",
-      "เป้าหมาย (1)": totals.platform_target,
+      "เป้าหมาย (1)": Math.round(totals.platform_target),
       "ผลงานแพลตฟอร์ม (1)": totals.platform_result,
       "ร้อยละ (1)": totalPercentPlatform.toFixed(2),
       "มาตามนัด (2)": totals.visit_type_2,
@@ -91,7 +91,8 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
 
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0];
-    writeFileXLSX(wb, `Daily_Telemedicine_อ_${districtName}_${dateStr}.xlsx`);
+    const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/:/g, '-');
+    writeFileXLSX(wb, `Daily_Telemedicine_อ_${districtName}_${dateStr}_${timeStr}.xlsx`);
   };
 
   return (
