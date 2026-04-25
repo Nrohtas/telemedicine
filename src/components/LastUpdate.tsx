@@ -44,6 +44,18 @@ export default function LastUpdate({ showLogo = true, type }: LastUpdateProps) {
                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-800"></span>
                 </span>
                 <span className="text-[10px] font-bold text-slate-400/80 tracking-wider whitespace-nowrap">
+                    {!type && (
+                        <span className="mr-3 pr-3 border-r border-slate-200">
+                            ที่มา : <a 
+                                href="https://lookerstudio.google.com/u/0/reporting/33f2a1d7-2f28-43b1-85ea-6cf3e8d579ac/page/p_q5mrcvqeyd" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="hover:text-blue-800 transition-colors"
+                            >
+                                กองสนับสนุนระบบสุขภาพปฐมภูมิ
+                            </a>
+                        </span>
+                    )}
                     Update : {formatThaiDate(lastUpdate)}
                 </span>
             </div>
