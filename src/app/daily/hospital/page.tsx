@@ -75,11 +75,11 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
       h.hospname,
       h.amp_code,
       h.amp_name,
-      COALESCE(p.target, 0) AS platform_target,
+      COALESCE(tgt.target, 0) AS platform_target,
       COALESCE(p.result, 0) AS platform_result,
       CASE
-        WHEN COALESCE(p.target, 0) > 0
-        THEN COALESCE(p.result, 0) / COALESCE(p.target, 0) * 100
+        WHEN COALESCE(tgt.target, 0) > 0
+        THEN COALESCE(p.result, 0) / COALESCE(tgt.target, 0) * 100
         ELSE 0
       END AS platform_percent,
       COALESCE(vtd.visit_type_2, 0) AS visit_type_2,
@@ -114,8 +114,16 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
         FROM hostype
         GROUP BY hostype_new, hostype_name
     ) ht ON h.hostype_new = ht.hostype_new
-    LEFT JOIN v_tele_target_result p
-      ON p.hospcode = h.hospcode
+    LEFT JOIN (
+      SELECT hospcode, op_30 AS target
+      FROM target
+      WHERE b_year = '2568'
+    ) tgt ON tgt.hospcode = h.hospcode
+    LEFT JOIN (
+      SELECT hospcode, result
+      FROM telemed
+      WHERE b_year = '2569'
+    ) p ON p.hospcode = h.hospcode
     LEFT JOIN (
       SELECT MAX(visit_date) AS latest_date
       FROM visit_type_daily

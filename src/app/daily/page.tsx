@@ -66,11 +66,11 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
     SELECT
       a.amp_code,
       a.amp_name,
-      COALESCE(SUM(p.target_raw), 0) AS platform_target,
+      COALESCE(SUM(tgt.target_raw), 0) AS platform_target,
       COALESCE(SUM(p.result), 0) AS platform_result,
       CASE
-        WHEN COALESCE(SUM(p.target_raw), 0) > 0
-        THEN COALESCE(SUM(p.result), 0) / COALESCE(SUM(p.target_raw), 0) * 100
+        WHEN COALESCE(SUM(tgt.target_raw), 0) > 0
+        THEN COALESCE(SUM(p.result), 0) / COALESCE(SUM(tgt.target_raw), 0) * 100
         ELSE 0
       END AS platform_percent,
       COALESCE(SUM(vtd.visit_type_2), 0) AS visit_type_2,
@@ -101,8 +101,16 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
     LEFT JOIN hospital h
       ON h.amp_code = a.amp_code
       AND h.status = '1'
-    LEFT JOIN v_tele_target_result p
-      ON p.hospcode = h.hospcode
+    LEFT JOIN (
+      SELECT hospcode, op_30 AS target_raw
+      FROM target
+      WHERE b_year = '2568'
+    ) tgt ON tgt.hospcode = h.hospcode
+    LEFT JOIN (
+      SELECT hospcode, result
+      FROM telemed
+      WHERE b_year = '2569'
+    ) p ON p.hospcode = h.hospcode
     LEFT JOIN (
       SELECT MAX(visit_date) AS latest_date
       FROM visit_type_daily
