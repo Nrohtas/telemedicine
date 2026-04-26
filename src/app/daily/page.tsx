@@ -232,6 +232,11 @@ export default async function DailyPage({
                       HDC
                     </a>
                     )
+                    <div className="flex justify-center mt-1">
+                      <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white/60 border border-emerald-200 text-emerald-800 shadow-sm">
+                        ร้อยละ : ( TYPEIN 5 / รวม 2,3,5 ) × 100
+                      </span>
+                    </div>
                   </th>
                   <th className="border-l-2 border-amber-300 bg-amber-50 px-5 py-3 text-amber-700" colSpan={1}>
                     (2) ลบ (1)
@@ -308,25 +313,25 @@ export default async function DailyPage({
                   </tr>
                 ))}
               </tbody>
-                <tfoot className="sticky bottom-0 z-10 bg-white border-t-2 border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
-                  <tr className="text-center">
-                    <td className="px-5 py-5 text-left font-black bg-slate-50">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-1.5 rounded-full bg-slate-400"></div>
-                        <span className="text-base font-black text-slate-700">รวมทั้งจังหวัด</span>
-                      </div>
-                    </td>
-                    <NumberCell value={Math.round(totals.platform_target)} footer className="bg-indigo-50/50 text-blue-700 font-black" />
-                    <NumberCell value={totals.platform_result} footer className="bg-indigo-50/50 text-blue-700 font-black" />
-                    <PercentCell value={platformTotalPercent} footer className="bg-indigo-50/50 text-blue-700 font-black" />
-                    <NumberCell value={totals.visit_type_2} footer className="bg-emerald-50/50 text-emerald-700 font-black" />
-                    <NumberCell value={totals.visit_type_3} footer className="bg-emerald-50/50 text-emerald-700 font-black" />
-                    <TelemedicineBadgeCell value={totals.visit_type_5} footer />
-                    <NumberCell value={totals.total} footer compact className="bg-slate-50/50 text-slate-700 font-black" />
-                    <PercentCell value={totalPercent} footer className="bg-slate-50/50 text-slate-700 font-black" />
-                    <DiffCell value={totalDiffPlatformHis} footer className="bg-amber-50/50 text-amber-700 font-black" />
-                  </tr>
-                </tfoot>
+              <tfoot className="sticky bottom-0 z-10 bg-white border-t-2 border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
+                <tr className="text-center">
+                  <td className="px-5 py-5 text-left font-black bg-slate-50">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-1.5 rounded-full bg-slate-400"></div>
+                      <span className="text-base font-black text-slate-700">รวมทั้งจังหวัด</span>
+                    </div>
+                  </td>
+                  <NumberCell value={Math.round(totals.platform_target)} footer className="bg-indigo-50/50 text-blue-700 font-black" />
+                  <NumberCell value={totals.platform_result} footer className="bg-indigo-50/50 text-blue-700 font-black" />
+                  <PercentCell value={platformTotalPercent} footer className="bg-indigo-50/50 text-blue-700 font-black" />
+                  <NumberCell value={totals.visit_type_2} footer className="bg-emerald-50/50 text-emerald-700 font-black" />
+                  <NumberCell value={totals.visit_type_3} footer className="bg-emerald-50/50 text-emerald-700 font-black" />
+                  <TelemedicineBadgeCell value={totals.visit_type_5} footer />
+                  <NumberCell value={totals.total} footer compact className="bg-slate-50/50 text-slate-700 font-black" />
+                  <PercentCell value={totalPercent} footer className="bg-slate-50/50 text-slate-700 font-black" />
+                  <DiffCell value={totalDiffPlatformHis} footer className="bg-amber-50/50 text-amber-700 font-black" />
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>

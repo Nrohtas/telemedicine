@@ -292,6 +292,11 @@ export default async function DailyHospitalPage({
                         HDC
                       </a>
                       )
+                      <div className="flex justify-center mt-1">
+                        <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white/60 border border-emerald-200 text-emerald-800 shadow-sm">
+                          ร้อยละ : ( TYPEIN 5 / รวม 2,3,5 ) × 100
+                        </span>
+                      </div>
                     </th>
                     <th className="border-l-2 border-amber-300 bg-amber-50 px-5 py-3 text-amber-700" colSpan={1}>
                       (2) ลบ (1)
