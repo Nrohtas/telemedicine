@@ -24,6 +24,7 @@ export async function middleware(request: NextRequest) {
             checkPath.startsWith('/api/last-update') ||
             checkPath.startsWith('/api/global-stats') ||
             checkPath.startsWith('/api/top-improvers') ||
+            checkPath.startsWith('/api/daily/top-performance') ||
             checkPath.startsWith('/api/updates') ||
             checkPath.startsWith('/api/target')
         ))

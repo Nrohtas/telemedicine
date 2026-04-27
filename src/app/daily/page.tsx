@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import pool from "@/lib/db";
 import LastUpdate from "@/components/LastUpdate";
 import Link from "next/link";
+import TopPerformance from "@/components/TopPerformance";
 
 export const dynamic = "force-dynamic";
 
@@ -335,6 +336,13 @@ export default async function DailyPage({
             </table>
           </div>
         </div>
+      </section>
+
+      <section className="px-3 md:px-6 mt-8">
+        <div className="mb-4 px-1">
+          <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">10 อันดับหน่วยบริการ (แพทย์ทางไกล)</h3>
+        </div>
+        <TopPerformance />
       </section>
 
       <Footer />
