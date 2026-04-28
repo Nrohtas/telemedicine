@@ -39,18 +39,18 @@ export default async function OnepagePage() {
         COALESCE(SUM(vtd.visit_type_5), 0) AS hdc_visit_type_5,
         COALESCE(SUM(p.result), 0) AS dashboard_result
       FROM ampur a
-      LEFT JOIN hospital h ON h.amp_code = a.amp_code AND h.status = '1'
+      LEFT JOIN hospital h ON h.amp_code = a.amp_code COLLATE utf8mb4_general_ci AND h.status = '1'
       LEFT JOIN (
         SELECT hoscode, COALESCE(SUM(visit_type_5), 0) AS visit_type_5
         FROM visit_type_daily
         WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
         GROUP BY hoscode
-      ) vtd ON vtd.hoscode = h.hospcode
+      ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
         SELECT hospcode, result
         FROM telemed_hdc
         WHERE b_year = '2569'
-      ) p ON p.hospcode = h.hospcode
+      ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       GROUP BY a.amp_code, a.amp_name
       ORDER BY hdc_visit_type_5 DESC
     `;
@@ -78,15 +78,15 @@ export default async function OnepagePage() {
         FROM visit_type_daily
         WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
         GROUP BY hoscode
-      ) vtd ON vtd.hoscode = h.hospcode
+      ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
         SELECT hospcode, result
         FROM telemed_hdc
         WHERE b_year = '2569'
-      ) p ON p.hospcode = h.hospcode
+      ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       WHERE h.status = '1' 
         AND h.hostype_new IN (5, 7)
-        AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข'
+        AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข' COLLATE utf8mb4_general_ci
       GROUP BY h.hospcode, h.hospname
       ORDER BY v5 DESC
     `;
@@ -128,8 +128,8 @@ export default async function OnepagePage() {
         COALESCE(vtd.visit_type_5, 0) AS v5,
         COALESCE(SUM(p.result), 0) AS dashboard_result
       FROM hospital h
-      LEFT JOIN ampur a ON a.amp_code = h.amp_code
-      JOIN hostype ht ON h.hostype_new = ht.hostype_new
+      LEFT JOIN ampur a ON a.amp_code = h.amp_code COLLATE utf8mb4_general_ci
+      JOIN hostype ht ON h.hostype_new = ht.hostype_new COLLATE utf8mb4_general_ci
       LEFT JOIN (
         SELECT hoscode, 
                COALESCE(SUM(visit_type_2), 0) AS visit_type_2,
@@ -138,15 +138,15 @@ export default async function OnepagePage() {
         FROM visit_type_daily
         WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
         GROUP BY hoscode
-      ) vtd ON vtd.hoscode = h.hospcode
+      ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
         SELECT hospcode, result
         FROM telemed_hdc
         WHERE b_year = '2569'
-      ) p ON p.hospcode = h.hospcode
+      ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       WHERE h.status = '1' 
         AND ht.hostype_new IN (8, 18, 21)
-        AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข'
+        AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข' COLLATE utf8mb4_general_ci
       GROUP BY h.hospcode, h.hospname, a.amp_name
       ORDER BY v5 DESC
     `;
