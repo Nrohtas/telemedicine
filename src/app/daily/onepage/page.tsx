@@ -15,7 +15,7 @@ export default async function OnepagePage() {
     WHERE vtd.visit_date BETWEEN '2026-03-23' AND CURDATE()
   `;
   const [overallRows]: any = await pool.query(overallQuery);
-  const overall = overallRows[0];
+  const overall = (overallRows && overallRows[0]) || {};
   const type2 = Number(overall.visit_type_2) || 0;
   const type3 = Number(overall.visit_type_3) || 0;
   const type5 = Number(overall.visit_type_5) || 0;
@@ -54,8 +54,8 @@ export default async function OnepagePage() {
     ORDER BY hdc_visit_type_5 DESC
   `;
   const [districtRows]: any = await pool.query(districtQuery);
-  const districtData = districtRows.map((r: any) => ({
-    name: 'อ.' + r.amp_name,
+  const districtData = (districtRows || []).map((r: any) => ({
+    name: 'อ.' + (r.amp_name || 'ไม่ระบุ'),
     dashboard: Number(r.hdc_visit_type_5) || 0, // Swapped to match dashboard = visit_type_5
     hdc: Number(r.dashboard_result) || 0,     // Report (Manual)
   }));
@@ -90,7 +90,7 @@ export default async function OnepagePage() {
     ORDER BY v5 DESC
   `;
   const [hospitalRows]: any = await pool.query(hospitalQuery);
-  const hospitalData = hospitalRows.map((r: any) => {
+  const hospitalData = (hospitalRows || []).map((r: any) => {
     const v2 = Number(r.v2) || 0;
     const v3 = Number(r.v3) || 0;
     const v5 = Number(r.v5) || 0;
@@ -98,7 +98,7 @@ export default async function OnepagePage() {
     const ratio = total235 > 0 ? (v5 / total235) * 100 : 0;
 
     return {
-      name: r.hospname.replace('โรงพยาบาล', 'รพ.'),
+      name: (r.hospname || '').replace('โรงพยาบาล', 'รพ.') || 'ไม่ระบุชื่อ',
       dashboard: v5, // User requested dashboard = visit_type_5
       hdc: Number(r.dashboard_result) || 0, // Swapping or keeping the other value
       v2,
@@ -128,7 +128,7 @@ export default async function OnepagePage() {
       COALESCE(SUM(p.result), 0) AS dashboard_result
     FROM hospital h
     LEFT JOIN ampur a ON a.amp_code = h.amp_code
-    JOIN hostype ht ON h.hostype = ht.hostype_new
+    JOIN hostype ht ON h.hostype_new = ht.hostype_new
     LEFT JOIN (
       SELECT hoscode, 
              COALESCE(SUM(visit_type_2), 0) AS visit_type_2,
@@ -150,9 +150,10 @@ export default async function OnepagePage() {
     ORDER BY v5 DESC
   `;
   const [subhRows]: any = await pool.query(subhQuery);
+  const subhSafeRows = subhRows || [];
   
   // Calculate Sub-hospital totals for Gauge from ALL matching rows
-  const subhTotals = subhRows.reduce((acc: any, r: any) => {
+  const subhTotals = subhSafeRows.reduce((acc: any, r: any) => {
     acc.type5 += Number(r.v5) || 0;
     acc.total235 += (Number(r.v2) + Number(r.v3) + Number(r.v5));
     return acc;
@@ -160,8 +161,8 @@ export default async function OnepagePage() {
   const subhPercentType5 = subhTotals.total235 > 0 ? (subhTotals.type5 * 100 / subhTotals.total235) : 0;
 
   // Take only top 10 for the chart
-  const top10Data = subhRows.slice(0, 10).map((r: any) => ({
-    name: r.hospname.replace('โรงพยาบาลส่งเสริมสุขภาพตำบล', 'รพ.สต.') + ' (' + r.amp_name + ')',
+  const top10Data = subhSafeRows.slice(0, 10).map((r: any) => ({
+    name: (r.hospname || '').replace('โรงพยาบาลส่งเสริมสุขภาพตำบล', 'รพ.สต.') + ' (' + (r.amp_name || 'ไม่ระบุ') + ')',
     dashboard: Number(r.v5) || 0, // Swapped
     hdc: Number(r.dashboard_result) || 0, // Report (Manual)
   }));
