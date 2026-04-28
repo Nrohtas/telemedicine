@@ -1,0 +1,154 @@
+import os
+import requests
+import pymysql
+import sys
+from datetime import datetime
+from dotenv import load_dotenv
+
+# Load .env file from the parent directory (project root)
+dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+load_dotenv(dotenv_path)
+
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASS = os.getenv("DB_PASSWORD", "")
+DB_NAME = os.getenv("DB_NAME", "telemedicine")
+DB_PORT = int(os.getenv("DB_PORT", 3306))
+
+API_URL = "https://opendata.moph.go.th/api/report_data"
+
+def main():
+    print(f"[{datetime.now()}] Starting sync for telemed_hdc...")
+    
+    # 1. Fetch Data
+    try:
+        payload = {
+            "tableName": "s_telemed_hosp",
+            "year": "2569",
+            "province": "65"
+        }
+        response = requests.post(API_URL, json=payload, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+    except Exception as e:
+        print(f"Error fetching API: {e}")
+        sys.exit(1)
+
+    # Validate data structure (assuming it's a list or has a 'data' array)
+    records = data if isinstance(data, list) else data.get("data", [])
+    
+    if not records:
+        print("No data received from API.")
+        sys.exit(0)
+
+    # 2. Filter Data
+    # Condition: areacode starts with 65 AND b_year == 2569
+    filtered_data = []
+    for row in records:
+        areacode = str(row.get("areacode", ""))
+        b_year = str(row.get("b_year", ""))
+        if areacode.startswith("65") and b_year == "2569":
+            filtered_data.append(row)
+
+    total_count = len(records)
+    matched_count = len(filtered_data)
+    print(f"Fetched {total_count} records. Matched {matched_count} records for areacode=65*, b_year=2569.")
+
+    if matched_count == 0:
+        log_to_db(total_count, 0, 0)
+        print("No matched data to insert.")
+        return
+
+    # 3. Insert into Database
+    h_y = 0 # Success count
+    h_n = 0 # Error count
+    
+    try:
+        # Connect to MySQL
+        conn = pymysql.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASS,
+            database=DB_NAME,
+            port=DB_PORT,
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        cursor = conn.cursor()
+
+        insert_sql = """
+            INSERT INTO telemed_hdc (id, hospcode, areacode, date_com, b_year, target, result)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE 
+                areacode = VALUES(areacode),
+                date_com = VALUES(date_com),
+                target = VALUES(target),
+                result = VALUES(result)
+        """
+
+        for item in filtered_data:
+            try:
+                # Use hospcode_byear as ID
+                record_id = f"{item.get('hospcode')}_{item.get('b_year')}"
+                
+                # Handle numeric parsing gracefully
+                target = int(item.get("target") or 0)
+                result = int(item.get("result") or 0)
+                
+                val = (
+                    record_id,
+                    item.get("hospcode"),
+                    item.get("areacode"),
+                    item.get("date_com"),
+                    item.get("b_year"),
+                    target,
+                    result
+                )
+                cursor.execute(insert_sql, val)
+                h_y += 1
+            except Exception as e:
+                print(f"Failed to insert row {item.get('hospcode')}: {e}")
+                h_n += 1
+
+        conn.commit()
+        print(f"Successfully processed {h_y} records. Failed: {h_n}.")
+
+    except Exception as e:
+        print(f"Database error: {e}")
+        h_n = matched_count - h_y # Assume the rest failed
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+    # 4. Log to hdc_api table
+    log_to_db(total_count, h_y, h_n)
+
+def log_to_db(h_count, h_y, h_n):
+    print("Writing log to hdc_api table...")
+    try:
+        conn = pymysql.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASS,
+            database=DB_NAME,
+            port=DB_PORT
+        )
+        cursor = conn.cursor()
+        
+        log_sql = """
+            INSERT INTO hdc_api (h_count, h_y, h_n, d_update)
+            VALUES (%s, %s, %s, NOW())
+        """
+        cursor.execute(log_sql, (h_count, h_y, h_n))
+        conn.commit()
+    except Exception as e:
+        print(f"Failed to log to hdc_api: {e}")
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+if __name__ == "__main__":
+    main()

@@ -47,17 +47,17 @@ export default async function OnepagePage() {
     ) vtd ON vtd.hoscode = h.hospcode
     LEFT JOIN (
       SELECT hospcode, result
-      FROM telemed
+      FROM telemed_hdc
       WHERE b_year = '2569'
     ) p ON p.hospcode = h.hospcode
     GROUP BY a.amp_code, a.amp_name
-    ORDER BY dashboard_result DESC
+    ORDER BY hdc_visit_type_5 DESC
   `;
   const [districtRows]: any = await pool.query(districtQuery);
   const districtData = districtRows.map((r: any) => ({
     name: 'อ.' + r.amp_name,
-    hdc: Number(r.hdc_visit_type_5) || 0,
-    dashboard: Number(r.dashboard_result) || 0,
+    dashboard: Number(r.hdc_visit_type_5) || 0, // Swapped to match dashboard = visit_type_5
+    hdc: Number(r.dashboard_result) || 0,     // Report (Manual)
   }));
 
   // Query 3: Hospital data (Filtered for hostype_new = 5, 7)
@@ -80,26 +80,39 @@ export default async function OnepagePage() {
     ) vtd ON vtd.hoscode = h.hospcode
     LEFT JOIN (
       SELECT hospcode, result
-      FROM telemed
+      FROM telemed_hdc
       WHERE b_year = '2569'
     ) p ON p.hospcode = h.hospcode
     WHERE h.status = '1' 
       AND h.hostype_new IN (5, 7)
       AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข'
     GROUP BY h.hospcode, h.hospname
-    ORDER BY dashboard_result DESC
+    ORDER BY v5 DESC
   `;
   const [hospitalRows]: any = await pool.query(hospitalQuery);
-  const hospitalData = hospitalRows.map((r: any) => ({
-    name: r.hospname.replace('โรงพยาบาล', 'รพ.'),
-    hdc: Number(r.v5) || 0,
-    dashboard: Number(r.dashboard_result) || 0,
-  }));
+  const hospitalData = hospitalRows.map((r: any) => {
+    const v2 = Number(r.v2) || 0;
+    const v3 = Number(r.v3) || 0;
+    const v5 = Number(r.v5) || 0;
+    const total235 = v2 + v3 + v5;
+    const ratio = total235 > 0 ? (v5 / total235) * 100 : 0;
+
+    return {
+      name: r.hospname.replace('โรงพยาบาล', 'รพ.'),
+      dashboard: v5, // User requested dashboard = visit_type_5
+      hdc: Number(r.dashboard_result) || 0, // Swapping or keeping the other value
+      v2,
+      v3,
+      v5,
+      total235,
+      ratio: ratio,
+    };
+  });
 
   // Calculate Hospital Only totals for Gauge
-  const hTotals = hospitalRows.reduce((acc: any, r: any) => {
-    acc.type5 += Number(r.v5) || 0; // Numerator is HDC Type 5
-    acc.total235 += (Number(r.v2) + Number(r.v3) + Number(r.v5));
+  const hTotals = hospitalData.reduce((acc: any, r: any) => {
+    acc.type5 += r.v5;
+    acc.total235 += r.total235;
     return acc;
   }, { type5: 0, total235: 0 });
   const hPercentType5 = hTotals.total235 > 0 ? (hTotals.type5 * 100 / hTotals.total235) : 0;
@@ -115,6 +128,7 @@ export default async function OnepagePage() {
       COALESCE(SUM(p.result), 0) AS dashboard_result
     FROM hospital h
     LEFT JOIN ampur a ON a.amp_code = h.amp_code
+    JOIN hostype ht ON h.hostype = ht.hostype_new
     LEFT JOIN (
       SELECT hoscode, 
              COALESCE(SUM(visit_type_2), 0) AS visit_type_2,
@@ -126,14 +140,14 @@ export default async function OnepagePage() {
     ) vtd ON vtd.hoscode = h.hospcode
     LEFT JOIN (
       SELECT hospcode, result
-      FROM telemed
+      FROM telemed_hdc
       WHERE b_year = '2569'
     ) p ON p.hospcode = h.hospcode
     WHERE h.status = '1' 
-      AND h.hostype_new IN (8, 18, 21)
+      AND ht.hostype_new IN (8, 18, 21)
       AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข'
     GROUP BY h.hospcode, h.hospname, a.amp_name
-    ORDER BY dashboard_result DESC, v5 DESC
+    ORDER BY v5 DESC
   `;
   const [subhRows]: any = await pool.query(subhQuery);
   
@@ -148,8 +162,8 @@ export default async function OnepagePage() {
   // Take only top 10 for the chart
   const top10Data = subhRows.slice(0, 10).map((r: any) => ({
     name: r.hospname.replace('โรงพยาบาลส่งเสริมสุขภาพตำบล', 'รพ.สต.') + ' (' + r.amp_name + ')',
-    hdc: Number(r.v5) || 0,
-    dashboard: Number(r.dashboard_result) || 0,
+    dashboard: Number(r.v5) || 0, // Swapped
+    hdc: Number(r.dashboard_result) || 0, // Report (Manual)
   }));
 
   const data = {

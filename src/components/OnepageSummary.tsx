@@ -70,7 +70,7 @@ export default function OnepageSummary({ data }: { data: any }) {
     const { x, y, width, value } = props;
     if (value === undefined || value === null || value === 0) return null;
     return (
-      <text x={x + width + 5} y={y + 12} fill="#4B5563" fontSize={10} fontWeight="bold" textAnchor="start">
+      <text x={x + width + 5} y={y + 12} fill="#4B5563" fontSize={18} fontWeight="bold" textAnchor="start">
         {Number(value).toLocaleString()}
       </text>
     );
@@ -209,13 +209,13 @@ export default function OnepageSummary({ data }: { data: any }) {
                     borderColor: item.fill + '50',      // ~31% opacity
                   }}
                 >
-                  <span className="text-[11px] font-black uppercase tracking-wider mb-1.5 text-slate-700">
+                  <span className="text-xs font-black uppercase tracking-wider mb-1.5 text-slate-700">
                     {item.name.split('(')[0]}
                   </span>
-                  <span className="text-2xl font-black text-slate-900 leading-none">
+                  <span className="text-3xl font-black text-slate-900 leading-none">
                     {((item.value / totals.total235) * 100).toFixed(1)}%
                   </span>
-                  <span className="text-[10px] font-bold text-slate-500 mt-1.5 tabular-nums">
+                  <span className="text-xs font-bold text-slate-500 mt-1.5 tabular-nums">
                     {item.value.toLocaleString()} ราย
                   </span>
                 </div>
@@ -242,12 +242,12 @@ export default function OnepageSummary({ data }: { data: any }) {
               {/* The Formula Section */}
               <div className="flex items-center gap-6">
                 {/* Fraction (Left) */}
-                <div className="flex flex-col items-center w-40 shrink-0">
+                <div className="flex flex-col items-center w-48 shrink-0">
                   {/* Top: TYPE 5 */}
                   <div className="w-full py-3 px-4 rounded-xl bg-indigo-50/50 border border-indigo-100 text-center shadow-sm">
-                    <span className="text-[10px] font-black text-indigo-500 uppercase tracking-tighter block mb-1">Telemedicine (TYPEIN 5)</span>
+                    <span className="text-xs font-black text-indigo-500 uppercase tracking-tighter block mb-1">Telemedicine (TYPEIN 5)</span>
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-3xl font-black text-indigo-900 tabular-nums leading-none">{totals.type5.toLocaleString()}</span>
+                      <span className="text-4xl font-black text-indigo-900 tabular-nums leading-none">{totals.type5.toLocaleString()}</span>
                     </div>
                   </div>
 
@@ -256,9 +256,9 @@ export default function OnepageSummary({ data }: { data: any }) {
 
                   {/* Bottom: HIS Total */}
                   <div className="w-full py-3 px-4 rounded-xl bg-emerald-50/50 border border-emerald-100 text-center shadow-sm">
-                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tighter block mb-1">Visit (TYPE2+3+5)</span>
+                    <span className="text-xs font-black text-emerald-600 uppercase tracking-tighter block mb-1">Visit (TYPE2+3+5)</span>
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-3xl font-black text-emerald-900 tabular-nums leading-none">{totals.total235.toLocaleString()}</span>
+                      <span className="text-4xl font-black text-emerald-900 tabular-nums leading-none">{totals.total235.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -306,7 +306,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                   </svg>
                   {/* Percentage Inside Gauge */}
                   <div className="absolute inset-0 flex items-center justify-center pt-8">
-                    <span className="text-3xl font-black text-indigo-600 leading-none">
+                    <span className="text-4xl font-black text-indigo-600 leading-none">
                       {totals.percentType5.toFixed(2)}%
                     </span>
                   </div>
@@ -324,23 +324,27 @@ export default function OnepageSummary({ data }: { data: any }) {
 
         {/* District Chart */}
         <motion.div variants={itemVariants}>
-          <SoftCard className="p-6">
-            <div className="flex items-center justify-between mb-8 px-2">
-              <h3 className="text-lg font-black text-indigo-950 flex items-center gap-2">
-                <div className="w-1.5 h-6 bg-purple-600 rounded-full" />
-                ผลงานรายอำเภอ
-              </h3>
-              <div className="flex gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-violet-600" />
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Dashboard</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
+          <SoftCard className="p-6 h-full">
+            <div className="flex items-start justify-between mb-8 px-2">
+              <div className="flex items-center gap-6">
+                <h3 className="text-lg font-black text-indigo-950 flex items-center gap-2">
+                  <div className="w-1.5 h-6 bg-purple-600 rounded-full" />
+                  ผลงานรายอำเภอ
+                </h3>
+                {/* Spacer to match Hospital header height/gauge */}
+                <div className="w-36 h-20 hidden md:block" />
+              </div>
+                <div className="flex gap-4 pt-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-violet-600" />
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">Dashboard</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
             <ResponsiveContainer width="100%" height={500}>
               <BarChart
@@ -353,8 +357,8 @@ export default function OnepageSummary({ data }: { data: any }) {
                 <YAxis
                   dataKey="name"
                   type="category"
-                  width={100}
-                  tick={{ fontSize: 11, fill: '#64748b', fontWeight: 800 }}
+                  width={130}
+                  tick={{ fontSize: 16, fill: '#64748b', fontWeight: 800 }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -372,20 +376,56 @@ export default function OnepageSummary({ data }: { data: any }) {
 
         {/* Hospital Chart */}
         <motion.div variants={itemVariants}>
-          <SoftCard className="p-6">
-            <div className="flex items-center justify-between mb-8 px-2">
-              <h3 className="text-lg font-black text-indigo-950 flex items-center gap-2">
-                <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
-                ผลงานรายโรงพยาบาล
-              </h3>
-              <div className="flex gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-violet-600" />
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Dashboard</span>
+          <SoftCard className="p-6 h-full">
+            <div className="flex items-start justify-between mb-8 px-2">
+              <div className="flex items-center gap-6">
+                <h3 className="text-lg font-black text-indigo-950 flex items-center gap-2">
+                  <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
+                  ผลงานรายโรงพยาบาล
+                </h3>
+              </div>
+
+              <div className="flex items-center gap-8 pt-0">
+                {/* Summary Gauge moved beside legend */}
+                <div className="w-36 h-20 flex flex-col items-center justify-center -mt-4">
+                  <span className="text-[10px] font-black text-blue-400 uppercase tracking-tighter mb-0 leading-none">สัดส่วน Telemedicine</span>
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <svg viewBox="0 0 100 60" className="w-full">
+                      <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#f1f5f9" strokeWidth="12" strokeLinecap="round" />
+                      <motion.path
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: (hTotals?.percentType5 || 0) / 100 }}
+                        transition={{ duration: 2, ease: "circOut" }}
+                        d="M 10 50 A 40 40 0 0 1 90 50"
+                        fill="none"
+                        stroke="url(#hospitalCornerGradient)"
+                        strokeWidth="12"
+                        strokeLinecap="round"
+                      />
+                      <defs>
+                        <linearGradient id="hospitalCornerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#3b82f6" />
+                          <stop offset="100%" stopColor="#2563eb" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center pt-5">
+                      <span className="text-lg font-black text-blue-600 tabular-nums">
+                        {hTotals?.percentType5.toFixed(2)}%
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
+
+                <div className="flex gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-violet-600" />
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">Dashboard</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -402,8 +442,8 @@ export default function OnepageSummary({ data }: { data: any }) {
                   <YAxis
                     dataKey="name"
                     type="category"
-                    width={120}
-                    tick={{ fontSize: 11, fill: '#64748b', fontWeight: 800 }}
+                    width={150}
+                    tick={{ fontSize: 16, fill: '#64748b', fontWeight: 800 }}
                     axisLine={false}
                     tickLine={false}
                   />
@@ -417,40 +457,11 @@ export default function OnepageSummary({ data }: { data: any }) {
                 </BarChart>
               </ResponsiveContainer>
 
-              {/* Corner Summary Gauge (No Frame) */}
-              <div className="absolute bottom-4 right-4 w-44 h-32 flex flex-col items-center justify-center">
-                <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">สัดส่วน Telemedicine</span>
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <svg viewBox="0 0 100 60" className="w-full">
-                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#f1f5f9" strokeWidth="12" strokeLinecap="round" />
-                    <motion.path
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: (hTotals?.percentType5 || 0) / 100 }}
-                      transition={{ duration: 2, ease: "circOut" }}
-                      d="M 10 50 A 40 40 0 0 1 90 50"
-                      fill="none"
-                      stroke="url(#hospitalCornerGradient)"
-                      strokeWidth="12"
-                      strokeLinecap="round"
-                    />
-                    <defs>
-                      <linearGradient id="hospitalCornerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#3b82f6" />
-                        <stop offset="100%" stopColor="#2563eb" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center pt-8">
-                    <span className="text-xl font-black text-blue-600 tabular-nums">
-                      {hTotals?.percentType5.toFixed(2)}%
-                    </span>
-                  </div>
-                </div>
-              </div>
             </div>
           </SoftCard>
         </motion.div>
       </div>
+
 
       {/* Bottom Rankings Section */}
       <motion.div variants={itemVariants}>
@@ -520,30 +531,26 @@ export default function OnepageSummary({ data }: { data: any }) {
                 className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/50 border border-white hover:bg-white hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 group"
               >
                 <div className="flex items-center gap-4 overflow-hidden">
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 transition-all shadow-sm ${idx === 0 ? 'bg-amber-400 text-white shadow-amber-200' :
-                      idx === 1 ? 'bg-slate-300 text-white shadow-slate-100' :
-                        idx === 2 ? 'bg-orange-400 text-white shadow-orange-100' :
-                          'bg-white text-indigo-600 border border-slate-100 group-hover:bg-indigo-600 group-hover:text-white'
-                    }`}>
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 transition-all shadow-sm bg-white text-indigo-600 border border-slate-100 group-hover:bg-indigo-600 group-hover:text-white">
                     {idx + 1}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[12px] font-black text-slate-700 truncate uppercase tracking-tight">
+                    <p className="text-[13px] font-black text-slate-700 truncate uppercase tracking-tight">
                       {item.name}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 shrink-0 pl-4">
                   <div className="text-right">
-                    <p className="text-[10px] font-bold text-violet-500 uppercase leading-none mb-1">Dashboard</p>
-                    <p className="text-sm font-black text-violet-700 tabular-nums leading-none">
+                    <p className="text-xs font-bold text-violet-500 uppercase leading-none mb-1">Dashboard</p>
+                    <p className="text-xl font-black text-violet-700 tabular-nums leading-none">
                       {item.dashboard.toLocaleString()}
                     </p>
                   </div>
-                  <div className="w-[1px] h-6 bg-slate-200" />
+                  <div className="w-[1px] h-8 bg-slate-200" />
                   <div className="text-right">
-                    <p className="text-[10px] font-bold text-emerald-500 uppercase leading-none mb-1">HDC</p>
-                    <p className="text-sm font-black text-emerald-700 tabular-nums leading-none">
+                    <p className="text-xs font-bold text-emerald-500 uppercase leading-none mb-1">HDC</p>
+                    <p className="text-xl font-black text-emerald-700 tabular-nums leading-none">
                       {item.hdc.toLocaleString()}
                     </p>
                   </div>
