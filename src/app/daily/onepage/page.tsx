@@ -216,18 +216,18 @@ export default async function OnepagePage() {
               {error.message || 'Unknown error'}
             </p>
             {error.stack && (
-              <p className="text-[10px] font-mono text-red-400 mt-2 break-all whitespace-pre-wrap">
+              <p className="text-[10px] font-mono text-red-400 mt-2 break-all whitespace-pre-wrap text-opacity-50">
                 {error.stack}
               </p>
             )}
           </div>
           
-          <button 
-            onClick={() => window.location.reload()}
-            className="mt-6 px-6 py-2 bg-red-600 text-white rounded-full text-sm font-bold hover:bg-red-700 transition-colors"
+          <a 
+            href="/telemedicine/daily/onepage"
+            className="mt-6 inline-block px-6 py-2 bg-red-600 text-white rounded-full text-sm font-bold hover:bg-red-700 transition-colors"
           >
             ลองใหม่อีกครั้ง
-          </button>
+          </a>
         </div>
       </main>
     );
