@@ -192,8 +192,10 @@ export default async function DailyPage({
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0 mb-3 px-1">
           <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">สรุปรายอำเภอ</h3>
           <div className="flex items-center gap-4">
-            <Link 
-              href="/daily/onepage" 
+            <Link
+              href="/daily/onepage"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md shadow-emerald-200 transition-all"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -205,15 +207,24 @@ export default async function DailyPage({
               </svg>
               Onepage
             </Link>
-            <LastUpdate showLogo={false} type="daily" />
           </div>
         </div>
 
         <div className="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-xl shadow-slate-900/5">
           <div className="border-b border-slate-100 bg-white px-5 py-3">
-            <p className="text-sm font-bold text-emerald-800 md:text-base">
-              {reportPeriodLabel}
-            </p>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <p className="text-sm font-bold text-emerald-800 md:text-base">
+                {reportPeriodLabel}
+              </p>
+              <div className="flex items-center gap-4 ml-auto">
+                <LastUpdate
+                  showLogo={false}
+                  type="daily"
+                  sourceLabel="HDC"
+                  sourceLink="https://app.powerbi.com/view?r=eyJrIjoiYjE4NGNjNzItYmM2ZS00MjFmLTlmNDEtOWQ1M2JiODk4N2M0IiwidCI6ImI3NmEyM2QzLThjZGYtNDNjMC1hNTNiLTYwYmNkMjM3OTg5NSIsImMiOjEwfQ%3D%3D"
+                />
+              </div>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1280px] divide-y divide-slate-100">
@@ -239,18 +250,11 @@ export default async function DailyPage({
                   </th>
                   <th className="border-l-2 border-emerald-300 bg-emerald-50 px-5 py-3 text-emerald-700" colSpan={5}>
                     (2) ผลงานใน HIS (
-                    <a
-                      href="https://hdc.moph.go.th/plk/public/standard-report-detail/2d85d6ec39840f8051854b028fa13073"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:underline hover:text-emerald-900 font-black"
-                    >
-                      HDC
-                    </a>
+                    HDC
                     )
                     <div className="flex justify-center mt-1">
                       <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white/60 border border-emerald-200 text-emerald-800 shadow-sm">
-                        ร้อยละ : ( TYPEIN 5 / รวม 2,3,5 ) × 100
+                        ร้อยละ : ( TYPEIN 5 / TYPEIN 2+3+5 ) × 100
                       </span>
                     </div>
                   </th>
@@ -291,7 +295,7 @@ export default async function DailyPage({
                   </th>
                   <th className="bg-emerald-50/70 px-5 py-3 text-right">
                     <Link href={getSortUrl("total")} scroll={false} className="hover:text-emerald-600">
-                      2+3+5 <SortIcon column="total" />
+                      TYPEIN 2+3+5 <SortIcon column="total" />
                     </Link>
                   </th>
                   <th className="bg-emerald-50/70 px-5 py-3 text-right">

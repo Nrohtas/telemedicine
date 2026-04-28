@@ -123,7 +123,21 @@ export default function HDCDashboard() {
       <div className="px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
         {/* Stats Section Header */}
         <div className="lg:col-span-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0 mb-[-8px] sm:mb-[-16px]">
-          <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">ภาพรวม HDC Dashboard</h3>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">ภาพรวม HDC Dashboard</h3>
+            <a 
+              href="https://app.powerbi.com/view?r=eyJrIjoiYjE4NGNjNzItYmM2ZS00MjFmLTlmNDEtOWQ1M2JiODk4N2M0IiwidCI6ImI3NmEyM2QzLThjZGYtNDNjMC1hNTNiLTYwYmNkMjM3OTg5NSIsImMiOjEwfQ%3D%3D"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-indigo-100 transition-all group"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+              เปิด HDC Power BI
+            </a>
+          </div>
           <LastUpdate />
         </div>
 
