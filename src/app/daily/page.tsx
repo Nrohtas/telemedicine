@@ -312,9 +312,13 @@ export default async function DailyPage({
                     <td className="whitespace-nowrap px-5 py-2.5">
                       <Link
                         href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}`}
-                        className="font-black text-slate-900 underline-offset-4 group-hover:text-emerald-700 group-hover:underline"
+                        className="flex items-center gap-2 font-black text-slate-900 underline-offset-4 group-hover:text-emerald-700 group-hover:underline decoration-emerald-500/30"
                       >
                         {row.amp_name}
+                        <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-4px] group-hover:translate-x-0 bg-emerald-50 text-emerald-600 text-[10px] px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-1">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                          หน่วยบริการ
+                        </span>
                       </Link>
                     </td>
                     <NumberCell value={Math.round(row.platform_target)} className="border-l-2 border-indigo-200 bg-indigo-50/20" />

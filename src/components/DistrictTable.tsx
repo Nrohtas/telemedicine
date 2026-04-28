@@ -114,6 +114,12 @@ export default function DistrictTable({ type, source }: DistrictTableProps = {})
                                                 </div>
                                                 <div>
                                                     <h4 className="font-black text-lg group-hover:text-nm-primary transition-colors leading-tight">{stat.amp_name}</h4>
+                                                    <div className="flex items-center gap-1 text-[9px] font-black text-indigo-400 group-hover:text-indigo-600 transition-colors mt-0.5 uppercase tracking-tighter">
+                                                        <span>คลิกดูหน่วยบริการ</span>
+                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                            <polyline points="9 18 15 12 9 6" />
+                                                        </svg>
+                                                    </div>
                                                 </div>
                                             </div>
 
