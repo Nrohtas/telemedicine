@@ -238,12 +238,12 @@ export default function OnepageSummary({ data }: { data: any }) {
               </h3>
               <div className="flex gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
-                </div>
-                <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-violet-600" />
                   <span className="text-[10px] font-bold text-slate-500 uppercase">Dashboard</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
                 </div>
               </div>
             </div>
@@ -265,11 +265,11 @@ export default function OnepageSummary({ data }: { data: any }) {
                   tickLine={false}
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
-                <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={14} radius={[0, 10, 10, 0]}>
-                  <LabelList dataKey="hdc" content={renderCustomizedLabel} />
-                </Bar>
                 <Bar dataKey="dashboard" name="Dashboard" fill={COLORS.dashboard} barSize={14} radius={[0, 10, 10, 0]}>
                   <LabelList dataKey="dashboard" content={renderCustomizedLabel} />
+                </Bar>
+                <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={14} radius={[0, 10, 10, 0]}>
+                  <LabelList dataKey="hdc" content={renderCustomizedLabel} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -286,12 +286,12 @@ export default function OnepageSummary({ data }: { data: any }) {
               </h3>
               <div className="flex gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
-                </div>
-                <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-violet-600" />
                   <span className="text-[10px] font-bold text-slate-500 uppercase">Dashboard</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
                 </div>
               </div>
             </div>
@@ -313,11 +313,11 @@ export default function OnepageSummary({ data }: { data: any }) {
                   tickLine={false}
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
-                <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={12} radius={[0, 10, 10, 0]}>
-                  <LabelList dataKey="hdc" content={renderCustomizedLabel} />
-                </Bar>
                 <Bar dataKey="dashboard" name="Dashboard" fill={COLORS.dashboard} barSize={12} radius={[0, 10, 10, 0]}>
                   <LabelList dataKey="dashboard" content={renderCustomizedLabel} />
+                </Bar>
+                <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={12} radius={[0, 10, 10, 0]}>
+                  <LabelList dataKey="hdc" content={renderCustomizedLabel} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
