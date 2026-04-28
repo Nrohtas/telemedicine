@@ -1,11 +1,11 @@
 "use client";
 
 import React from 'react';
-import {
-  PieChart, Pie, Cell, Tooltip,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, LabelList
+import { 
+  PieChart, Pie, Cell, Tooltip, 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, LabelList 
 } from 'recharts';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import SoftCard from './ui/SoftCard';
 
 export default function OnepageSummary({ data }: { data: any }) {
@@ -19,7 +19,7 @@ export default function OnepageSummary({ data }: { data: any }) {
     type5: '#3B82F6',    // Blue
   };
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -29,7 +29,7 @@ export default function OnepageSummary({ data }: { data: any }) {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
