@@ -30,7 +30,7 @@ export async function GET() {
                 SELECT hostype_new, MAX(hostype) as hostype_label, MAX(hostype_name) as affiliation
                 FROM hostype
                 GROUP BY hostype_new
-            ) ht ON h.hostype_new = ht.hostype_new
+            ) ht ON h.hostype_new = ht.hostype_new COLLATE utf8mb4_general_ci
             LEFT JOIN (
                 SELECT 
                     hoscode, 
@@ -40,7 +40,7 @@ export async function GET() {
                 FROM visit_type_daily
                 WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
                 GROUP BY hoscode
-            ) vtd ON h.hospcode = vtd.hoscode
+            ) vtd ON h.hospcode = vtd.hoscode COLLATE utf8mb4_general_ci
             LEFT JOIN (
                 SELECT 
                     hospcode,
@@ -49,18 +49,18 @@ export async function GET() {
                 FROM telemed_opd_hdc
                 WHERE b_year = '2569'
                 GROUP BY hospcode
-            ) hdc ON h.hospcode = hdc.hospcode
-            LEFT JOIN target tg ON h.hospcode = tg.hospcode AND tg.b_year = '2568'
+            ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
+            LEFT JOIN target tg ON h.hospcode = tg.hospcode COLLATE utf8mb4_general_ci AND tg.b_year = '2568'
             WHERE h.status = '1'
             AND h.hostype_new IN (${types.join(',')})
+            AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข' COLLATE utf8mb4_general_ci
             ${extraWhere}
             ORDER BY current_total DESC, performance_percent DESC, h.hospcode ASC
             LIMIT 10
         `;
 
-        const mophWhere = "AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข'";
-        const [hospitals] = await pool.query(getQuery([5, 7, 11, 12], mophWhere));
-        const [primaryCare] = await pool.query(getQuery([8, 13, 18, 21], mophWhere));
+        const [hospitals] = await pool.query(getQuery([5, 7, 11, 12]));
+        const [primaryCare] = await pool.query(getQuery([8, 13, 18, 21]));
 
         // Add summary for hostype 5 and 7 (Hospitals)
         const [hospSummaryRows]: any = await pool.query(`
@@ -78,7 +78,7 @@ export async function GET() {
                 FROM telemed_opd_hdc
                 WHERE b_year = '2569'
                 GROUP BY hospcode
-            ) hdc ON h.hospcode = hdc.hospcode
+            ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
             LEFT JOIN (
                 SELECT 
                     hoscode, 
@@ -88,10 +88,10 @@ export async function GET() {
                 FROM visit_type_daily
                 WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
                 GROUP BY hoscode
-            ) vtd ON h.hospcode = vtd.hoscode
+            ) vtd ON h.hospcode = vtd.hoscode COLLATE utf8mb4_general_ci
             WHERE h.status = '1'
             AND h.hostype_new IN (5, 7)
-            AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข'
+            AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข' COLLATE utf8mb4_general_ci
         `);
 
         const hospSummary = hospSummaryRows[0] || { hdc_result: 0, hdc_opd: 0, total_visit_5: 0, total_all: 0 };
@@ -119,7 +119,7 @@ export async function GET() {
                 FROM telemed_opd_hdc
                 WHERE b_year = '2569'
                 GROUP BY hospcode
-            ) hdc ON h.hospcode = hdc.hospcode
+            ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
             LEFT JOIN (
                 SELECT 
                     hoscode, 
@@ -129,10 +129,10 @@ export async function GET() {
                 FROM visit_type_daily
                 WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
                 GROUP BY hoscode
-            ) vtd ON h.hospcode = vtd.hoscode
+            ) vtd ON h.hospcode = vtd.hoscode COLLATE utf8mb4_general_ci
             WHERE h.status = '1'
             AND h.hostype_new IN (8, 18, 21)
-            AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข'
+            AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข' COLLATE utf8mb4_general_ci
         `);
 
         const pcSummary = pcSummaryRows[0] || { hdc_result: 0, hdc_opd: 0, total_visit_5: 0, total_all: 0 };
