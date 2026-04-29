@@ -18,7 +18,12 @@ interface PerformanceItem {
 
 const TopPerformance = () => {
 
-    const [data, setData] = useState<{ hospitals: PerformanceItem[], primaryCare: PerformanceItem[] }>({ hospitals: [], primaryCare: [] });
+    const [data, setData] = useState<{ 
+        hospitals: PerformanceItem[], 
+        primaryCare: PerformanceItem[],
+        hospSummary?: { total_visit_5: number, total_all: number, percent: number },
+        pcSummary?: { total_visit_5: number, total_all: number, percent: number }
+    }>({ hospitals: [], primaryCare: [] });
     const [isLoading, setIsLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
 
@@ -61,18 +66,39 @@ const TopPerformance = () => {
         );
     }
 
-    const renderList = (items: PerformanceItem[], title: string, subtitle: string, iconColor: string) => (
+    const renderList = (items: PerformanceItem[], title: string, subtitle: string, iconColor: string, summaryData?: { total_visit_5: number, percent: number }, summaryLabel: string = "สรุปยอดรวม") => (
         <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-4 px-2">
-                <div className={`p-2.5 rounded-xl ${iconColor} text-white shadow-lg shadow-indigo-100`}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
+                <div className="flex items-center gap-4">
+                    <div className={`p-2.5 rounded-xl ${iconColor} text-white shadow-lg shadow-indigo-100`}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                    </div>
+                    <div className="flex flex-col">
+                        <h2 className="text-base md:text-lg font-black text-indigo-900 tracking-tight leading-none uppercase">{title}</h2>
+                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1.5 opacity-80">{subtitle}</p>
+                    </div>
                 </div>
-                <div className="flex flex-col">
-                    <h2 className="text-base md:text-lg font-black text-indigo-900 tracking-tight leading-none uppercase">{title}</h2>
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1.5 opacity-80">{subtitle}</p>
-                </div>
+
+                {summaryData && (
+                    <div className="flex items-center gap-2 bg-indigo-50/50 p-1.5 pr-3 rounded-2xl border border-indigo-100/50 shadow-sm animate-in fade-in slide-in-from-right-4 duration-700">
+                        <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-xl shadow-sm border border-indigo-50">
+                            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-tighter">{summaryLabel}</span>
+                            <span className="text-base font-black text-indigo-700 tabular-nums">
+                                {Number(summaryData.total_visit_5).toLocaleString()}
+                            </span>
+                            <span className="text-[9px] font-black text-indigo-300">ครั้ง</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-black shadow-md shadow-emerald-200">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                <polyline points="17 6 23 6 23 12"></polyline>
+                            </svg>
+                            {Number(summaryData.percent).toFixed(2)}%
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="flex flex-col gap-3">
@@ -141,8 +167,8 @@ const TopPerformance = () => {
             <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-50/30 rounded-full -ml-36 -mb-36 blur-3xl pointer-events-none" />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
-                {renderList(data.primaryCare, "10 อันดับ รพ.สต./ศูนย์สุขภาพ", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-emerald-500")}
-                {renderList(data.hospitals, "10 อันดับ โรงพยาบาล", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-blue-600")}
+                {renderList(data.primaryCare, "10 อันดับ รพ.สต./ศูนย์สุขภาพ", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-emerald-500", data.pcSummary, "ยอดรวมเฉพาะ รพ.สต.")}
+                {renderList(data.hospitals, "10 อันดับ โรงพยาบาล", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-blue-600", data.hospSummary, "ยอดรวมเฉพาะ รพ.")}
             </div>
 
             <div className="mt-12 flex justify-center">

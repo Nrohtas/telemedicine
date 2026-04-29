@@ -46,9 +46,65 @@ export async function GET() {
         const [hospitals] = await pool.query(getQuery([5, 7, 11, 12], mophWhere));
         const [primaryCare] = await pool.query(getQuery([8, 13, 18, 21], mophWhere));
 
+        // Add summary for hostype 5 and 7 (Hospitals)
+        const [hospSummaryRows]: any = await pool.query(`
+            SELECT 
+                COALESCE(SUM(vtd.visit_type_5), 0) as total_visit_5,
+                COALESCE(SUM(vtd.visit_type_2 + vtd.visit_type_3 + vtd.visit_type_5), 0) as total_all
+            FROM hospital h
+            LEFT JOIN (
+                SELECT 
+                    hoscode, 
+                    SUM(visit_type_2) as visit_type_2,
+                    SUM(visit_type_3) as visit_type_3,
+                    SUM(visit_type_5) as visit_type_5
+                FROM visit_type_daily
+                WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
+                GROUP BY hoscode
+            ) vtd ON h.hospcode = vtd.hoscode
+            WHERE h.status = '1'
+            AND h.hostype_new IN (5, 7)
+            AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข'
+        `);
+
+        const hospSummary = hospSummaryRows[0] || { total_visit_5: 0, total_all: 0 };
+        const hospSummaryPercent = hospSummary.total_all > 0 ? (hospSummary.total_visit_5 / hospSummary.total_all) * 100 : 0;
+
+        // Add summary for hostype 8, 18, 21 (Primary Care)
+        const [pcSummaryRows]: any = await pool.query(`
+            SELECT 
+                COALESCE(SUM(vtd.visit_type_5), 0) as total_visit_5,
+                COALESCE(SUM(vtd.visit_type_2 + vtd.visit_type_3 + vtd.visit_type_5), 0) as total_all
+            FROM hospital h
+            LEFT JOIN (
+                SELECT 
+                    hoscode, 
+                    SUM(visit_type_2) as visit_type_2,
+                    SUM(visit_type_3) as visit_type_3,
+                    SUM(visit_type_5) as visit_type_5
+                FROM visit_type_daily
+                WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
+                GROUP BY hoscode
+            ) vtd ON h.hospcode = vtd.hoscode
+            WHERE h.status = '1'
+            AND h.hostype_new IN (8, 18, 21)
+            AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข'
+        `);
+
+        const pcSummary = pcSummaryRows[0] || { total_visit_5: 0, total_all: 0 };
+        const pcSummaryPercent = pcSummary.total_all > 0 ? (pcSummary.total_visit_5 / pcSummary.total_all) * 100 : 0;
+
         return NextResponse.json({
             hospitals,
-            primaryCare
+            primaryCare,
+            hospSummary: {
+                ...hospSummary,
+                percent: hospSummaryPercent
+            },
+            pcSummary: {
+                ...pcSummary,
+                percent: pcSummaryPercent
+            }
         });
     } catch (error: any) {
         console.error('Database error in top-performance:', error);
