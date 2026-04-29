@@ -122,7 +122,7 @@ export default async function OnepagePage() {
       return acc;
     }, { type5: 0, total235: 0, hdc_tele: 0, hdc_opd: 0 });
     const hPercentType5 = hTotals.total235 > 0 ? (hTotals.type5 * 100 / hTotals.total235) : 0;
-    const hHdcPercent = hTotals.hdc_opd > 0 ? (hTotals.hdc_tele * 100 / hTotals.hdc_opd) : 0;
+    const hHdcPercent = (hTotals.hdc_opd + hTotals.hdc_tele) > 0 ? (hTotals.hdc_tele * 100 / (hTotals.hdc_opd + hTotals.hdc_tele)) : 0;
 
     // Query 4: Sub-hospitals (รพ.สต.) data for Top 10 and Gauge
     const subhQuery = `
@@ -132,7 +132,8 @@ export default async function OnepagePage() {
         COALESCE(vtd.visit_type_2, 0) AS v2,
         COALESCE(vtd.visit_type_3, 0) AS v3,
         COALESCE(vtd.visit_type_5, 0) AS v5,
-        COALESCE(SUM(p.result), 0) AS dashboard_result
+        COALESCE(SUM(p.result), 0) AS dashboard_result,
+        COALESCE(SUM(p.opd), 0) AS hdc_opd
       FROM hospital h
       LEFT JOIN ampur a ON a.amp_code = h.amp_code COLLATE utf8mb4_general_ci
       JOIN hostype ht ON h.hostype_new = ht.hostype_new COLLATE utf8mb4_general_ci
@@ -146,7 +147,7 @@ export default async function OnepagePage() {
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
-        SELECT hospcode, telemedicine AS result
+        SELECT hospcode, telemedicine AS result, opd
         FROM telemed_opd_hdc
         WHERE b_year = '2569'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
@@ -162,16 +163,25 @@ export default async function OnepagePage() {
     const subhTotals = subhSafeRows.reduce((acc: any, r: any) => {
       acc.type5 += Number(r.v5) || 0;
       acc.total235 += (Number(r.v2) + Number(r.v3) + Number(r.v5));
+      acc.hdc_tele += Number(r.dashboard_result) || 0;
+      acc.hdc_opd += Number(r.hdc_opd) || 0;
       return acc;
-    }, { type5: 0, total235: 0 });
+    }, { type5: 0, total235: 0, hdc_tele: 0, hdc_opd: 0 });
     const subhPercentType5 = subhTotals.total235 > 0 ? (subhTotals.type5 * 100 / subhTotals.total235) : 0;
+    const subhHdcPercent = (subhTotals.hdc_opd + subhTotals.hdc_tele) > 0 ? (subhTotals.hdc_tele * 100 / (subhTotals.hdc_opd + subhTotals.hdc_tele)) : 0;
+    
+    // Final aggregate for subhTotals to pass to component
+    const subhTotalsFinal = {
+      ...subhTotals,
+      percentType5: subhPercentType5,
+      hdc_percent: subhHdcPercent
+    };
 
     const top10Data = subhSafeRows.slice(0, 10).map((r: any) => ({
       name: (r.hospname || '').replace('โรงพยาบาลส่งเสริมสุขภาพตำบล', 'รพ.สต.') + ' (' + (r.amp_name || 'ไม่ระบุ') + ')',
       dashboard: Number(r.v5) || 0,
       hdc: Number(r.dashboard_result) || 0,
     }));
-
     const data = {
       pie: [
         { name: 'ตามนัด (2)', value: type2, fill: '#6EE7B7' },
@@ -184,7 +194,7 @@ export default async function OnepagePage() {
         percentType5,
         hdc_opd: Number(overall.hdc_opd) || 0,
         hdc_tele: Number(overall.hdc_tele) || 0,
-        hdc_percent: (Number(overall.hdc_opd) || 0) > 0 ? (Number(overall.hdc_tele) / Number(overall.hdc_opd)) * 100 : 0
+        hdc_percent: (Number(overall.hdc_opd) + Number(overall.hdc_tele)) > 0 ? (Number(overall.hdc_tele) / (Number(overall.hdc_opd) + Number(overall.hdc_tele))) * 100 : 0
       },
       hTotals: { 
         type5: hTotals.type5, 
@@ -194,18 +204,14 @@ export default async function OnepagePage() {
         hdc_opd: hTotals.hdc_opd,
         hdc_percent: hHdcPercent
       },
-      subhTotals: { type5: subhTotals.type5, total235: subhTotals.total235, percentType5: subhPercentType5 },
+      subhTotals: subhTotalsFinal,
       formattedDate,
       districtData,
       hospitalData,
       top10Data,
     };
 
-    return (
-      <main className="min-h-screen bg-slate-50">
-        <OnepageSummary data={data} />
-      </main>
-    );
+    return <OnepageSummary data={data} />;
   } catch (error) {
     console.error('Error loading OnepagePage:', error);
     return (
