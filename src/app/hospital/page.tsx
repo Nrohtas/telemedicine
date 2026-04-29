@@ -34,6 +34,15 @@ interface DistrictGroup {
     hospitals: Hospital[];
 }
 
+const formatPercent = (val: number) => {
+    const num = Number(val);
+    if (isNaN(num)) return "0%";
+    return new Intl.NumberFormat("th-TH", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    }).format(num) + "%";
+};
+
 export default function HospitalDirectory() {
     return (
         <Suspense fallback={
@@ -143,7 +152,7 @@ function HospitalDirectoryContent() {
                     "หมอพร้อม": h.moph,
                     "สอน.บัดดี้": h.buddycare,
                     "ยอดรวม": h.moph + h.buddycare,
-                    "เปอร์เซ็นต์": h.op_30 > 0 ? ((h.moph + h.buddycare) / h.op_30 * 100).toFixed(2) : "0.00",
+                    "เปอร์เซ็นต์": h.op_30 > 0 ? formatPercent((h.moph + h.buddycare) / h.op_30 * 100) : "0%",
                     "ขาดอีก": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0,
                     "ตำบล": h.tmb_name || '-',
                     "อำเภอ": h.amp_name,
@@ -164,7 +173,7 @@ function HospitalDirectoryContent() {
                         "หมอพร้อม": h.moph,
                         "สอน.บัดดี้": h.buddycare,
                         "รวม": h.moph + h.buddycare,
-                        "เปอร์เซ็นต์": h.op_30 > 0 ? ((h.moph + h.buddycare) / h.op_30 * 100).toFixed(2) : "0.00",
+                        "เปอร์เซ็นต์": h.op_30 > 0 ? formatPercent((h.moph + h.buddycare) / h.op_30 * 100) : "0%",
                         "ขาดอีก": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0,
                         "ตำบล": h.tmb_name || '-',
                         "อำเภอ": h.amp_name,
@@ -185,7 +194,7 @@ function HospitalDirectoryContent() {
                     "หมอพร้อม": districtMoph,
                     "สอน.บัดดี้": districtBuddy,
                     "ยอดรวม": districtMoph + districtBuddy,
-                    "เปอร์เซ็นต์": districtTarget > 0 ? ((districtMoph + districtBuddy) / districtTarget * 100).toFixed(2) : "0.00",
+                    "เปอร์เซ็นต์": districtTarget > 0 ? formatPercent((districtMoph + districtBuddy) / districtTarget * 100) : "0%",
                     "ขาดอีก": districtTarget > 0 ? Math.max(0, districtTarget - (districtMoph + districtBuddy)) : 0,
                     "ตำบล": "",
                     "อำเภอ": "",
@@ -208,7 +217,7 @@ function HospitalDirectoryContent() {
                 "หมอพร้อม": grandMoph,
                 "สอน.บัดดี้": grandBuddy,
                 "ยอดรวม": grandMoph + grandBuddy,
-                "เปอร์เซ็นต์": grandTarget > 0 ? ((grandMoph + grandBuddy) / grandTarget * 100).toFixed(2) : "0.00",
+                "เปอร์เซ็นต์": grandTarget > 0 ? formatPercent((grandMoph + grandBuddy) / grandTarget * 100) : "0%",
                 "ขาดอีก": grandTarget > 0 ? Math.max(0, grandTarget - (grandMoph + grandBuddy)) : 0,
                 "ตำบล": "",
                 "อำเภอ": "",
@@ -469,7 +478,7 @@ function HospitalDirectoryContent() {
                                                                 </td>
                                                                 <td className="px-6 py-3 text-right bg-emerald-50/30">
                                                                     <span className="text-sm font-bold text-emerald-600">
-                                                                        {(hospital.op_30 > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op_30 * 100) : 0).toFixed(2)}%
+                                                                        {formatPercent(hospital.op_30 > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op_30 * 100) : 0)}
                                                                     </span>
                                                                 </td>
                                                                 <td className="px-6 py-3 text-right bg-red-50/30">
@@ -533,8 +542,8 @@ function HospitalDirectoryContent() {
                                                             {(() => {
                                                                 const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0);
                                                                 const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
-                                                                return (target > 0 ? (current / target * 100) : 0).toFixed(2);
-                                                            })()}%
+                                                                return formatPercent(target > 0 ? (current / target * 100) : 0);
+                                                            })()}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-5 text-right bg-red-50/50">
@@ -650,7 +659,7 @@ function HospitalDirectoryContent() {
                                                                     </td>
                                                                     <td className="px-6 py-3 text-right bg-emerald-50/30">
                                                                         <span className="text-sm font-bold text-emerald-600">
-                                                                            {(hospital.op_30 > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op_30 * 100) : 0).toFixed(2)}%
+                                                                            {formatPercent(hospital.op_30 > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op_30 * 100) : 0)}
                                                                         </span>
                                                                     </td>
                                                                     <td className="px-6 py-3 text-right bg-red-50/30">
@@ -714,8 +723,8 @@ function HospitalDirectoryContent() {
                                                                 {(() => {
                                                                     const target = group.hospitals.reduce((sum, h) => sum + h.op_30, 0);
                                                                     const current = group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0);
-                                                                    return (target > 0 ? (current / target * 100) : 0).toFixed(2);
-                                                                })()}%
+                                                                    return formatPercent(target > 0 ? (current / target * 100) : 0);
+                                                                })()}
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-4 text-right bg-red-50/30">

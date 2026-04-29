@@ -273,7 +273,7 @@ export default function Home() {
                           <span className="text-[10px] font-black text-emerald-900/40 uppercase tracking-tighter leading-none mb-1">ผลงาน</span>
                           <div className="flex items-baseline leading-none">
                             <span className="text-3xl font-black text-emerald-900 tracking-tighter">
-                              {targetData.target_30 > 0 ? ((globalStats.total_services / targetData.target_30) * 100).toFixed(2) : 0}
+                              {targetData.target_30 > 0 ? (new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format((globalStats.total_services / targetData.target_30) * 100)) : 0}
                             </span>
                             <span className="text-sm font-black text-emerald-900/60">%</span>
                           </div>
@@ -336,7 +336,7 @@ export default function Home() {
                   </div>
                   <div className="flex flex-col items-end leading-none">
                     <span className="text-xl font-black text-[#006837] tracking-tighter">
-                      {globalStats.total_moph + globalStats.total_buddycare > 0 ? ((globalStats.total_moph / (globalStats.total_moph + globalStats.total_buddycare)) * 100).toFixed(2) : 0}%
+                      {globalStats.total_moph + globalStats.total_buddycare > 0 ? (new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format((globalStats.total_moph / (globalStats.total_moph + globalStats.total_buddycare)) * 100)) : 0}%
                     </span>
                   </div>
                 </div>
@@ -381,7 +381,7 @@ export default function Home() {
                   </div>
                   <div className="flex flex-col items-end leading-none">
                     <span className="text-xl font-black text-[#00ADEF] tracking-tighter">
-                      {globalStats.total_moph + globalStats.total_buddycare > 0 ? ((globalStats.total_buddycare / (globalStats.total_moph + globalStats.total_buddycare)) * 100).toFixed(2) : 0}%
+                      {globalStats.total_moph + globalStats.total_buddycare > 0 ? (new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format((globalStats.total_buddycare / (globalStats.total_moph + globalStats.total_buddycare)) * 100)) : 0}%
                     </span>
                   </div>
                 </div>

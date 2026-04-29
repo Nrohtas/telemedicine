@@ -19,6 +19,15 @@ interface PerformanceItem {
     target: number;
 }
 
+const formatPercent = (val: number) => {
+    const num = Number(val);
+    if (isNaN(num)) return "0%";
+    return new Intl.NumberFormat("th-TH", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    }).format(num) + "%";
+};
+
 const TopPerformance = () => {
 
     const [data, setData] = useState<{
@@ -97,7 +106,7 @@ const TopPerformance = () => {
                                     <span className="text-sm font-black tabular-nums leading-none text-blue-700">{(summaryData?.his_tele || 0).toLocaleString()}</span>
                                     <span className="text-[10px] font-bold text-blue-500/70">ครั้ง</span>
                                     <div className="px-1.5 py-0.5 bg-blue-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-blue-100 ml-1">
-                                        {(summaryData?.his_percent || 0).toFixed(1)}%
+                                        {formatPercent(summaryData?.his_percent || 0)}
                                     </div>
                                 </div>
                             </div>
@@ -109,7 +118,7 @@ const TopPerformance = () => {
                                     <span className="text-sm font-black tabular-nums leading-none text-emerald-700">{(summaryData?.hdc_tele || 0).toLocaleString()}</span>
                                     <span className="text-[10px] font-bold text-emerald-500/70">ครั้ง</span>
                                     <div className="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-emerald-100 ml-1">
-                                        {(summaryData?.hdc_percent || 0).toFixed(1)}%
+                                        {formatPercent(summaryData?.hdc_percent || 0)}
                                     </div>
                                 </div>
                             </div>
@@ -166,7 +175,7 @@ const TopPerformance = () => {
                                                 <span className="text-[9px] font-bold text-blue-500/80">ครั้ง</span>
                                             </div>
                                             <div className="px-1.5 py-0.5 bg-blue-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-blue-100">
-                                                {Number(item.his_percent).toFixed(1)}%
+                                                {formatPercent(item.his_percent)}
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 bg-emerald-50/50 px-2.5 py-1 rounded-xl border border-emerald-100 shadow-sm group-hover:bg-white transition-colors">
@@ -176,7 +185,7 @@ const TopPerformance = () => {
                                                 <span className="text-[9px] font-bold text-emerald-500/80">ครั้ง</span>
                                             </div>
                                             <div className="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-emerald-100">
-                                                {Number(item.performance_percent).toFixed(1)}%
+                                                {formatPercent(item.performance_percent)}
                                             </div>
                                         </div>
                                     </div>

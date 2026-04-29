@@ -244,7 +244,9 @@ export default function DistrictTable({ type, source }: DistrictTableProps = {})
                                                     <div className="flex flex-col items-center">
                                                         <span className="text-[8px] font-black text-emerald-600/60 uppercase tracking-tighter leading-none mb-0.5">ผลงาน</span>
                                                         <div className="flex items-baseline leading-none">
-                                                            <span className="text-lg font-black text-emerald-700 tracking-tighter">{completionRate.toFixed(2)}</span>
+                                                            <span className="text-lg font-black text-emerald-700 tracking-tighter">
+                                                                {new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(completionRate)}
+                                                            </span>
                                                             <span className="text-[8px] font-black text-emerald-700/60">%</span>
                                                         </div>
                                                     </div>

@@ -35,12 +35,12 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
       "ประเภท": row.hostype_level || '-',
       "เป้าหมาย (1)": Math.round(row.platform_target),
       "ผลงาน Platform (1)": row.platform_result,
-      "ร้อยละ (1)": row.platform_percent.toFixed(2),
+      "ร้อยละ (1)": parseFloat(row.platform_percent.toFixed(2)),
       "มาตามนัด (2)": row.visit_type_2,
       "รับส่งต่อ (3)": row.visit_type_3,
       "แพทย์ทางไกล (5)": row.visit_type_5,
       "รวม 2+3+5": row.total,
-      "ร้อยละ (5/รวม)": row.percent.toFixed(2),
+      "ร้อยละ (5/รวม)": parseFloat(row.percent.toFixed(2)),
       "ผลต่าง (HIS-Platform)": row.diff_platform_his,
       "อำเภอ": row.amp_name
     }));
@@ -75,12 +75,12 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
       "ประเภท": "",
       "เป้าหมาย (1)": Math.round(totals.platform_target),
       "ผลงาน Platform (1)": totals.platform_result,
-      "ร้อยละ (1)": totalPercentPlatform.toFixed(2),
+      "ร้อยละ (1)": parseFloat(totalPercentPlatform.toFixed(2)),
       "มาตามนัด (2)": totals.visit_type_2,
       "รับส่งต่อ (3)": totals.visit_type_3,
       "แพทย์ทางไกล (5)": totals.visit_type_5,
       "รวม 2+3+5": totals.total,
-      "ร้อยละ (5/รวม)": totalPercentHIS.toFixed(2),
+      "ร้อยละ (5/รวม)": parseFloat(totalPercentHIS.toFixed(2)),
       "ผลต่าง (HIS-Platform)": totals.diff_platform_his,
       "อำเภอ": ""
     });

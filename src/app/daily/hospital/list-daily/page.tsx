@@ -31,7 +31,7 @@ interface DailyServiceTotals {
 
 const numberFormat = new Intl.NumberFormat("th-TH");
 const percentFormat = new Intl.NumberFormat("th-TH", {
-  minimumFractionDigits: 2,
+  minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });
 

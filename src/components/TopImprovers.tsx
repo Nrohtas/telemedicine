@@ -140,7 +140,7 @@ const TopImprovers = ({ source }: TopImproversProps = {}) => {
                                         </div>
                                     </div>
                                     <p className="text-[8px] font-black text-indigo-700 uppercase tracking-widest mt-0.5 whitespace-nowrap">
-                                        ผลงานล่าสุด <span className="text-emerald-600">({item.target > 0 ? ((item.current_total / item.target) * 100).toFixed(2) + '%' : '-'})</span>
+                                        ผลงานล่าสุด <span className="text-emerald-600">({item.target > 0 ? new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format((item.current_total / item.target) * 100) + '%' : '-'})</span>
                                     </p>
                                 </div>
                             </div>

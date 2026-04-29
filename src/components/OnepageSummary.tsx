@@ -9,6 +9,15 @@ import {
 import { motion, Variants } from 'framer-motion';
 import SoftCard from './ui/SoftCard';
 
+const formatPercent = (val: number) => {
+  const num = Number(val);
+  if (isNaN(num)) return "0%";
+  return new Intl.NumberFormat("th-TH", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(num) + "%";
+};
+
 export default function OnepageSummary({ data }: { data: any }) {
   const { pie, totals, hTotals, subhTotals, formattedDate, districtData, hospitalData, top10Data } = data;
   const dashboardRef = useRef<HTMLDivElement>(null);
@@ -227,7 +236,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                       {item.name}
                     </span>
                     <span className="text-3xl font-black text-slate-900 leading-none">
-                      {((item.value / totals.total235) * 100).toFixed(2)}%
+                      {formatPercent((item.value / totals.total235) * 100)}
                     </span>
                     <span className="text-xs font-bold text-slate-500 mt-2 tabular-nums">
                       {item.value.toLocaleString()} ราย
@@ -286,7 +295,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                     OPD
                   </span>
                   <span className="text-3xl font-black text-slate-900 leading-none">
-                    {(totals.hdc_opd + totals.hdc_tele) > 0 ? ((totals.hdc_opd / (totals.hdc_opd + totals.hdc_tele)) * 100).toFixed(2) : "0.00"}%
+                    {formatPercent((totals.hdc_opd + totals.hdc_tele) > 0 ? (totals.hdc_opd / (totals.hdc_opd + totals.hdc_tele)) * 100 : 0)}
                   </span>
                   <span className="text-xs font-bold text-slate-500 mt-2 tabular-nums">
                     {totals.hdc_opd.toLocaleString()} ราย
@@ -297,7 +306,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                     Telemedicine
                   </span>
                   <span className="text-3xl font-black text-slate-900 leading-none">
-                    {(totals.hdc_opd + totals.hdc_tele) > 0 ? ((totals.hdc_tele / (totals.hdc_opd + totals.hdc_tele)) * 100).toFixed(2) : "0.00"}%
+                    {formatPercent((totals.hdc_opd + totals.hdc_tele) > 0 ? (totals.hdc_tele / (totals.hdc_opd + totals.hdc_tele)) * 100 : 0)}
                   </span>
                   <span className="text-xs font-bold text-slate-500 mt-2 tabular-nums">
                     {totals.hdc_tele.toLocaleString()} ราย
@@ -355,7 +364,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center pt-6">
                       <span className="text-2xl font-black text-indigo-600 leading-none">
-                        {totals.percentType5.toFixed(2)}%
+                        {formatPercent(totals.percentType5)}
                       </span>
                     </div>
                   </div>
@@ -405,7 +414,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center pt-6">
                       <span className="text-2xl font-black text-emerald-600 leading-none">
-                        {(totals.hdc_opd + totals.hdc_tele) > 0 ? ((totals.hdc_tele * 100 / (totals.hdc_opd + totals.hdc_tele))).toFixed(2) : "0.00"}%
+                        {formatPercent((totals.hdc_opd + totals.hdc_tele) > 0 ? (totals.hdc_tele * 100 / (totals.hdc_opd + totals.hdc_tele)) : 0)}
                       </span>
                     </div>
                   </div>
@@ -501,7 +510,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                       </svg>
                       <div className="absolute inset-0 flex items-center justify-center pt-5">
                         <span className="text-xl font-black text-indigo-600 tabular-nums">
-                          {hTotals?.percentType5.toFixed(1)}%
+                          {formatPercent(hTotals?.percentType5 || 0)}
                         </span>
                       </div>
                     </div>
@@ -528,7 +537,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                       </svg>
                       <div className="absolute inset-0 flex items-center justify-center pt-5">
                         <span className="text-xl font-black text-emerald-600 tabular-nums">
-                          {hTotals?.hdc_percent.toFixed(1)}%
+                          {formatPercent(hTotals?.hdc_percent || 0)}
                         </span>
                       </div>
                     </div>
@@ -606,7 +615,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center pt-5">
                     <span className="text-lg font-black text-indigo-600 tabular-nums">
-                      {(subhTotals?.percentType5 || 0).toFixed(1)}%
+                      {formatPercent(subhTotals?.percentType5 || 0)}
                     </span>
                   </div>
                 </div>
@@ -633,7 +642,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center pt-5">
                     <span className="text-lg font-black text-emerald-600 tabular-nums">
-                      {(subhTotals?.hdc_percent || 0).toFixed(1)}%
+                      {formatPercent(subhTotals?.hdc_percent || 0)}
                     </span>
                   </div>
                 </div>
