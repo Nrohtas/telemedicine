@@ -10,7 +10,9 @@ export default async function OnepagePage() {
       COALESCE(SUM(vtd.visit_type_2), 0) AS visit_type_2,
       COALESCE(SUM(vtd.visit_type_3), 0) AS visit_type_3,
       COALESCE(SUM(vtd.visit_type_5), 0) AS visit_type_5,
-      MAX(vtd.visit_date) AS latest_date
+      MAX(vtd.visit_date) AS latest_date,
+      (SELECT COALESCE(SUM(opd), 0) FROM telemed_opd_hdc WHERE b_year = '2569') AS hdc_opd,
+      (SELECT COALESCE(SUM(telemedicine), 0) FROM telemed_opd_hdc WHERE b_year = '2569') AS hdc_tele
     FROM visit_type_daily vtd
     WHERE vtd.visit_date BETWEEN '2026-03-23' AND CURDATE()
   `;
@@ -47,8 +49,8 @@ export default async function OnepagePage() {
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
-        SELECT hospcode, result
-        FROM telemed_hdc
+        SELECT hospcode, telemedicine AS result
+        FROM telemed_opd_hdc
         WHERE b_year = '2569'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       GROUP BY a.amp_code, a.amp_name
@@ -68,7 +70,8 @@ export default async function OnepagePage() {
         COALESCE(vtd.visit_type_2, 0) AS v2,
         COALESCE(vtd.visit_type_3, 0) AS v3,
         COALESCE(vtd.visit_type_5, 0) AS v5,
-        COALESCE(SUM(p.result), 0) AS dashboard_result
+        COALESCE(SUM(p.result), 0) AS dashboard_result,
+        COALESCE(SUM(p.opd), 0) AS hdc_opd
       FROM hospital h
       LEFT JOIN (
         SELECT hoscode, 
@@ -80,8 +83,8 @@ export default async function OnepagePage() {
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
-        SELECT hospcode, result
-        FROM telemed_hdc
+        SELECT hospcode, telemedicine AS result, opd
+        FROM telemed_opd_hdc
         WHERE b_year = '2569'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       WHERE h.status = '1' 
@@ -107,15 +110,19 @@ export default async function OnepagePage() {
         v5,
         total235,
         ratio: ratio,
+        hdc_opd: Number(r.hdc_opd) || 0,
       };
     });
 
     const hTotals = hospitalData.reduce((acc: any, r: any) => {
       acc.type5 += r.v5;
       acc.total235 += r.total235;
+      acc.hdc_tele += r.hdc;
+      acc.hdc_opd += r.hdc_opd;
       return acc;
-    }, { type5: 0, total235: 0 });
+    }, { type5: 0, total235: 0, hdc_tele: 0, hdc_opd: 0 });
     const hPercentType5 = hTotals.total235 > 0 ? (hTotals.type5 * 100 / hTotals.total235) : 0;
+    const hHdcPercent = hTotals.hdc_opd > 0 ? (hTotals.hdc_tele * 100 / hTotals.hdc_opd) : 0;
 
     // Query 4: Sub-hospitals (รพ.สต.) data for Top 10 and Gauge
     const subhQuery = `
@@ -139,8 +146,8 @@ export default async function OnepagePage() {
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
-        SELECT hospcode, result
-        FROM telemed_hdc
+        SELECT hospcode, telemedicine AS result
+        FROM telemed_opd_hdc
         WHERE b_year = '2569'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       WHERE h.status = '1' 
@@ -171,8 +178,22 @@ export default async function OnepagePage() {
         { name: 'ส่งต่อ (3)', value: type3, fill: '#FCA5A5' },
         { name: 'แพทย์ทางไกล (5)', value: type5, fill: '#93C5FD' },
       ],
-      totals: { type5, total235, percentType5 },
-      hTotals: { type5: hTotals.type5, total235: hTotals.total235, percentType5: hPercentType5 },
+      totals: { 
+        type5, 
+        total235, 
+        percentType5,
+        hdc_opd: Number(overall.hdc_opd) || 0,
+        hdc_tele: Number(overall.hdc_tele) || 0,
+        hdc_percent: (Number(overall.hdc_opd) || 0) > 0 ? (Number(overall.hdc_tele) / Number(overall.hdc_opd)) * 100 : 0
+      },
+      hTotals: { 
+        type5: hTotals.type5, 
+        total235: hTotals.total235, 
+        percentType5: hPercentType5,
+        hdc_tele: hTotals.hdc_tele,
+        hdc_opd: hTotals.hdc_opd,
+        hdc_percent: hHdcPercent
+      },
       subhTotals: { type5: subhTotals.type5, total235: subhTotals.total235, percentType5: subhPercentType5 },
       formattedDate,
       districtData,

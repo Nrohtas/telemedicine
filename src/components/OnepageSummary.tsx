@@ -168,163 +168,252 @@ export default function OnepageSummary({ data }: { data: any }) {
       {/* Hero Stats Row */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
 
-        {/* Pie Chart Card */}
-        <motion.div variants={itemVariants} className="xl:col-span-6 h-full">
-          <SoftCard className="p-6 h-full flex flex-col items-center justify-center relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-16 -mt-16 blur-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
-
-            <h3 className="text-lg font-black text-indigo-950 mb-4 self-start flex items-center gap-2">
-              <div className="w-1.5 h-6 bg-indigo-600 rounded-full" />
-              สัดส่วนประเภทการมารับบริการทั้งจังหวัด
-            </h3>
-
-            <div className="relative w-full flex items-center justify-center">
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie
-                    data={pie}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={100}
-                    paddingAngle={8}
-                    dataKey="value"
-                    animationBegin={0}
-                    animationDuration={1500}
-                  >
-                    {pie.map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} stroke="white" strokeWidth={4} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-[-10px]">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total</span>
-                <span className="text-2xl font-black text-indigo-950 tabular-nums">
-                  {totals.total235.toLocaleString()}
-                </span>
-                <span className="text-[10px] font-bold text-slate-400">Services</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4 w-full mt-4">
-              {pie.map((item: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="flex flex-col items-center p-4 rounded-2xl border transition-all duration-300 shadow-sm hover:shadow-md hover:scale-[1.02]"
-                  style={{
-                    backgroundColor: item.fill + '15', // ~8% opacity
-                    borderColor: item.fill + '50',      // ~31% opacity
-                  }}
-                >
-                  <span className="text-xs font-black uppercase tracking-wider mb-1.5 text-slate-700">
-                    {item.name}
-                  </span>
-                  <span className="text-3xl font-black text-slate-900 leading-none">
-                    {((item.value / totals.total235) * 100).toFixed(2)}%
-                  </span>
-                  <span className="text-xs font-bold text-slate-500 mt-1.5 tabular-nums">
-                    {item.value.toLocaleString()} ราย
-                  </span>
-                </div>
-              ))}
-            </div>
-          </SoftCard>
-        </motion.div>
-
-        {/* Liquid Progress Card */}
-        <motion.div variants={itemVariants} className="xl:col-span-6">
-          <SoftCard className="p-6 h-full flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-50 rounded-full -ml-24 -mb-24 blur-2xl opacity-50" />
-
-            <div className="flex justify-between items-start mb-6">
-              <div>
+        {/* Comparison Charts Row */}
+        <motion.div variants={itemVariants} className="xl:col-span-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            {/* HIS Summary Card */}
+            <SoftCard className="p-4 flex flex-col items-center justify-center relative overflow-hidden group border-t-4 border-t-indigo-500">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-16 -mt-16 blur-2xl opacity-50" />
+              
+              <div className="w-full flex justify-between items-center mb-6">
                 <h3 className="text-lg font-black text-indigo-950 flex items-center gap-2">
-                  <div className="w-1.5 h-6 bg-emerald-600 rounded-full" />
-                  สัดส่วนการใช้ Telemedicine ทั้งจังหวัด
+                  <div className="w-1.5 h-6 bg-indigo-600 rounded-full" />
+                  สัดส่วนประเภทการรับบริการ (HIS)
                 </h3>
               </div>
-            </div>
 
-            <div className="flex-1 flex items-center justify-center gap-2 md:gap-8">
-              {/* The Formula Section */}
-              <div className="flex items-center gap-6">
-                {/* Fraction (Left) */}
-                <div className="flex flex-col items-center w-48 shrink-0">
-                  {/* Top: TYPE 5 */}
-                  <div className="w-full py-3 px-4 rounded-xl bg-indigo-50/50 border border-indigo-100 text-center shadow-sm">
-                    <span className="text-xs font-black text-indigo-500 uppercase tracking-tighter block mb-1">Telemedicine (TYPEIN 5)</span>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-black text-indigo-900 tabular-nums leading-none">{totals.type5.toLocaleString()}</span>
-                    </div>
-                  </div>
-
-                  {/* Fraction Line */}
-                  <div className="w-full h-1 bg-indigo-500 rounded-full my-3 opacity-50 shadow-sm" />
-
-                  {/* Bottom: HIS Total */}
-                  <div className="w-full py-3 px-4 rounded-xl bg-emerald-50/50 border border-emerald-100 text-center shadow-sm">
-                    <span className="text-xs font-black text-emerald-600 uppercase tracking-tighter block mb-1">Service (TYPE 2+3+5)</span>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-black text-emerald-900 tabular-nums leading-none">{totals.total235.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Multiplier */}
-                <span className="text-xl font-black text-slate-900">X 100</span>
-
-                <span className="text-xl font-black text-slate-400">=</span>
-
-                {/* Semi-Circle Gauge (Right Side - Final Result) */}
-                <div className="relative w-48 h-32 flex flex-col items-center justify-center shrink-0">
-                  <svg viewBox="0 0 100 60" className="w-full">
-                    <defs>
-                      <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#6366f1" />
-                        <stop offset="100%" stopColor="#4338ca" />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M 10 50 A 40 40 0 0 1 90 50"
-                      fill="none"
-                      stroke="#ecfdf5"
-                      strokeWidth="10"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M 10 50 A 40 40 0 0 1 90 50"
-                      fill="none"
-                      stroke="#10b981"
-                      strokeWidth="10"
-                      strokeLinecap="round"
-                      opacity="0.3"
-                    />
-                    <motion.path
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: totals.percentType5 / 100 }}
-                      transition={{ duration: 2, ease: "circOut" }}
-                      d="M 10 50 A 40 40 0 0 1 90 50"
-                      fill="none"
-                      stroke="url(#gaugeGradient)"
-                      strokeWidth="10"
-                      strokeLinecap="round"
-                      style={{ filter: 'drop-shadow(0px 4px 6px rgba(79, 70, 229, 0.2))' }}
-                    />
-                  </svg>
-                  {/* Percentage Inside Gauge */}
-                  <div className="absolute inset-0 flex items-center justify-center pt-8">
-                    <span className="text-4xl font-black text-indigo-600 leading-none">
-                      {totals.percentType5.toFixed(2)}%
-                    </span>
-                  </div>
-
-
+              <div className="relative w-full flex items-center justify-center mb-4">
+                <ResponsiveContainer width="100%" height={140}>
+                  <PieChart>
+                    <Pie
+                      data={pie}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={65}
+                      paddingAngle={8}
+                      dataKey="value"
+                      animationBegin={0}
+                      animationDuration={1500}
+                    >
+                      {pie.map((entry: any, index: number) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} stroke="white" strokeWidth={4} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-[-10px]">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">TOTAL</span>
+                  <span className="text-2xl font-black text-indigo-950 tabular-nums">
+                    {totals.total235.toLocaleString()}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400">Services</span>
                 </div>
               </div>
-            </div>
-          </SoftCard>
+
+              <div className="grid grid-cols-3 gap-2 w-full">
+                {pie.map((item: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className="flex flex-col items-center p-4 rounded-2xl border transition-all duration-300 shadow-sm hover:shadow-md hover:scale-[1.02]"
+                    style={{
+                      backgroundColor: item.fill + '10',
+                      borderColor: item.fill + '40',
+                    }}
+                  >
+                    <span className="text-[11px] font-black uppercase tracking-wider mb-2 text-slate-600">
+                      {item.name}
+                    </span>
+                    <span className="text-3xl font-black text-slate-900 leading-none">
+                      {((item.value / totals.total235) * 100).toFixed(2)}%
+                    </span>
+                    <span className="text-xs font-bold text-slate-500 mt-2 tabular-nums">
+                      {item.value.toLocaleString()} ราย
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </SoftCard>
+
+            {/* HDC Summary Card */}
+            <SoftCard className="p-4 flex flex-col items-center justify-center relative overflow-hidden group border-t-4 border-t-emerald-500">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 blur-2xl opacity-50" />
+              
+              <div className="w-full flex justify-between items-center mb-6">
+                <h3 className="text-lg font-black text-emerald-950 flex items-center gap-2">
+                  <div className="w-1.5 h-6 bg-emerald-600 rounded-full" />
+                  สัดส่วนประเภทการรับบริการ (HDC)
+                </h3>
+              </div>
+
+              <div className="relative w-full flex items-center justify-center mb-4">
+                <ResponsiveContainer width="100%" height={140}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'OPD ทั่วไป', value: totals.hdc_opd - totals.hdc_tele, fill: '#10B981' },
+                        { name: 'Telemedicine', value: totals.hdc_tele, fill: '#3B82F6' }
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={65}
+                      paddingAngle={8}
+                      dataKey="value"
+                      animationBegin={0}
+                      animationDuration={1500}
+                    >
+                      <Cell fill="#10B981" stroke="white" strokeWidth={4} />
+                      <Cell fill="#3B82F6" stroke="white" strokeWidth={4} />
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-[-10px]">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">TOTAL</span>
+                  <span className="text-2xl font-black text-emerald-950 tabular-nums">
+                    {totals.hdc_opd.toLocaleString()}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400">Services</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 w-full">
+                <div className="flex flex-col items-center p-4 rounded-2xl border bg-emerald-50/20 border-emerald-500/20 shadow-sm hover:shadow-md transition-all">
+                  <span className="text-[11px] font-black uppercase tracking-wider mb-2 text-emerald-700">
+                    OPD ทั่วไป
+                  </span>
+                  <span className="text-3xl font-black text-slate-900 leading-none">
+                    {totals.hdc_opd > 0 ? (((totals.hdc_opd - totals.hdc_tele) / totals.hdc_opd) * 100).toFixed(2) : "0.00"}%
+                  </span>
+                  <span className="text-xs font-bold text-slate-500 mt-2 tabular-nums">
+                    {(totals.hdc_opd - totals.hdc_tele).toLocaleString()} ราย
+                  </span>
+                </div>
+                <div className="flex flex-col items-center p-4 rounded-2xl border bg-blue-50/20 border-blue-500/20 shadow-sm hover:shadow-md transition-all">
+                  <span className="text-[11px] font-black uppercase tracking-wider mb-2 text-blue-700">
+                    Telemedicine
+                  </span>
+                  <span className="text-3xl font-black text-slate-900 leading-none">
+                    {totals.hdc_opd > 0 ? ((totals.hdc_tele / totals.hdc_opd) * 100).toFixed(2) : "0.00"}%
+                  </span>
+                  <span className="text-xs font-bold text-slate-500 mt-2 tabular-nums">
+                    {totals.hdc_tele.toLocaleString()} ราย
+                  </span>
+                </div>
+              </div>
+            </SoftCard>
+
+          </div>
+        </motion.div>
+
+        {/* Liquid Progress Card - Comparison */}
+        <motion.div variants={itemVariants} className="xl:col-span-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            {/* HIS Ratio Card */}
+            <SoftCard className="p-6 h-full flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-50 rounded-full -ml-24 -mb-24 blur-2xl opacity-50" />
+              
+              <div className="mb-6">
+                <h3 className="text-lg font-black text-indigo-950 flex items-center gap-2">
+                  <div className="w-1.5 h-6 bg-indigo-600 rounded-full" />
+                  สัดส่วนการใช้ Telemedicine (HIS)
+                </h3>
+              </div>
+
+              <div className="flex-1 flex items-center justify-center gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col items-center w-40 shrink-0">
+                    <div className="w-full py-2 px-3 rounded-xl bg-indigo-50/50 border border-indigo-100 text-center shadow-sm">
+                      <span className="text-[10px] font-black text-indigo-500 uppercase tracking-tighter block mb-1">Telemedicine (Type 5)</span>
+                      <span className="text-3xl font-black text-indigo-900 tabular-nums leading-none">{totals.type5.toLocaleString()}</span>
+                    </div>
+                    <div className="w-full h-1 bg-indigo-500 rounded-full my-2 opacity-50 shadow-sm" />
+                    <div className="w-full py-2 px-3 rounded-xl bg-slate-50/50 border border-slate-100 text-center shadow-sm">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter block mb-1">Service (Type 2+3+5)</span>
+                      <span className="text-3xl font-black text-slate-900 tabular-nums leading-none">{totals.total235.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <span className="text-lg font-black text-slate-900">X 100</span>
+                  <span className="text-lg font-black text-slate-400">=</span>
+                  <div className="relative w-36 h-24 flex flex-col items-center justify-center shrink-0">
+                    <svg viewBox="0 0 100 60" className="w-full">
+                      <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#f1f5f9" strokeWidth="10" strokeLinecap="round" />
+                      <motion.path
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: totals.percentType5 / 100 }}
+                        transition={{ duration: 2, ease: "circOut" }}
+                        d="M 10 50 A 40 40 0 0 1 90 50"
+                        fill="none"
+                        stroke="#6366f1"
+                        strokeWidth="10"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center pt-6">
+                      <span className="text-2xl font-black text-indigo-600 leading-none">
+                        {totals.percentType5.toFixed(2)}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </SoftCard>
+
+            {/* HDC Ratio Card */}
+            <SoftCard className="p-6 h-full flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-50 rounded-full -ml-24 -mb-24 blur-2xl opacity-50" />
+              
+              <div className="mb-6">
+                <h3 className="text-lg font-black text-emerald-950 flex items-center gap-2">
+                  <div className="w-1.5 h-6 bg-emerald-600 rounded-full" />
+                  สัดส่วนการใช้ Telemedicine (HDC)
+                </h3>
+              </div>
+
+              <div className="flex-1 flex items-center justify-center gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col items-center w-40 shrink-0">
+                    <div className="w-full py-2 px-3 rounded-xl bg-emerald-50/50 border border-emerald-100 text-center shadow-sm">
+                      <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tighter block mb-1">Telemedicine (HDC)</span>
+                      <span className="text-3xl font-black text-emerald-900 tabular-nums leading-none">{totals.hdc_tele.toLocaleString()}</span>
+                    </div>
+                    <div className="w-full h-1 bg-emerald-500 rounded-full my-2 opacity-50 shadow-sm" />
+                    <div className="w-full py-2 px-3 rounded-xl bg-slate-50/50 border border-slate-100 text-center shadow-sm">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter block mb-1">OPD ทั้งหมด (HDC)</span>
+                      <span className="text-3xl font-black text-slate-900 tabular-nums leading-none">{totals.hdc_opd.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <span className="text-lg font-black text-slate-900">X 100</span>
+                  <span className="text-lg font-black text-slate-400">=</span>
+                  <div className="relative w-36 h-24 flex flex-col items-center justify-center shrink-0">
+                    <svg viewBox="0 0 100 60" className="w-full">
+                      <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#f1f5f9" strokeWidth="10" strokeLinecap="round" />
+                      <motion.path
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: (totals.hdc_percent || 0) / 100 }}
+                        transition={{ duration: 2, ease: "circOut" }}
+                        d="M 10 50 A 40 40 0 0 1 90 50"
+                        fill="none"
+                        stroke="#10b981"
+                        strokeWidth="10"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center pt-6">
+                      <span className="text-2xl font-black text-emerald-600 leading-none">
+                        {(totals.hdc_percent || 0).toFixed(2)}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </SoftCard>
+
+          </div>
         </motion.div>
       </div>
 
@@ -386,54 +475,64 @@ export default function OnepageSummary({ data }: { data: any }) {
         {/* Hospital Chart */}
         <motion.div variants={itemVariants}>
           <SoftCard className="p-6 h-full">
-            <div className="flex items-start justify-between mb-8 px-2">
-              <div className="flex items-center gap-6">
-                <h3 className="text-lg font-black text-indigo-950 flex items-center gap-2">
-                  <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
+            <div className="flex flex-col mb-4">
+              <div className="flex items-center justify-between mb-4 px-2">
+                <h3 className="text-xl font-black text-indigo-950 flex items-center gap-3 flex-shrink-0">
+                  <div className="w-2 h-7 bg-blue-600 rounded-full" />
                   ผลงานรายโรงพยาบาล
                 </h3>
-              </div>
-
-              <div className="flex items-center gap-8 pt-0">
-                {/* Summary Gauge moved beside legend */}
-                <div className="w-36 h-20 flex flex-col items-center justify-center -mt-4">
-                  <span className="text-[10px] font-black text-blue-400 uppercase tracking-tighter mb-0 leading-none">สัดส่วน Telemedicine</span>
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    <svg viewBox="0 0 100 60" className="w-full">
-                      <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#f1f5f9" strokeWidth="12" strokeLinecap="round" />
-                      <motion.path
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: (hTotals?.percentType5 || 0) / 100 }}
-                        transition={{ duration: 2, ease: "circOut" }}
-                        d="M 10 50 A 40 40 0 0 1 90 50"
-                        fill="none"
-                        stroke="url(#hospitalCornerGradient)"
-                        strokeWidth="12"
-                        strokeLinecap="round"
-                      />
-                      <defs>
-                        <linearGradient id="hospitalCornerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#3b82f6" />
-                          <stop offset="100%" stopColor="#2563eb" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center pt-5">
-                      <span className="text-lg font-black text-blue-600 tabular-nums">
-                        {hTotals?.percentType5.toFixed(2)}%
-                      </span>
+                
+                <div className="flex items-center gap-2 flex-grow justify-end">
+                  {/* HIS Gauge */}
+                  <div className="flex items-center gap-1">
+                    <div className="w-32 h-20 relative flex items-center justify-center">
+                      <svg viewBox="0 0 100 60" className="w-full">
+                        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e0e7ff" strokeWidth="16" strokeLinecap="round" />
+                        <motion.path
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: (hTotals?.percentType5 || 0) / 100 }}
+                          transition={{ duration: 2, ease: "circOut" }}
+                          d="M 10 50 A 40 40 0 0 1 90 50"
+                          fill="none"
+                          stroke="#6366f1"
+                          strokeWidth="16"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center pt-5">
+                        <span className="text-xl font-black text-indigo-600 tabular-nums">
+                          {hTotals?.percentType5.toFixed(1)}%
+                        </span>
+                      </div>
                     </div>
+                    <span className="text-[11px] font-black text-indigo-500 uppercase tracking-widest mr-2">HIS</span>
                   </div>
-                </div>
 
-                <div className="flex gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-violet-600" />
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">HIS</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
+                  <div className="w-[1px] h-8 bg-slate-100 hidden sm:block" />
+
+                  {/* HDC Gauge */}
+                  <div className="flex items-center gap-1">
+                    <div className="w-32 h-20 relative flex items-center justify-center">
+                      <svg viewBox="0 0 100 60" className="w-full">
+                        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#d1fae5" strokeWidth="16" strokeLinecap="round" />
+                        <motion.path
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: (hTotals?.hdc_percent || 0) / 100 }}
+                          transition={{ duration: 2, ease: "circOut" }}
+                          d="M 10 50 A 40 40 0 0 1 90 50"
+                          fill="none"
+                          stroke="#10b981"
+                          strokeWidth="16"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center pt-5">
+                        <span className="text-xl font-black text-emerald-600 tabular-nums">
+                          {hTotals?.hdc_percent.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">HDC</span>
                   </div>
                 </div>
               </div>
@@ -488,47 +587,57 @@ export default function OnepageSummary({ data }: { data: any }) {
               </h3>
               <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-1 ml-11">ความก้าวหน้าผลงานสูงสุด</p>
             </div>
-            <div className="flex items-end gap-6">
-              {/* Corner Summary Gauge (No Frame) */}
-              <div className="w-36 h-24 flex flex-col items-center justify-center">
-                <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">สัดส่วน Telemedicine</span>
-                <div className="relative w-full h-full flex items-center justify-center">
+            <div className="flex items-center gap-6">
+              {/* HIS Gauge in Header */}
+              <div className="flex items-center gap-2">
+                <div className="w-28 h-18 relative flex items-center justify-center">
                   <svg viewBox="0 0 100 60" className="w-full">
-                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#f1f5f9" strokeWidth="12" strokeLinecap="round" />
+                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e0e7ff" strokeWidth="16" strokeLinecap="round" />
                     <motion.path
                       initial={{ pathLength: 0 }}
                       animate={{ pathLength: (subhTotals?.percentType5 || 0) / 100 }}
                       transition={{ duration: 2, ease: "circOut" }}
                       d="M 10 50 A 40 40 0 0 1 90 50"
                       fill="none"
-                      stroke="url(#subhCornerGradient)"
-                      strokeWidth="12"
+                      stroke="#6366f1"
+                      strokeWidth="16"
                       strokeLinecap="round"
                     />
-                    <defs>
-                      <linearGradient id="subhCornerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#3b82f6" />
-                        <stop offset="100%" stopColor="#2563eb" />
-                      </linearGradient>
-                    </defs>
                   </svg>
-                  <div className="absolute inset-0 flex items-center justify-center pt-6">
-                    <span className="text-lg font-black text-blue-600 tabular-nums">
-                      {subhTotals?.percentType5.toFixed(2)}%
+                  <div className="absolute inset-0 flex items-center justify-center pt-5">
+                    <span className="text-lg font-black text-indigo-600 tabular-nums">
+                      {(subhTotals?.percentType5 || 0).toFixed(1)}%
                     </span>
                   </div>
                 </div>
+                <span className="text-[11px] font-black text-indigo-500 uppercase tracking-widest">HIS</span>
               </div>
 
-              <div className="flex flex-col gap-2 bg-slate-50 px-4 py-3 rounded-2xl border border-white">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-violet-600" />
-                  <span className="text-[10px] font-black text-slate-500">HIS</span>
+              <div className="w-[1px] h-8 bg-slate-100" />
+
+              {/* HDC Gauge in Header */}
+              <div className="flex items-center gap-2">
+                <div className="w-28 h-18 relative flex items-center justify-center">
+                  <svg viewBox="0 0 100 60" className="w-full">
+                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#d1fae5" strokeWidth="16" strokeLinecap="round" />
+                    <motion.path
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: (subhTotals?.hdc_percent || 0) / 100 }}
+                      transition={{ duration: 2, ease: "circOut" }}
+                      d="M 10 50 A 40 40 0 0 1 90 50"
+                      fill="none"
+                      stroke="#10b981"
+                      strokeWidth="16"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center pt-5">
+                    <span className="text-lg font-black text-emerald-600 tabular-nums">
+                      {(subhTotals?.hdc_percent || 0).toFixed(1)}%
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] font-black text-slate-500">HDC</span>
-                </div>
+                <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">HDC</span>
               </div>
             </div>
           </div>
