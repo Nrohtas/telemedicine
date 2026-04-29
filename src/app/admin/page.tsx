@@ -15,9 +15,22 @@ interface UploadHistory {
     file_time: string;
     username: string;
     file_log: string;
+    file_platform: string;
 }
 
-const TelemedicineUpload = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
+const UploadCard = ({ 
+    type, 
+    title, 
+    subtitle, 
+    icons, 
+    onUploadSuccess 
+}: { 
+    type: string; 
+    title: string; 
+    subtitle: string; 
+    icons: React.ReactNode; 
+    onUploadSuccess: () => void 
+}) => {
     const [file, setFile] = useState<File | null>(null);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const dateInputRef = useRef<HTMLInputElement>(null);
@@ -37,7 +50,7 @@ const TelemedicineUpload = ({ onUploadSuccess }: { onUploadSuccess: () => void }
         setIsUploading(true);
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('type', 'Telemedicine');
+        formData.append('type', type);
         formData.append('date', selectedDate);
 
         try {
@@ -62,26 +75,21 @@ const TelemedicineUpload = ({ onUploadSuccess }: { onUploadSuccess: () => void }
     };
 
     return (
-        <SoftCard className="p-6 flex flex-col items-center text-center space-y-5 max-w-sm mx-auto border-none shadow-xl shadow-indigo-100/30 rounded-[2rem] bg-white relative overflow-hidden">
+        <SoftCard className="p-6 flex flex-col items-center text-center space-y-5 w-full max-w-sm border-none shadow-xl shadow-indigo-100/30 rounded-[2rem] bg-white relative overflow-hidden">
             {/* Background Decorative Blob */}
             <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-full -mr-12 -mt-12 blur-2xl pointer-events-none" />
 
             <div className="flex flex-col items-center w-full mb-2">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
+                <div className="flex gap-4 mb-4">
+                    {icons}
                 </div>
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Medical Data Sync</h3>
-                <p className="text-[10px] text-slate-400 font-medium tracking-tight mt-1">Upload telemedicine report for data analysis</p>
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">{title}</h3>
+                <p className="text-[10px] text-slate-400 font-medium tracking-tight mt-1">{subtitle}</p>
             </div>
 
             <div className="w-full space-y-5">
-                {/* Unified Selection Bar */}
                 <div className="bg-slate-50 p-1 rounded-2xl border border-slate-200/60">
                     <div className="flex flex-col sm:flex-row bg-white rounded-xl border border-slate-100 overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-slate-100 shadow-sm">
-                        
-                        {/* Date Selection Part */}
                         <div className="relative flex-1">
                             <input
                                 ref={dateInputRef}
@@ -108,8 +116,6 @@ const TelemedicineUpload = ({ onUploadSuccess }: { onUploadSuccess: () => void }
                                 </div>
                             </button>
                         </div>
-
-                        {/* File Selection Part */}
                         <div className="flex-1">
                             <button
                                 onClick={() => fileInputRef.current?.click()}
@@ -179,6 +185,44 @@ const TelemedicineUpload = ({ onUploadSuccess }: { onUploadSuccess: () => void }
     );
 };
 
+const HistoryItem = ({ item, idx }: { item: UploadHistory, idx: number }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: idx * 0.05 }}
+        className="flex items-center justify-between p-4 bg-white border border-slate-50 rounded-[1.5rem] hover:shadow-xl hover:shadow-slate-100 transition-all group"
+    >
+        <div className="flex items-center gap-4">
+            <div className={`w-10 h-10 rounded-xl ${item.file_log === 'HDC' ? 'bg-indigo-50 text-indigo-500' : 'bg-emerald-50 text-emerald-500'} flex items-center justify-center transition-all group-hover:scale-110 shadow-sm`}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <path d="M8 13h2" />
+                    <path d="M8 17h2" />
+                </svg>
+            </div>
+            <div className="min-w-0">
+                <p className="text-slate-900 font-black text-[13px] truncate max-w-[150px]">{item.file_name}</p>
+                <p className="text-slate-500 text-[9px] font-bold mt-0.5 uppercase tracking-widest">
+                    By {item.username} • {(item.file_size).toFixed(1)} KB
+                </p>
+            </div>
+        </div>
+        <div className="text-right">
+            <p className="text-slate-900 font-bold text-[11px] tracking-tight">{formatThaiDate(item.file_time)}</p>
+            <p className="text-emerald-500 text-[8px] font-black uppercase tracking-widest mt-0.5 flex items-center justify-end gap-1">
+                <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span> Synced
+            </p>
+        </div>
+    </motion.div>
+);
+
+const EmptyHistory = () => (
+    <div className="py-12 text-center bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-[2rem]">
+        <p className="text-slate-400 font-black uppercase tracking-[0.3em] text-[9px]">No recent data</p>
+    </div>
+);
+
 export default function AdminPage() {
     const [history, setHistory] = useState<UploadHistory[]>([]);
 
@@ -198,7 +242,6 @@ export default function AdminPage() {
         }
     };
 
-
     return (
         <main className="min-h-screen bg-background font-sans relative overflow-hidden pb-12">
             <Navbar
@@ -210,14 +253,59 @@ export default function AdminPage() {
                 }}
             />
 
-            {/* Background Decorative Blobs to match main dashboard feel */}
+            {/* Background Decorative Blobs */}
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-50/30 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-sky-50/30 rounded-full blur-[120px] pointer-events-none" />
 
-            <div className="max-w-4xl mx-auto space-y-24 relative z-10 pt-12">
+            <div className="max-w-6xl mx-auto space-y-24 relative z-10 pt-12 px-6">
 
-                {/* Single Telemedicine Upload Card */}
-                <TelemedicineUpload onUploadSuccess={fetchHistory} />
+                {/* Upload Cards Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start justify-items-center">
+                    {/* Card 1: MohPhrom + SornBuddy */}
+                    <UploadCard 
+                        type="Telemedicine"
+                        title="อัปโหลดไฟล์"
+                        subtitle="หมอพร้อม Station + สอน.บัดดี้"
+                        onUploadSuccess={fetchHistory}
+                        icons={
+                            <>
+                                <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center shadow-sm border border-emerald-100">
+                                    <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="50" cy="22" r="14" fill="#006837" />
+                                        <path d="M25 40H75V75C75 80 71 84 66 84H34C29 84 25 80 25 75V40Z" stroke="#F6D76E" strokeWidth="10" />
+                                        <rect x="40" y="52" width="20" height="7" fill="#A5A7AA" />
+                                        <rect x="46.5" y="46" width="7" height="19" fill="#A5A7AA" />
+                                    </svg>
+                                </div>
+                                <div className="w-14 h-14 rounded-2xl bg-sky-50 flex items-center justify-center shadow-sm border border-sky-100">
+                                    <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10 45L50 15L90 45" stroke="#00ADEF" strokeWidth="12" strokeLinecap="round" />
+                                        <rect x="40" y="32" width="20" height="7" fill="#A5A7AA" />
+                                        <rect x="46.5" y="26" width="7" height="19" fill="#A5A7AA" />
+                                        <path d="M25 55C25 55 25 85 50 85C75 85 75 60 75 60" stroke="#F6D76E" strokeWidth="10" fill="none" strokeLinecap="round" />
+                                        <circle cx="75" cy="62" r="8" fill="#0060A9" />
+                                    </svg>
+                                </div>
+                            </>
+                        }
+                    />
+
+                    {/* Card 2: HDC */}
+                    <UploadCard 
+                        type="HDC"
+                        title="อัปโหลดไฟล์ HDC"
+                        subtitle="ระบบข้อมูลกลางกระทรวงสาธารณสุข"
+                        onUploadSuccess={fetchHistory}
+                        icons={
+                            <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center shadow-sm border border-emerald-100">
+                                <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <text x="50" y="55" dominantBaseline="middle" textAnchor="middle" fill="#2D845A" fontWeight="900" fontSize="34" fontFamily="Inter, sans-serif">HDC</text>
+                                    <path d="M25 75H75" stroke="#F6D76E" strokeWidth="8" strokeLinecap="round" />
+                                </svg>
+                            </div>
+                        }
+                    />
+                </div>
 
                 {/* Activities / History Section */}
                 <div className="space-y-12">
@@ -226,52 +314,40 @@ export default function AdminPage() {
                         <div className="h-px w-full bg-slate-200"></div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4">
-                        {history.length > 0 ? (
-                            history.slice(0, 5).map((item, idx) => (
-                                <motion.div
-                                    key={item.file_id}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.05 }}
-                                    className="flex items-center justify-between p-6 bg-white border border-slate-50 rounded-[2rem] hover:shadow-2xl hover:shadow-slate-100 transition-all group"
-                                >
-                                    <div className="flex items-center gap-6">
-                                        <div className={`w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center transition-all group-hover:bg-emerald-500 group-hover:text-white shadow-sm`}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                                <polyline points="14 2 14 8 20 8" />
-                                                <path d="M8 13h2" />
-                                                <path d="M8 17h2" />
-                                                <path d="M14 13h2" />
-                                                <path d="M14 17h2" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <div className="flex items-center gap-3">
-                                                <p className="text-slate-900 font-black text-sm">{item.file_name}</p>
-                                                <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 text-[8px] font-black uppercase tracking-widest">
-                                                    {item.file_log || 'Telemedicine'}
-                                                </span>
-                                            </div>
-                                            <p className="text-slate-500 text-[10px] font-bold mt-1 uppercase tracking-widest">
-                                                By {item.username} &gt; {(item.file_size).toFixed(1)} KB
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-slate-900 font-bold text-sm tracking-tight">{formatThaiDate(item.file_time)}</p>
-                                        <p className="text-emerald-500 text-[9px] font-black uppercase tracking-widest mt-1 flex items-center justify-end gap-1.5">
-                                            <span className="w-1 h-1 rounded-full bg-emerald-500"></span> Synced
-                                        </p>
-                                    </div>
-                                </motion.div>
-                            ))
-                        ) : (
-                            <div className="py-20 text-center bg-slate-50/50 border-2 border-dashed border-slate-300 rounded-[3rem]">
-                                <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-[10px]">No recent data streams</p>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        {/* Column 1: Telemedicine */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">หมอพร้อม + สอน.บัดดี้</h4>
                             </div>
-                        )}
+                            <div className="space-y-4">
+                                {history.filter(item => item.file_platform === 'moph_buddycare').length > 0 ? (
+                                    history.filter(item => item.file_platform === 'moph_buddycare').slice(0, 5).map((item, idx) => (
+                                        <HistoryItem key={item.file_id} item={item} idx={idx} />
+                                    ))
+                                ) : (
+                                    <EmptyHistory />
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Column 2: HDC */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                                <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">HDC</h4>
+                            </div>
+                            <div className="space-y-4">
+                                {history.filter(item => item.file_platform === 'hdc').length > 0 ? (
+                                    history.filter(item => item.file_platform === 'hdc').slice(0, 5).map((item, idx) => (
+                                        <HistoryItem key={item.file_id} item={item} idx={idx} />
+                                    ))
+                                ) : (
+                                    <EmptyHistory />
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 

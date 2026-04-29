@@ -26,85 +26,130 @@ export async function POST(request: NextRequest) {
         console.log("=== RAW DATA FIRST ROW ===");
         console.dir(rawData[0]);
 
-        // Mapping and Filtering
-        // จังหวัด (เฉพาะ พิษณุโลก)
-        // รหัส -> hospcode (รหัสไม่ครบ 5 หลัก เติม 0 ด้านหน้า)
-        // หมอพร้อม station -> moph
-        // สอน.บัดดี้ -> buddycare
-        // ปีงบประมาณ -> b_year
-        // ID -> hospcode_b_year
+        let results: any;
+        let importedCount = 0;
 
-        const filteredData = rawData.filter(row => {
-            const province = String(row['จังหวัด'] || '').trim();
-            return province === 'พิษณุโลก';
-        });
+        if (type === 'HDC') {
+            // Processing for HDC (telemed_opd_hdc table)
+            const targetBYear = date ? (new Date(date).getFullYear() + 543).toString() : '2569';
 
-        if (filteredData.length === 0) {
-            return NextResponse.json({ error: 'No data found for พิษณุโลก' }, { status: 400 });
-        }
+            const hdcValues = rawData.map((row, index) => {
+                // Helper to find key by partial match
+                const findKey = (keywords: string[]) => {
+                    return Object.keys(row).find(k =>
+                        keywords.some(kw => k.trim().replace(/\s+/g, ' ').includes(kw))
+                    );
+                };
 
-        const aggregatedData: Record<string, any> = {};
+                const hospcodeKey = findKey(['รหัสหน่วยบริการ', 'hospcode']);
+                const opdKey = findKey(['ยอด OPD', 'opd', 'ยอดOPD']);
+                const teleKey = findKey(['Telemedicine', 'telemedicine']);
 
-        filteredData.forEach(row => {
-            const rawHospcode = String(row['รหัส 5 หลัก'] || row['รหัส'] || row['หน่วยบริการ'] || row['hospcode'] || '');
-            if (!rawHospcode || rawHospcode === 'undefined') return;
+                const rawHospcode = String(row[hospcodeKey || ''] || '');
+                if (!rawHospcode || rawHospcode === 'undefined' || rawHospcode.includes('รวม')) return null;
 
-            const hospcode = rawHospcode.padStart(5, '0');
-            const b_year = String(row['ปีงบประมาณ'] || row['b_year'] || '');
-            const platform = String(row['แพลตฟอร์ม'] || '').trim();
-            const count = parseInt(row['จำนวนนัด Telemed'] || row['จำนวน'] || '0') || 0;
+                const hospcode = rawHospcode.padStart(5, '0');
 
-            const id = `${hospcode}_${b_year}`;
+                // Clean numeric strings (ensure absolute integer)
+                const cleanNumber = (val: any) => {
+                    if (val === undefined || val === null || val === '') return 0;
+                    if (typeof val === 'number') return Math.floor(val);
+                    // Remove commas and parse as float then floor to get integer
+                    const cleaned = String(val).replace(/,/g, '').trim();
+                    return Math.floor(parseFloat(cleaned) || 0);
+                };
 
-            if (!aggregatedData[id]) {
-                aggregatedData[id] = { id, hospcode, b_year, moph: 0, buddycare: 0 };
+                const opd = cleanNumber(row[opdKey || '']);
+                const telemedicine = cleanNumber(row[teleKey || '']);
+                const id = `${hospcode}_${targetBYear}`;
+                const percent = opd > 0 ? (telemedicine * 100) / opd : 0;
+
+                return [id, hospcode, targetBYear, opd, telemedicine, percent, new Date()];
+            }).filter(item => item !== null);
+
+            if (hdcValues.length === 0) {
+                return NextResponse.json({ error: 'No valid HDC data found in file' }, { status: 400 });
             }
 
-            if (platform === 'หมอพร้อม station' || platform === 'หมอพร้อม') {
-                aggregatedData[id].moph += count;
-            } else if (platform === 'สอน.บัดดี้' || platform === 'สอน.บัดดี') {
-                aggregatedData[id].buddycare += count;
+            const hdcQuery = `
+                INSERT INTO telemed_opd_hdc (id, hospcode, b_year, opd, telemedicine, percent, d_update)
+                VALUES ?
+                ON DUPLICATE KEY UPDATE
+                    opd = VALUES(opd),
+                    telemedicine = VALUES(telemedicine),
+                    percent = VALUES(percent),
+                    d_update = VALUES(d_update)
+            `;
+
+            [results] = await pool.query(hdcQuery, [hdcValues]);
+            importedCount = hdcValues.length;
+
+        } else {
+            // Processing for Telemedicine (telemed table - Existing logic)
+            const filteredData = rawData.filter(row => {
+                const province = String(row['จังหวัด'] || '').trim();
+                return province === 'พิษณุโลก';
+            });
+
+            if (filteredData.length === 0) {
+                return NextResponse.json({ error: 'No data found for พิษณุโลก' }, { status: 400 });
             }
-        });
 
-        const values = Object.values(aggregatedData).map((item: any) => {
-            const result = item.moph + item.buddycare;
-            return [item.id, item.hospcode, item.b_year, item.moph, item.buddycare, result];
-        });
+            const aggregatedData: Record<string, any> = {};
 
-        if (values.length === 0) {
-            return NextResponse.json({ error: 'No valid data to import after extraction.' }, { status: 400 });
+            filteredData.forEach(row => {
+                const rawHospcode = String(row['รหัส 5 หลัก'] || row['รหัส'] || row['หน่วยบริการ'] || row['hospcode'] || '');
+                if (!rawHospcode || rawHospcode === 'undefined') return;
+
+                const hospcode = rawHospcode.padStart(5, '0');
+                const b_year = String(row['ปีงบประมาณ'] || row['b_year'] || '');
+                const platform = String(row['แพลตฟอร์ม'] || '').trim();
+                const count = parseInt(row['จำนวนนัด Telemed'] || row['จำนวน'] || '0') || 0;
+
+                const id = `${hospcode}_${b_year}`;
+
+                if (!aggregatedData[id]) {
+                    aggregatedData[id] = { id, hospcode, b_year, moph: 0, buddycare: 0 };
+                }
+
+                if (platform === 'หมอพร้อม station' || platform === 'หมอพร้อม') {
+                    aggregatedData[id].moph += count;
+                } else if (platform === 'สอน.บัดดี้' || platform === 'สอน.บัดดี') {
+                    aggregatedData[id].buddycare += count;
+                }
+            });
+
+            const compareQuery = `
+                INSERT INTO telemed (id, hospcode, b_year, moph, buddycare, result, moph_date, buddycare_date, result_date)
+                VALUES ?
+                ON DUPLICATE KEY UPDATE
+                    moph_compare = VALUES(moph) - moph,
+                    buddycare_compare = VALUES(buddycare) - buddycare,
+                    result_compare = VALUES(result) - result,
+                    percentage = CASE WHEN result > 0 THEN ((VALUES(result) - result) / result) * 100 ELSE 0 END,
+                    moph_past = moph,
+                    moph_past_date = moph_date,
+                    buddycare_past = buddycare,
+                    buddycare_past_date = buddycare_date,
+                    result_past = result,
+                    result_past_date = result_date,
+                    b_year = VALUES(b_year),
+                    moph = VALUES(moph),
+                    buddycare = VALUES(buddycare),
+                    result = VALUES(result),
+                    moph_date = VALUES(moph_date),
+                    buddycare_date = VALUES(buddycare_date),
+                    result_date = VALUES(result_date)
+            `;
+
+            const compareValues = Object.values(aggregatedData).map((item: any) => {
+                const result = item.moph + item.buddycare;
+                return [item.id, item.hospcode, item.b_year, item.moph, item.buddycare, result, date, date, date];
+            });
+
+            [results] = await pool.query(compareQuery, [compareValues]);
+            importedCount = filteredData.length;
         }
-
-        const compareQuery = `
-            INSERT INTO telemed (id, hospcode, b_year, moph, buddycare, result, moph_date, buddycare_date, result_date)
-            VALUES ?
-            ON DUPLICATE KEY UPDATE
-                moph_compare = VALUES(moph) - moph,
-                buddycare_compare = VALUES(buddycare) - buddycare,
-                result_compare = VALUES(result) - result,
-                percentage = CASE WHEN result > 0 THEN ((VALUES(result) - result) / result) * 100 ELSE 0 END,
-                moph_past = moph,
-                moph_past_date = moph_date,
-                buddycare_past = buddycare,
-                buddycare_past_date = buddycare_date,
-                result_past = result,
-                result_past_date = result_date,
-                b_year = VALUES(b_year),
-                moph = VALUES(moph),
-                buddycare = VALUES(buddycare),
-                result = VALUES(result),
-                moph_date = VALUES(moph_date),
-                buddycare_date = VALUES(buddycare_date),
-                result_date = VALUES(result_date)
-        `;
-
-        const compareValues = Object.values(aggregatedData).map((item: any) => {
-            const result = item.moph + item.buddycare;
-            return [item.id, item.hospcode, item.b_year, item.moph, item.buddycare, result, date, date, date];
-        });
-
-        const [results]: any = await pool.query(compareQuery, [compareValues]);
 
         // Log to fileupload table
         try {
@@ -114,19 +159,27 @@ export async function POST(request: NextRequest) {
                 return await verifyJWT(token);
             })() : null;
             const username = payload?.username || 'system';
-            const logType = filteredData[0]['ปีงบประมาณ'] || type;
+            
+            // Determine fiscal year for logging
+            const targetBYear = date ? (new Date(date).getFullYear() + 543).toString() : '2569';
+            const excelBYear = rawData[0]['ปีงบประมาณ'] || rawData[0]['b_year'];
+            const logType = excelBYear ? String(excelBYear).trim() : (type === 'HDC' ? targetBYear : 'Telemed');
+
+            // Determine file_platform based on type
+            const file_platform = type === 'HDC' ? 'hdc' : 'moph_buddycare';
 
             const logQuery = `
                 INSERT INTO fileupload 
-                (file_name, file_type, file_size, file_time, username, file_log)
-                VALUES (?, ?, ?, NOW(), ?, ?)
+                (file_name, file_type, file_size, file_time, username, file_log, file_platform)
+                VALUES (?, ?, ?, NOW(), ?, ?, ?)
             `;
             await pool.query(logQuery, [
                 file.name,
                 file.name.split('.').pop()?.substring(0, 10) || '',
                 file.size / 1024, // KB
                 username,
-                logType
+                logType,
+                file_platform
             ]);
         } catch (logError) {
             console.error('Failed to log file upload:', logError);
@@ -135,7 +188,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             success: true,
             count: results.affectedRows,
-            imported: filteredData.length,
+            imported: importedCount,
             message: 'Data synchronized successfully'
         });
 

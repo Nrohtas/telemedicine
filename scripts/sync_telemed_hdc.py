@@ -76,13 +76,14 @@ def main():
         cursor = conn.cursor()
 
         insert_sql = """
-            INSERT INTO telemed_hdc (id, hospcode, areacode, date_com, b_year, target, result)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO telemed_hdc (id, hospcode, areacode, date_com, b_year, target, result, d_update)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
             ON DUPLICATE KEY UPDATE 
                 areacode = VALUES(areacode),
                 date_com = VALUES(date_com),
                 target = VALUES(target),
-                result = VALUES(result)
+                result = VALUES(result),
+                d_update = NOW()
         """
 
         for item in filtered_data:
