@@ -178,26 +178,35 @@ export default function OnepageSummary({ data }: { data: any }) {
               สัดส่วนประเภทการมารับบริการทั้งจังหวัด
             </h3>
 
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie
-                  data={pie}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={70}
-                  outerRadius={100}
-                  paddingAngle={8}
-                  dataKey="value"
-                  animationBegin={0}
-                  animationDuration={1500}
-                >
-                  {pie.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} stroke="white" strokeWidth={4} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
+            <div className="relative w-full flex items-center justify-center">
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie
+                    data={pie}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={100}
+                    paddingAngle={8}
+                    dataKey="value"
+                    animationBegin={0}
+                    animationDuration={1500}
+                  >
+                    {pie.map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} stroke="white" strokeWidth={4} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-[-10px]">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total</span>
+                <span className="text-2xl font-black text-indigo-950 tabular-nums">
+                  {totals.total235.toLocaleString()}
+                </span>
+                <span className="text-[10px] font-bold text-slate-400">Services</span>
+              </div>
+            </div>
 
             <div className="grid grid-cols-3 gap-4 w-full mt-4">
               {pie.map((item: any, idx: number) => (
@@ -210,10 +219,10 @@ export default function OnepageSummary({ data }: { data: any }) {
                   }}
                 >
                   <span className="text-xs font-black uppercase tracking-wider mb-1.5 text-slate-700">
-                    {item.name.split('(')[0]}
+                    {item.name}
                   </span>
                   <span className="text-3xl font-black text-slate-900 leading-none">
-                    {((item.value / totals.total235) * 100).toFixed(1)}%
+                    {((item.value / totals.total235) * 100).toFixed(2)}%
                   </span>
                   <span className="text-xs font-bold text-slate-500 mt-1.5 tabular-nums">
                     {item.value.toLocaleString()} ราย
@@ -256,7 +265,7 @@ export default function OnepageSummary({ data }: { data: any }) {
 
                   {/* Bottom: HIS Total */}
                   <div className="w-full py-3 px-4 rounded-xl bg-emerald-50/50 border border-emerald-100 text-center shadow-sm">
-                    <span className="text-xs font-black text-emerald-600 uppercase tracking-tighter block mb-1">Visit (TYPE2+3+5)</span>
+                    <span className="text-xs font-black text-emerald-600 uppercase tracking-tighter block mb-1">Service (TYPE 2+3+5)</span>
                     <div className="flex items-baseline justify-center gap-1">
                       <span className="text-4xl font-black text-emerald-900 tabular-nums leading-none">{totals.total235.toLocaleString()}</span>
                     </div>

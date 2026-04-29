@@ -166,9 +166,9 @@ export default async function OnepagePage() {
 
   const data = {
     pie: [
-      { name: 'ตามนัด(2)', value: type2, fill: '#6EE7B7' },
-      { name: 'ส่งต่อ(3)', value: type3, fill: '#FCA5A5' },
-      { name: 'แพทย์ทางไกล(5)', value: type5, fill: '#93C5FD' },
+      { name: 'ตามนัด (2)', value: type2, fill: '#6EE7B7' },
+      { name: 'ส่งต่อ (3)', value: type3, fill: '#FCA5A5' },
+      { name: 'แพทย์ทางไกล (5)', value: type5, fill: '#93C5FD' },
     ],
     totals: { type5, total235, percentType5 },
     hTotals: { type5: hTotals.type5, total235: hTotals.total235, percentType5: hPercentType5 },
