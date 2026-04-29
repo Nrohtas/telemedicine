@@ -5,7 +5,7 @@ import SoftCard from '@/components/ui/SoftCard';
 import SoftButton from '@/components/ui/SoftButton';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { formatThaiDate, formatThaiDateOnly, formatThaiDateNumeric } from '@/utils/date';
+import { formatThaiDate, formatThaiDateOnly, formatThaiDateNumeric, formatEnglishDate } from '@/utils/date';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface UploadHistory {
@@ -23,13 +23,15 @@ const UploadCard = ({
     title, 
     subtitle, 
     icons, 
-    onUploadSuccess 
+    onUploadSuccess,
+    lastUpdateDate
 }: { 
     type: string; 
     title: string; 
     subtitle: string; 
     icons: React.ReactNode; 
-    onUploadSuccess: () => void 
+    onUploadSuccess: () => void;
+    lastUpdateDate?: string | null;
 }) => {
     const [file, setFile] = useState<File | null>(null);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -60,15 +62,15 @@ const UploadCard = ({
             });
             const data = await res.json();
             if (res.ok) {
-                setStatus({ type: 'success', message: `นำเข้าข้อมูลสำเร็จ ${data.count} รายการ` });
+                setStatus({ type: 'success', message: `Imported ${data.count} items successfully` });
                 setFile(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
                 onUploadSuccess();
             } else {
-                setStatus({ type: 'error', message: data.error || 'การอัปโหลดล้มเหลว' });
+                setStatus({ type: 'error', message: data.error || 'Upload failed' });
             }
         } catch (err) {
-            setStatus({ type: 'error', message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
+            setStatus({ type: 'error', message: 'Connection error' });
         } finally {
             setIsUploading(false);
         }
@@ -109,10 +111,15 @@ const UploadCard = ({
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 <div className="min-w-0">
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Target Date</p>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Processing Date</p>
                                     <p className="text-xs font-black text-slate-700 truncate">
                                         {selectedDate ? selectedDate.split('-').reverse().join('/') : 'Select Date'}
                                     </p>
+                                    {lastUpdateDate && (
+                                        <p className="text-[8px] font-bold text-emerald-500 mt-1 uppercase tracking-tighter">
+                                            Data as of: {formatEnglishDate(lastUpdateDate).split(',')[0]}
+                                        </p>
+                                    )}
                                 </div>
                             </button>
                         </div>
@@ -209,7 +216,7 @@ const HistoryItem = ({ item, idx }: { item: UploadHistory, idx: number }) => (
             </div>
         </div>
         <div className="text-right">
-            <p className="text-slate-900 font-bold text-[11px] tracking-tight">{formatThaiDate(item.file_time)}</p>
+            <p className="text-slate-900 font-bold text-[11px] tracking-tight">{formatEnglishDate(item.file_time)}</p>
             <p className="text-emerald-500 text-[8px] font-black uppercase tracking-widest mt-0.5 flex items-center justify-end gap-1">
                 <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span> Synced
             </p>
@@ -225,6 +232,7 @@ const EmptyHistory = () => (
 
 export default function AdminPage() {
     const [history, setHistory] = useState<UploadHistory[]>([]);
+    const [lastHdcUpdate, setLastHdcUpdate] = useState<string | null>(null);
 
     useEffect(() => {
         fetchHistory();
@@ -236,6 +244,7 @@ export default function AdminPage() {
             const data = await res.json();
             if (data.success) {
                 setHistory(data.data);
+                setLastHdcUpdate(data.lastHdcUpdate);
             }
         } catch (err) {
             console.error('Failed to fetch history');
@@ -264,7 +273,7 @@ export default function AdminPage() {
                     {/* Card 1: MohPhrom + SornBuddy */}
                     <UploadCard 
                         type="Telemedicine"
-                        title="อัปโหลดไฟล์"
+                        title="Upload File"
                         subtitle="หมอพร้อม Station + สอน.บัดดี้"
                         onUploadSuccess={fetchHistory}
                         icons={
@@ -293,9 +302,10 @@ export default function AdminPage() {
                     {/* Card 2: HDC */}
                     <UploadCard 
                         type="HDC"
-                        title="อัปโหลดไฟล์ HDC"
-                        subtitle="ระบบข้อมูลกลางกระทรวงสาธารณสุข"
+                        title="Upload File"
+                        subtitle="Health Data Center"
                         onUploadSuccess={fetchHistory}
+                        lastUpdateDate={lastHdcUpdate}
                         icons={
                             <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center shadow-sm border border-emerald-100">
                                 <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -402,7 +412,7 @@ const SystemUpdatesManager = () => {
             const data = await res.json();
 
             if (res.ok) {
-                setStatus({ type: 'success', text: 'บันทึกรายการอัปเดตเรียบร้อยแล้ว' });
+                setStatus({ type: 'success', text: 'Update saved successfully' });
                 setDate('');
                 setDescription('');
                 fetchUpdates();
@@ -417,14 +427,14 @@ const SystemUpdatesManager = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?')) return;
+        if (!window.confirm('Are you sure you want to delete this item?')) return;
 
         try {
             const res = await fetch(`/telemedicine/api/updates?id=${id}`, { method: 'DELETE' });
             if (res.ok) {
                 fetchUpdates();
             } else {
-                alert('เกิดข้อผิดพลาดในการลบรายการ');
+                alert('Error deleting item');
             }
         } catch (error) {
             console.error('Failed to delete:', error);
@@ -449,7 +459,7 @@ const SystemUpdatesManager = () => {
                 )}
 
                 <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-500">Date (วัน/เดือน/ปี)</label>
+                    <label className="text-xs font-bold text-slate-500">Update Date (DD/MM/YYYY)</label>
                     <div className="relative">
                         <input
                             ref={dateInputRef}
@@ -512,7 +522,7 @@ const SystemUpdatesManager = () => {
                             <div key={upd.update_id} className="flex items-center justify-between p-4 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <p className="text-sm font-bold text-purple-800">{formatThaiDateNumeric(upd.update_date)}</p>
+                                        <p className="text-sm font-bold text-purple-800">{formatEnglishDate(upd.update_date)}</p>
                                         {upd.update_version && (
                                             <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">
                                                 {upd.update_version}
@@ -533,7 +543,7 @@ const SystemUpdatesManager = () => {
                             </div>
                         ))
                     ) : (
-                        <p className="text-sm text-slate-400 text-center py-4 bg-slate-50 rounded-xl">ไม่มีรายการอัปเดต</p>
+                        <p className="text-sm text-slate-400 text-center py-4 bg-slate-50 rounded-xl">No updates found</p>
                     )}
                 </div>
             </div>

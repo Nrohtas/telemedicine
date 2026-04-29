@@ -47,3 +47,21 @@ export const formatThaiDateNumeric = (dateString: string) => {
         return dateString;
     }
 };
+
+export const formatEnglishDate = (dateString: string) => {
+    if (!dateString) return '';
+    try {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('en-GB', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Asia/Bangkok'
+        }).format(date);
+    } catch (err) {
+        console.error('Error formatting date:', err);
+        return dateString;
+    }
+};

@@ -11,18 +11,23 @@ interface PerformanceItem {
     hostype_label: string;
     affiliation: string;
     current_total: number;
+    his_tele: number;
+    hdc_tele: number;
     total_all: number;
     performance_percent: number;
+    his_percent: number;
     target: number;
 }
 
 const TopPerformance = () => {
 
-    const [data, setData] = useState<{ 
-        hospitals: PerformanceItem[], 
+    const [data, setData] = useState<{
+        hospitals: PerformanceItem[],
         primaryCare: PerformanceItem[],
-        hospSummary?: { total_visit_5: number, total_all: number, percent: number },
-        pcSummary?: { total_visit_5: number, total_all: number, percent: number }
+        hospSummary?: { hdc_tele: number, hdc_opd: number, his_tele: number, his_opd: number, hdc_percent: number, his_percent: number },
+        pcSummary?: { hdc_tele: number, hdc_opd: number, his_tele: number, his_opd: number, hdc_percent: number, his_percent: number },
+        lastHdcUpdate?: string | null,
+        lastHisUpdate?: string | null
     }>({ hospitals: [], primaryCare: [] });
     const [isLoading, setIsLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
@@ -66,7 +71,7 @@ const TopPerformance = () => {
         );
     }
 
-    const renderList = (items: PerformanceItem[], title: string, subtitle: string, iconColor: string, summaryData?: { total_visit_5: number, percent: number }, summaryLabel: string = "สรุปยอดรวม") => (
+    const renderList = (items: PerformanceItem[], title: string, subtitle: string, iconColor: string, summaryData?: { hdc_tele: number, hdc_opd: number, his_tele: number, his_opd: number, hdc_percent: number, his_percent: number }) => (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
                 <div className="flex items-center gap-4">
@@ -77,25 +82,37 @@ const TopPerformance = () => {
                     </div>
                     <div className="flex flex-col">
                         <h2 className="text-base md:text-lg font-black text-indigo-900 tracking-tight leading-none uppercase">{title}</h2>
-                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1.5 opacity-80">{subtitle}</p>
+                        <div className="flex items-center gap-2 mt-1.5">
+                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] opacity-80">{subtitle}</p>
+                        </div>
                     </div>
                 </div>
 
                 {summaryData && (
-                    <div className="flex items-center gap-2 bg-indigo-50/50 p-1.5 pr-3 rounded-2xl border border-indigo-100/50 shadow-sm animate-in fade-in slide-in-from-right-4 duration-700">
-                        <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-xl shadow-sm border border-indigo-50">
-                            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-tighter">{summaryLabel}</span>
-                            <span className="text-base font-black text-indigo-700 tabular-nums">
-                                {Number(summaryData.total_visit_5).toLocaleString()}
-                            </span>
-                            <span className="text-[9px] font-black text-indigo-300">ครั้ง</span>
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-50/80 rounded-xl shadow-sm border border-blue-100">
+                            <div className="flex flex-col">
+                                <span className="text-[8px] font-black uppercase tracking-widest text-blue-500 leading-none mb-1">HIS</span>
+                                <div className="flex items-baseline gap-1.5">
+                                    <span className="text-sm font-black tabular-nums leading-none text-blue-700">{(summaryData?.his_tele || 0).toLocaleString()}</span>
+                                    <span className="text-[10px] font-bold text-blue-500/70">ครั้ง</span>
+                                    <div className="px-1.5 py-0.5 bg-blue-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-blue-100 ml-1">
+                                        {(summaryData?.his_percent || 0).toFixed(1)}%
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-black shadow-md shadow-emerald-200">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                                <polyline points="17 6 23 6 23 12"></polyline>
-                            </svg>
-                            {Number(summaryData.percent).toFixed(2)}%
+                        <div className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50/80 rounded-xl shadow-sm border border-emerald-100">
+                            <div className="flex flex-col">
+                                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500 leading-none mb-1">HDC</span>
+                                <div className="flex items-baseline gap-1.5">
+                                    <span className="text-sm font-black tabular-nums leading-none text-emerald-700">{(summaryData?.hdc_tele || 0).toLocaleString()}</span>
+                                    <span className="text-[10px] font-bold text-emerald-500/70">ครั้ง</span>
+                                    <div className="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-emerald-100 ml-1">
+                                        {(summaryData?.hdc_percent || 0).toFixed(1)}%
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -139,19 +156,30 @@ const TopPerformance = () => {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4 pl-4 border-l border-slate-100/50">
-                                <div className="text-right flex flex-col items-end">
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex items-baseline gap-0.5 whitespace-nowrap bg-indigo-50 px-2 py-1 rounded-xl border border-indigo-100">
-                                            <span className="text-xl font-black text-indigo-700 tracking-tighter tabular-nums">
-                                                {item.current_total.toLocaleString()}
-                                            </span>
-                                            <span className="text-[10px] font-black text-indigo-400 uppercase">ครั้ง</span>
+                            <div className="flex flex-col gap-1 pr-1">
+                                <div className="flex items-center gap-2">
+                                    <div className="flex flex-col items-end gap-1">
+                                        <div className="flex items-center gap-2 bg-blue-50/50 px-2.5 py-1 rounded-xl border border-blue-100 shadow-sm group-hover:bg-white transition-colors">
+                                            <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">HIS</span>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-[13px] font-black text-blue-700 tabular-nums">{item.his_tele.toLocaleString()}</span>
+                                                <span className="text-[9px] font-bold text-blue-500/80">ครั้ง</span>
+                                            </div>
+                                            <div className="px-1.5 py-0.5 bg-blue-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-blue-100">
+                                                {Number(item.his_percent).toFixed(1)}%
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 bg-emerald-50/50 px-2.5 py-1 rounded-xl border border-emerald-100 shadow-sm group-hover:bg-white transition-colors">
+                                            <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">HDC</span>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-[13px] font-black text-emerald-700 tabular-nums">{item.hdc_tele.toLocaleString()}</span>
+                                                <span className="text-[9px] font-bold text-emerald-500/80">ครั้ง</span>
+                                            </div>
+                                            <div className="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-emerald-100">
+                                                {Number(item.performance_percent).toFixed(1)}%
+                                            </div>
                                         </div>
                                     </div>
-                                    <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mt-1 whitespace-nowrap bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                                        ( {Number(item.performance_percent).toFixed(2)}% )
-                                    </p>
                                 </div>
                             </div>
                         </motion.div>
@@ -162,19 +190,16 @@ const TopPerformance = () => {
     );
 
     return (
-        <SoftCard className="p-6 md:p-10 overflow-hidden relative border-none shadow-2xl shadow-indigo-100/20 rounded-[2.5rem] bg-white">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50/50 rounded-full -mr-48 -mt-48 blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-50/30 rounded-full -ml-36 -mb-36 blur-3xl pointer-events-none" />
-
+        <div className="py-8 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
-                {renderList(data.primaryCare, "10 อันดับ รพ.สต./ศูนย์สุขภาพ", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-emerald-500", data.pcSummary, "ยอดรวมเฉพาะ รพ.สต.")}
-                {renderList(data.hospitals, "10 อันดับ โรงพยาบาล", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-blue-600", data.hospSummary, "ยอดรวมเฉพาะ รพ.")}
+                {renderList(data.hospitals, "โรงพยาบาล", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-emerald-500", data.hospSummary)}
+                {renderList(data.primaryCare, "รพ.สต./ศูนย์สุขภาพ", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-blue-500", data.pcSummary)}
             </div>
 
             <div className="mt-12 flex justify-center">
-                <div className="h-1.5 w-16 bg-slate-100 rounded-full" />
+                <div className="h-1 w-12 bg-slate-100 rounded-full" />
             </div>
-        </SoftCard>
+        </div>
     );
 };
 

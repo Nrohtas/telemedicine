@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
                 const id = `${hospcode}_${targetBYear}`;
                 const percent = opd > 0 ? (telemedicine * 100) / opd : 0;
 
-                return [id, hospcode, targetBYear, opd, telemedicine, percent, new Date()];
+                return [id, hospcode, targetBYear, opd, telemedicine, percent, date, new Date()];
             }).filter(item => item !== null);
 
             if (hdcValues.length === 0) {
@@ -72,12 +72,13 @@ export async function POST(request: NextRequest) {
             }
 
             const hdcQuery = `
-                INSERT INTO telemed_opd_hdc (id, hospcode, b_year, opd, telemedicine, percent, d_update)
+                INSERT INTO telemed_opd_hdc (id, hospcode, b_year, opd, telemedicine, percent, hdc_update, d_update)
                 VALUES ?
                 ON DUPLICATE KEY UPDATE
                     opd = VALUES(opd),
                     telemedicine = VALUES(telemedicine),
                     percent = VALUES(percent),
+                    hdc_update = VALUES(hdc_update),
                     d_update = VALUES(d_update)
             `;
 

@@ -346,7 +346,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                 <div className="flex gap-4 pt-2">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-violet-600" />
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">Dashboard</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">HIS</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-emerald-500" />
@@ -372,7 +372,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                   tickLine={false}
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
-                <Bar dataKey="dashboard" name="Dashboard" fill={COLORS.dashboard} barSize={14} radius={[0, 10, 10, 0]}>
+                <Bar dataKey="dashboard" name="HIS" fill={COLORS.dashboard} barSize={14} radius={[0, 10, 10, 0]}>
                   <LabelList dataKey="dashboard" content={renderCustomizedLabel} />
                 </Bar>
                 <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={14} radius={[0, 10, 10, 0]}>
@@ -429,7 +429,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                 <div className="flex gap-4">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-violet-600" />
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">Dashboard</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">HIS</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-emerald-500" />
@@ -457,7 +457,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                     tickLine={false}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
-                  <Bar dataKey="dashboard" name="Dashboard" fill={COLORS.dashboard} barSize={12} radius={[0, 10, 10, 0]}>
+                  <Bar dataKey="dashboard" name="HIS" fill={COLORS.dashboard} barSize={12} radius={[0, 10, 10, 0]}>
                     <LabelList dataKey="dashboard" content={renderCustomizedLabel} />
                   </Bar>
                   <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={12} radius={[0, 10, 10, 0]}>
@@ -523,7 +523,7 @@ export default function OnepageSummary({ data }: { data: any }) {
               <div className="flex flex-col gap-2 bg-slate-50 px-4 py-3 rounded-2xl border border-white">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-violet-600" />
-                  <span className="text-[10px] font-black text-slate-500">DASHBOARD</span>
+                  <span className="text-[10px] font-black text-slate-500">HIS</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-emerald-500" />
@@ -551,7 +551,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                 </div>
                 <div className="flex items-center gap-4 shrink-0 pl-4">
                   <div className="text-right">
-                    <p className="text-xs font-bold text-violet-500 uppercase leading-none mb-1">Dashboard</p>
+                    <p className="text-xs font-bold text-violet-500 uppercase leading-none mb-1">HIS</p>
                     <p className="text-xl font-black text-violet-700 tabular-nums leading-none">
                       {item.dashboard.toLocaleString()}
                     </p>
