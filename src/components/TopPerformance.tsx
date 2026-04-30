@@ -113,12 +113,12 @@ const TopPerformance = () => {
                         </div>
 
                         {showDiff && (
-                            <div className={`px-3 py-2 rounded-xl shadow-sm border flex flex-col items-center justify-center min-w-[50px] ${((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
+                            <div className={`w-10 h-10 rounded-full shadow-md border flex flex-col items-center justify-center shrink-0 ${((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
                                     ((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
                                         'bg-slate-50 border-slate-100 text-slate-500'
                                 }`}>
-                                <span className="text-[8px] font-black uppercase tracking-widest leading-none mb-1 opacity-70">Diff</span>
-                                <span className="text-sm font-black tabular-nums leading-none">
+                                <span className="text-[6px] font-black uppercase tracking-widest leading-none mb-0.5 opacity-70">Diff</span>
+                                <span className="text-[11px] font-black tabular-nums leading-none">
                                     {((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? `+${(summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)}` : (summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)}
                                 </span>
                             </div>
@@ -195,12 +195,12 @@ const TopPerformance = () => {
                                 {showDiff && (() => {
                                     const diff = (item.hdc_tele || 0) - (item.his_tele || 0);
                                     return (
-                                        <div className={`flex flex-col items-center justify-center min-w-[48px] h-[42px] px-1 rounded-xl border shadow-sm ${diff > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
+                                        <div className={`flex flex-col items-center justify-center w-9 h-9 shrink-0 rounded-full border shadow-sm transition-transform duration-300 group-hover:scale-110 ${diff > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
                                                 diff < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
                                                     'bg-slate-50 border-slate-100 text-slate-500'
                                             }`}>
-                                            <span className="text-[7px] font-black uppercase tracking-tighter opacity-70 leading-none mb-0.5">Diff</span>
-                                            <span className="text-[12px] font-black tabular-nums leading-none">{diff > 0 ? `+${diff}` : diff}</span>
+                                            <span className="text-[5px] font-black uppercase tracking-tighter opacity-70 leading-none mb-0.5">Diff</span>
+                                            <span className="text-[10px] font-black tabular-nums leading-none">{diff > 0 ? `+${diff}` : diff}</span>
                                         </div>
                                     );
                                 })()}

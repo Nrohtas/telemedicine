@@ -282,7 +282,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-[-10px]">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">TOTAL</span>
-                  <span className="text-2xl font-black text-emerald-950 tabular-nums">
+                  <span className="text-xl font-black text-emerald-950 tabular-nums">
                     {(totals.hdc_opd + totals.hdc_tele).toLocaleString()}
                   </span>
                   <span className="text-[10px] font-bold text-slate-400">Services</span>
@@ -294,10 +294,10 @@ export default function OnepageSummary({ data }: { data: any }) {
                   <span className="text-[11px] font-black uppercase tracking-wider mb-2 text-emerald-700">
                     OPD
                   </span>
-                  <span className="text-3xl font-black text-slate-900 leading-none">
+                  <span className="text-2xl font-black text-slate-900 leading-none">
                     {formatPercent((totals.hdc_opd + totals.hdc_tele) > 0 ? (totals.hdc_opd / (totals.hdc_opd + totals.hdc_tele)) * 100 : 0)}
                   </span>
-                  <span className="text-xs font-bold text-slate-500 mt-2 tabular-nums">
+                  <span className="text-[10px] font-bold text-slate-500 mt-2 tabular-nums">
                     {totals.hdc_opd.toLocaleString()} ราย
                   </span>
                 </div>
@@ -305,10 +305,10 @@ export default function OnepageSummary({ data }: { data: any }) {
                   <span className="text-[11px] font-black uppercase tracking-wider mb-2 text-blue-700">
                     Telemedicine
                   </span>
-                  <span className="text-3xl font-black text-slate-900 leading-none">
+                  <span className="text-2xl font-black text-slate-900 leading-none">
                     {formatPercent((totals.hdc_opd + totals.hdc_tele) > 0 ? (totals.hdc_tele / (totals.hdc_opd + totals.hdc_tele)) * 100 : 0)}
                   </span>
-                  <span className="text-xs font-bold text-slate-500 mt-2 tabular-nums">
+                  <span className="text-[10px] font-bold text-slate-500 mt-2 tabular-nums">
                     {totals.hdc_tele.toLocaleString()} ราย
                   </span>
                 </div>
@@ -338,12 +338,12 @@ export default function OnepageSummary({ data }: { data: any }) {
                   <div className="flex flex-col items-center w-40 shrink-0">
                     <div className="w-full py-2 px-3 rounded-xl bg-indigo-50/50 border border-indigo-100 text-center shadow-sm">
                       <span className="text-[10px] font-black text-indigo-500 uppercase tracking-tighter block mb-1">Telemedicine (Type 5)</span>
-                      <span className="text-3xl font-black text-indigo-900 tabular-nums leading-none">{totals.type5.toLocaleString()}</span>
+                      <span className="text-2xl font-black text-indigo-900 tabular-nums leading-none">{totals.type5.toLocaleString()}</span>
                     </div>
                     <div className="w-full h-1 bg-indigo-500 rounded-full my-2 opacity-50 shadow-sm" />
                     <div className="w-full py-2 px-3 rounded-xl bg-slate-50/50 border border-slate-100 text-center shadow-sm">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter block mb-1">Service (Type 2+3+5)</span>
-                      <span className="text-3xl font-black text-slate-900 tabular-nums leading-none">{totals.total235.toLocaleString()}</span>
+                      <span className="text-2xl font-black text-slate-900 tabular-nums leading-none">{totals.total235.toLocaleString()}</span>
                     </div>
                   </div>
                   <span className="text-lg font-black text-slate-900">X 100</span>
@@ -388,12 +388,12 @@ export default function OnepageSummary({ data }: { data: any }) {
                   <div className="flex flex-col items-center w-40 shrink-0">
                     <div className="w-full py-2 px-3 rounded-xl bg-emerald-50/50 border border-emerald-100 text-center shadow-sm">
                       <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tighter block mb-1">Telemedicine (HDC)</span>
-                      <span className="text-3xl font-black text-emerald-900 tabular-nums leading-none">{totals.hdc_tele.toLocaleString()}</span>
+                      <span className="text-2xl font-black text-emerald-900 tabular-nums leading-none">{totals.hdc_tele.toLocaleString()}</span>
                     </div>
                     <div className="w-full h-1 bg-emerald-500 rounded-full my-2 opacity-50 shadow-sm" />
                     <div className="w-full py-2 px-3 rounded-xl bg-slate-50/50 border border-slate-100 text-center shadow-sm">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter block mb-1">OPD ทั้งหมด (HDC)</span>
-                      <span className="text-3xl font-black text-slate-900 tabular-nums leading-none">{(totals.hdc_opd + totals.hdc_tele).toLocaleString()}</span>
+                      <span className="text-2xl font-black text-slate-900 tabular-nums leading-none">{(totals.hdc_opd + totals.hdc_tele).toLocaleString()}</span>
                     </div>
                   </div>
                   <span className="text-lg font-black text-slate-900">X 100</span>
@@ -491,10 +491,10 @@ export default function OnepageSummary({ data }: { data: any }) {
                   ผลงานรายโรงพยาบาล
                 </h3>
 
-                <div className="flex items-center gap-4 flex-grow justify-end">
+                <div className="flex items-center gap-2 flex-grow justify-end">
                   {/* HIS Gauge */}
-                  <div className="flex items-center gap-2">
-                    <div className="w-32 h-20 relative flex items-center justify-center">
+                  <div className="flex items-center gap-1">
+                    <div className="w-24 h-16 relative flex items-center justify-center">
                       <svg viewBox="0 0 100 60" className="w-full">
                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e0e7ff" strokeWidth="16" strokeLinecap="round" />
                         <motion.path
@@ -508,32 +508,32 @@ export default function OnepageSummary({ data }: { data: any }) {
                           strokeLinecap="round"
                         />
                       </svg>
-                      <div className="absolute inset-0 flex items-center justify-center pt-5">
-                        <span className="text-xl font-black text-indigo-600 tabular-nums">
+                      <div className="absolute inset-0 flex items-center justify-center pt-4">
+                        <span className="text-lg font-black text-indigo-600 tabular-nums">
                           {formatPercent(hTotals?.percentType5 || 0)}
                         </span>
                       </div>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-black text-indigo-500 uppercase tracking-widest leading-none mb-1">HIS</span>
-                      <span className="text-xs font-black text-indigo-900/60 leading-none">{(hTotals?.type5 || 0).toLocaleString()}</span>
+                      <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-none mb-1">HIS</span>
+                      <span className="text-base font-black text-indigo-900 tabular-nums leading-none">{(hTotals?.type5 || 0).toLocaleString()}</span>
                     </div>
                   </div>
 
                   {/* Diff Total Badge */}
-                  <div className={`px-3 py-2 rounded-xl border flex flex-col items-center justify-center min-w-[65px] shadow-sm ${((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
+                  <div className={`w-9 h-9 rounded-full border flex flex-col items-center justify-center shrink-0 shadow-sm ${((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
                       ((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
                         'bg-slate-50 border-slate-100 text-slate-500'
                     }`}>
-                    <span className="text-[8px] font-black uppercase tracking-widest leading-none mb-1 opacity-70">Diff</span>
-                    <span className="text-sm font-black tabular-nums leading-none">
+                    <span className="text-[5px] font-black uppercase tracking-tighter leading-none mb-0.5 opacity-70">Diff</span>
+                    <span className="text-[10px] font-black tabular-nums leading-none">
                       {((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) > 0 ? `+${(hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)}` : (hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)}
                     </span>
                   </div>
 
                   {/* HDC Gauge */}
-                  <div className="flex items-center gap-2">
-                    <div className="w-32 h-20 relative flex items-center justify-center">
+                  <div className="flex items-center gap-1">
+                    <div className="w-24 h-16 relative flex items-center justify-center">
                       <svg viewBox="0 0 100 60" className="w-full">
                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#d1fae5" strokeWidth="16" strokeLinecap="round" />
                         <motion.path
@@ -547,15 +547,15 @@ export default function OnepageSummary({ data }: { data: any }) {
                           strokeLinecap="round"
                         />
                       </svg>
-                      <div className="absolute inset-0 flex items-center justify-center pt-5">
-                        <span className="text-xl font-black text-emerald-600 tabular-nums">
+                      <div className="absolute inset-0 flex items-center justify-center pt-4">
+                        <span className="text-lg font-black text-emerald-600 tabular-nums">
                           {formatPercent(hTotals?.hdc_percent || 0)}
                         </span>
                       </div>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">HDC</span>
-                      <span className="text-xs font-black text-emerald-900/60 leading-none">{(hTotals?.hdc_tele || 0).toLocaleString()}</span>
+                      <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">HDC</span>
+                      <span className="text-base font-black text-emerald-900 tabular-nums leading-none">{(hTotals?.hdc_tele || 0).toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
