@@ -124,6 +124,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
       COALESCE(vtd.visit_type_5, 0) - COALESCE(p.result, 0) AS diff_platform_his,
       COALESCE(hdc.telemedicine, 0) - COALESCE(vtd.visit_type_5, 0) AS diff_hdc_his,
       latest.latest_date,
+      latest_t.latest_time,
       ht.hostype_name,
       ht.hostype_level
     FROM hospital h
@@ -146,6 +147,10 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
       SELECT MAX(visit_date) AS latest_date
       FROM visit_type_daily
     ) latest ON 1 = 1
+    LEFT JOIN (
+      SELECT MAX(d_update) AS latest_time
+      FROM visit_type_daily
+    ) latest_t ON 1 = 1
     LEFT JOIN (
       SELECT
         hoscode,
@@ -185,13 +190,23 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
       hdc_percent: Number(row.hdc_percent) || 0,
       diff_platform_his: Number(row.diff_platform_his) || 0,
       diff_hdc_his: Number(row.diff_hdc_his) || 0,
-      latest_date: row.latest_date,
+      latest_date: row.latest_time || row.latest_date,
       hostype_name: row.hostype_name || '-',
       hostype_level: row.hostype_level || '-',
     }));
   } catch (error) {
     console.error('Error in getDailyHospitalRows:', error);
     return [];
+  }
+}
+
+async function getHdcLatestUpdate(): Promise<string | null> {
+  try {
+    const [rows]: any = await pool.query('SELECT MAX(hdc_update) as last_update FROM telemed_opd_hdc');
+    return rows[0]?.last_update || null;
+  } catch (err) {
+    console.error('Error fetching HDC latest update:', err);
+    return null;
   }
 }
 
@@ -207,6 +222,8 @@ export default async function DailyHospitalPage({
     const sortOrder = params.sort_order ?? "ASC";
 
     const rows = ampCode ? await getDailyHospitalRows(ampCode, sortBy, sortOrder) : [];
+    const hdcLastUpdate = await getHdcLatestUpdate();
+    const hisLastUpdate = rows[0]?.latest_date || null;
     const districtName = rows[0]?.amp_name ?? "-";
     const totals = rows.reduce<DailyHospitalTotals>(
       (sum, row) => ({
@@ -273,7 +290,6 @@ export default async function DailyHospitalPage({
                 </div>
 
                 <div className="flex flex-col gap-2 md:flex-row md:items-center">
-                  <ExportDailyHospital rows={rows} districtName={districtName} />
                   <Link
                     href="/daily/onepage"
                     className="inline-flex items-center gap-2 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-indigo-100 hover:scale-105 active:scale-95 transition-all"
@@ -287,6 +303,7 @@ export default async function DailyHospitalPage({
                     </svg>
                     Onepage
                   </Link>
+                  <ExportDailyHospital rows={rows} districtName={districtName} />
                 </div>
               </div>
             </div>
@@ -298,12 +315,41 @@ export default async function DailyHospitalPage({
                     {reportPeriodLabel}
                   </p>
                   <div className="flex items-center gap-4 ml-auto">
-                    <LastUpdate
-                      showLogo={false}
-                      type="daily"
-                      sourceLabel="HDC"
-                      sourceLink="https://app.powerbi.com/view?r=eyJrIjoiYjE4NGNjNzItYmM2ZS00MjFmLTlmNDEtOWQ1M2JiODk4N2M0IiwidCI6ImI3NmEyM2QzLThjZGYtNDNjMC1hNTNiLTYwYmNkMjM3OTg5NSIsImMiOjEwfQ%3D%3D"
-                    />
+                    <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 shadow-sm">
+                      <span className="text-[10px] font-black text-blue-800 uppercase tracking-widest whitespace-nowrap">HIS UPDATE :</span>
+                      <span className="text-[11px] font-black text-blue-600 whitespace-nowrap uppercase">
+                        {hisLastUpdate ? new Date(hisLastUpdate).toLocaleDateString('th-TH', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                          calendar: 'buddhist'
+                        } as any) + ' ' + new Date(hisLastUpdate).toLocaleTimeString('th-TH', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false
+                        }) + ' น.' : '-'}
+                      </span>
+                    </div>
+                    {hdcLastUpdate && (
+                      <a
+                        href="https://app.powerbi.com/view?r=eyJrIjoiYjE4NGNjNzItYmM2ZS00MjFmLTlmNDEtOWQ1M2JiODk4N2M0IiwidCI6ImI3NmEyM2QzLThjZGYtNDNjMC1hNTNiLTYwYmNkMjM3OTg5NSIsImMiOjEwfQ%3D%3D"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 shadow-sm hover:bg-emerald-100 transition-all duration-300 group hover:shadow-md"
+                      >
+                        <span className="text-[10px] font-black text-emerald-800 uppercase tracking-widest whitespace-nowrap">ที่มา :</span>
+                        <span className="text-[11px] font-black text-emerald-600 whitespace-nowrap group-hover:text-emerald-800 transition-colors">HDC Update</span>
+                        <span className="w-1 h-1 rounded-full bg-emerald-300"></span>
+                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-tighter whitespace-nowrap">
+                          {new Date(hdcLastUpdate).toLocaleDateString('th-TH', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            calendar: 'buddhist'
+                          } as any)}
+                        </span>
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
