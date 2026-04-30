@@ -511,7 +511,7 @@ function HospitalDirectoryContent() {
                                                     <td colSpan={3} className="px-6 py-5 text-nm-primary text-right text-base">
                                                         รวมทั้งจังหวัด
                                                     </td>
-                                                    <td className="px-6 py-5 text-right font-bold text-red-600">
+                                                    <td className="px-6 py-5 text-right font-black text-red-800">
                                                         <span className="text-xl">
                                                             {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0).toLocaleString()}
                                                         </span>
@@ -520,25 +520,25 @@ function HospitalDirectoryContent() {
                                                         {renderComparisonCell(
                                                             filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph, 0), 0),
                                                             filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph_past, 0), 0),
-                                                            "text-xl font-bold text-[#006837]"
+                                                            "text-xl font-black text-emerald-800"
                                                         )}
                                                     </td>
                                                     <td className="px-6 py-5">
                                                         {renderComparisonCell(
                                                             filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare, 0), 0),
                                                             filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare_past, 0), 0),
-                                                            "text-xl font-bold text-[#00ADEF]"
+                                                            "text-xl font-black text-blue-800"
                                                         )}
                                                     </td>
                                                     <td className="px-6 py-5 bg-indigo-50/50">
                                                         {renderComparisonCell(
                                                             filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0),
                                                             filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph_past + h.buddycare_past, 0), 0),
-                                                            "text-xl font-black text-indigo-700"
+                                                            "text-xl font-black text-indigo-900"
                                                         )}
                                                     </td>
                                                     <td className="px-6 py-5 text-right bg-emerald-50/50">
-                                                        <span className="text-xl font-bold text-emerald-600">
+                                                        <span className="text-xl font-black text-emerald-700">
                                                             {(() => {
                                                                 const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0);
                                                                 const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
@@ -547,7 +547,7 @@ function HospitalDirectoryContent() {
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-5 text-right bg-red-50/50">
-                                                        <span className="text-xl font-bold text-[#FF6B6B]">
+                                                        <span className="text-xl font-black text-red-700">
                                                             {(() => {
                                                                 const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0);
                                                                 const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
@@ -637,40 +637,40 @@ function HospitalDirectoryContent() {
                                                             const rowColor = getRowColor(hospital.hostype_name);
                                                             return (
                                                                 <tr key={hospital.hospcode} className="transition-colors duration-200">
-                                                                    <td className={`px-6 py-3 font-mono text-sm opacity-70 font-bold ${rowColor} sticky left-0 z-10 bg-white/95 backdrop-blur-sm shadow-[1px_0_0_0_rgba(0,0,0,0.03)]`}>
+                                                                    <td className={`px-6 py-3 font-mono text-sm font-black ${rowColor} sticky left-0 z-10 bg-white/95 backdrop-blur-sm shadow-[1px_0_0_0_rgba(0,0,0,0.03)]`}>
                                                                         {hospital.hospcode}
                                                                     </td>
                                                                     <td className="px-6 py-3">
-                                                                        <span className={`text-sm font-bold transition-colors whitespace-nowrap ${rowColor}`}>
+                                                                        <span className={`text-sm font-black transition-colors whitespace-nowrap ${rowColor.replace('600', '700').replace('500', '600')}`}>
                                                                             {hospital.hospname}
                                                                         </span>
                                                                     </td>
                                                                     <td className="px-6 py-3 text-right">
-                                                                        <span className="text-sm font-bold text-red-600">{hospital.op_30.toLocaleString()}</span>
+                                                                        <span className="text-sm font-black text-red-800">{hospital.op_30.toLocaleString()}</span>
                                                                     </td>
                                                                     <td className="px-6 py-3">
-                                                                        {renderComparisonCell(hospital.moph, hospital.moph_past, "text-sm font-bold text-[#006837]")}
+                                                                        {renderComparisonCell(hospital.moph, hospital.moph_past, "text-sm font-black text-emerald-800")}
                                                                     </td>
                                                                     <td className="px-6 py-3">
-                                                                        {renderComparisonCell(hospital.buddycare, hospital.buddycare_past, "text-sm font-bold text-[#00ADEF]")}
+                                                                        {renderComparisonCell(hospital.buddycare, hospital.buddycare_past, "text-sm font-black text-blue-800")}
                                                                     </td>
                                                                     <td className="px-6 py-3 bg-indigo-50/30">
-                                                                        {renderComparisonCell(hospital.moph + hospital.buddycare, hospital.moph_past + hospital.buddycare_past, "text-sm font-black text-indigo-700")}
+                                                                        {renderComparisonCell(hospital.moph + hospital.buddycare, hospital.moph_past + hospital.buddycare_past, "text-sm font-black text-indigo-900")}
                                                                     </td>
                                                                     <td className="px-6 py-3 text-right bg-emerald-50/30">
-                                                                        <span className="text-sm font-bold text-emerald-600">
+                                                                        <span className="text-sm font-black text-emerald-700">
                                                                             {formatPercent(hospital.op_30 > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op_30 * 100) : 0)}
                                                                         </span>
                                                                     </td>
                                                                     <td className="px-6 py-3 text-right bg-red-50/30">
-                                                                        <span className="text-sm font-bold text-[#FF6B6B]">
+                                                                        <span className="text-sm font-bold text-red-600">
                                                                             {(hospital.op_30 > 0 ? Math.max(0, hospital.op_30 - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
                                                                         </span>
                                                                     </td>
-                                                                    <td className="px-6 py-3 text-sm opacity-70 whitespace-nowrap">
+                                                                    <td className="px-6 py-3 text-sm font-black text-slate-700 whitespace-nowrap">
                                                                         ต.{hospital.tmb_name || '-'}
                                                                     </td>
-                                                                    <td className="px-6 py-3 text-sm opacity-70 font-bold whitespace-nowrap">
+                                                                    <td className="px-6 py-3 text-sm font-black text-slate-900 whitespace-nowrap">
                                                                         อ.{hospital.amp_name}
                                                                     </td>
                                                                     <td className="px-6 py-3 whitespace-nowrap">
