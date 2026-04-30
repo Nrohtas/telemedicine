@@ -421,17 +421,17 @@ export default async function DailyHospitalPage({
                     </tr>
                     <tr className="border-b border-slate-200 text-left text-[11px] font-black uppercase tracking-tight text-slate-500">
                       <th className="border-l-2 border-indigo-300 bg-indigo-50/70 px-3 py-2 text-right">
-                        <Link href={getSortUrl("platform_target")} scroll={false} className="hover:text-indigo-900 text-indigo-900">
+                        <Link href={getSortUrl("platform_target")} scroll={false} className="hover:text-indigo-700 text-indigo-700">
                           เป้าหมาย <SortIcon column="platform_target" />
                         </Link>
                       </th>
                       <th className="bg-indigo-50/70 px-3 py-2 text-right">
-                        <Link href={getSortUrl("platform_result")} scroll={false} className="hover:text-indigo-900 text-indigo-900">
+                        <Link href={getSortUrl("platform_result")} scroll={false} className="hover:text-indigo-700 text-indigo-700">
                           ผลงาน <SortIcon column="platform_result" />
                         </Link>
                       </th>
                       <th className="bg-indigo-50/70 px-3 py-2 text-center">
-                        <Link href={getSortUrl("platform_percent")} scroll={false} className="hover:text-indigo-900 font-black text-[14px] text-indigo-900">
+                        <Link href={getSortUrl("platform_percent")} scroll={false} className="hover:text-indigo-700 font-black text-[14px] text-indigo-700">
                           % <SortIcon column="platform_percent" />
                         </Link>
                       </th>
@@ -499,18 +499,18 @@ export default async function DailyHospitalPage({
                           <td className="min-w-[280px] max-w-[400px] px-5 py-4">
                             <Link
                               href={`/daily/hospital/list-daily?hospcode=${encodeURIComponent(row.hospcode)}`}
-                              className={`block whitespace-normal break-words text-[11px] font-black leading-snug underline-offset-4 hover:underline ${getRowColor(row.hostype_name)}`}
+                              className={`block whitespace-normal break-words text-[11px] font-bold leading-snug underline-offset-4 hover:underline ${getRowColor(row.hostype_name)}`}
                             >
                               {row.hospname}
                             </Link>
                           </td>
-                          <NumberCell value={Math.round(row.platform_target)} className="border-l-2 border-indigo-200 bg-indigo-50/20 font-black text-indigo-900" />
-                          <NumberCell value={row.platform_result} className="bg-indigo-50/20 font-black text-indigo-900" />
-                          <PercentCell value={row.platform_percent} className="bg-indigo-50/20 font-black text-indigo-950" color="indigo" />
-                          <NumberCell value={row.visit_type_2} className="border-l-2 border-cyan-200 bg-cyan-50/10 font-black text-cyan-900" />
-                          <NumberCell value={row.visit_type_3} className="bg-cyan-50/10 font-black text-cyan-900" />
+                          <NumberCell value={Math.round(row.platform_target)} className="border-l-2 border-indigo-200 bg-indigo-50/20" compact />
+                          <NumberCell value={row.platform_result} className="bg-indigo-50/20" compact />
+                          <PercentCell value={row.platform_percent} className="bg-indigo-50/20" color="indigo" />
+                          <NumberCell value={row.visit_type_2} className="border-l-2 border-cyan-200 bg-cyan-50/10 font-bold text-cyan-800" />
+                          <NumberCell value={row.visit_type_3} className="bg-cyan-50/10 font-bold text-cyan-800" />
                           <TelemedicineBadgeCell value={row.visit_type_5} color="cyan" size="sm" />
-                          <NumberCell value={row.total} className="bg-cyan-50/10 font-black text-cyan-950" />
+                          <NumberCell value={row.total} className="bg-cyan-50/10 font-bold text-cyan-900" />
                           <PercentCell value={row.percent} className="bg-cyan-50/10" color="cyan" />
                           <NumberCell value={row.hdc_opd} className="border-l-2 border-emerald-200 bg-emerald-50/30" />
                           <TelemedicineBadgeCell value={row.hdc_result} color="emerald" />
@@ -536,19 +536,19 @@ export default async function DailyHospitalPage({
                           <span className="text-base font-black text-slate-700">รวม</span>
                         </div>
                       </td>
-                      <NumberCell value={Math.round(totals.platform_target)} footer className="bg-indigo-50/50 text-indigo-950" />
-                      <NumberCell value={totals.platform_result} footer className="bg-indigo-50/50 text-indigo-950" />
-                      <PercentCell value={platformTotalPercent} footer className="bg-indigo-50/50 text-blue-900 font-black" color="indigo" />
-                      <NumberCell value={totals.visit_type_2} footer className="bg-cyan-50/50 text-cyan-950 font-black" />
-                      <NumberCell value={totals.visit_type_3} footer className="bg-cyan-50/50 text-cyan-950 font-black" />
+                      <NumberCell value={Math.round(totals.platform_target)} footer compact className="bg-indigo-50/50 text-indigo-700 font-normal" />
+                      <NumberCell value={totals.platform_result} footer compact className="bg-indigo-50/50 text-indigo-700 font-normal" />
+                      <PercentCell value={platformTotalPercent} footer className="bg-indigo-50/50 text-blue-700 font-normal" color="indigo" />
+                      <NumberCell value={totals.visit_type_2} footer className="bg-cyan-50/50 text-cyan-800 font-bold" />
+                      <NumberCell value={totals.visit_type_3} footer className="bg-cyan-50/50 text-cyan-800 font-bold" />
                       <TelemedicineBadgeCell value={totals.visit_type_5} footer color="cyan" size="sm" />
-                      <NumberCell value={totals.total} footer className="bg-cyan-50/50 text-cyan-950 font-black" />
-                      <PercentCell value={totalPercent} footer className="bg-cyan-50/50 text-cyan-950 font-black" color="cyan" />
-                      <NumberCell value={totals.hdc_opd} footer className="bg-emerald-50/50 text-emerald-950 font-black" />
+                      <NumberCell value={totals.total} footer className="bg-cyan-50/50 text-cyan-900 font-bold" />
+                      <PercentCell value={totalPercent} footer className="bg-cyan-50/50 text-cyan-800 font-bold" color="cyan" />
+                      <NumberCell value={totals.hdc_opd} footer className="bg-emerald-50/50 text-emerald-800 font-bold" />
                       <TelemedicineBadgeCell value={totals.hdc_result} footer color="emerald" />
-                      <PercentCell value={hdcTotalPercent} footer className="bg-emerald-50/50 text-emerald-950 font-black" color="emerald" />
-                      <DiffCell value={totals.hdc_result - totals.platform_result} footer className="bg-amber-50/50 text-amber-900 font-black" />
-                      <DiffCell value={totals.hdc_result - totals.total} footer className="bg-amber-50/50 text-amber-900 font-black" />
+                      <PercentCell value={hdcTotalPercent} footer className="bg-emerald-50/50 text-emerald-800 font-bold" color="emerald" />
+                      <DiffCell value={totals.hdc_result - totals.platform_result} footer className="bg-amber-50/50 text-amber-700 font-bold" />
+                      <DiffCell value={totals.hdc_result - totals.total} footer className="bg-amber-50/50 text-amber-700 font-bold" />
                     </tr>
                   </tfoot>
                 </table>
@@ -582,8 +582,8 @@ function NumberCell({
   showDecimal?: boolean;
 }) {
   const baseClassName = footer
-    ? `px-3 py-4 text-right text-[11px] font-black`
-    : `whitespace-nowrap px-3 py-2 text-right ${strong ? "text-[13px] font-black text-slate-950" : "text-[12px] font-black text-slate-900"
+    ? `px-3 py-4 text-right text-[11px] ${compact ? "font-normal text-slate-600" : "font-black"}`
+    : `whitespace-nowrap px-3 py-2 text-right ${compact ? "text-[11px] font-medium text-slate-600" : strong ? "text-[13px] font-black text-slate-950" : "text-[12px] font-bold text-slate-700"
     }`;
 
   return <td className={`${baseClassName} ${className}`}>{showDecimal ? percentFormat.format(value) : numberFormat.format(value)}</td>;
