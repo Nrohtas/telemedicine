@@ -3,7 +3,7 @@ import pool from '@/lib/db';
 
 export async function GET() {
     try {
-        const getQuery = (types: number[], extraWhere: string = '') => `
+        const getQuery = (types: number[], orderBy: string = 'current_total DESC, performance_percent DESC') => `
             SELECT 
                 h.hospcode, 
                 h.hospname, 
@@ -54,13 +54,12 @@ export async function GET() {
             WHERE h.status = '1'
             AND h.hostype_new IN (${types.join(',')})
             AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข' COLLATE utf8mb4_general_ci
-            ${extraWhere}
-            ORDER BY current_total DESC, performance_percent DESC, h.hospcode ASC
+            ORDER BY ${orderBy}, h.hospcode ASC
             LIMIT 10
         `;
 
-        const [hospitals] = await pool.query(getQuery([5, 7, 11, 12]));
-        const [primaryCare] = await pool.query(getQuery([8, 13, 18, 21]));
+        const [hospitals] = await pool.query(getQuery([5, 7, 11, 12], 'performance_percent DESC, current_total DESC'));
+        const [primaryCare] = await pool.query(getQuery([8, 13, 18, 21], 'current_total DESC, performance_percent DESC'));
 
         // Add summary for hostype 5 and 7 (Hospitals)
         const [hospSummaryRows]: any = await pool.query(`
