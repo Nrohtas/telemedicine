@@ -80,7 +80,7 @@ const TopPerformance = () => {
         );
     }
 
-    const renderList = (items: PerformanceItem[], title: string, subtitle: string, iconColor: string, summaryData?: { hdc_tele: number, hdc_opd: number, his_tele: number, his_opd: number, hdc_percent: number, his_percent: number }) => (
+    const renderList = (items: PerformanceItem[], title: string, subtitle: string, iconColor: string, summaryData?: { hdc_tele: number, hdc_opd: number, his_tele: number, his_opd: number, hdc_percent: number, his_percent: number }, showDiff: boolean = false) => (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
                 <div className="flex items-center gap-4">
@@ -111,6 +111,19 @@ const TopPerformance = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {showDiff && (
+                            <div className={`px-3 py-2 rounded-xl shadow-sm border flex flex-col items-center justify-center min-w-[50px] ${((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
+                                    ((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
+                                        'bg-slate-50 border-slate-100 text-slate-500'
+                                }`}>
+                                <span className="text-[8px] font-black uppercase tracking-widest leading-none mb-1 opacity-70">Diff</span>
+                                <span className="text-sm font-black tabular-nums leading-none">
+                                    {((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? `+${(summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)}` : (summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)}
+                                </span>
+                            </div>
+                        )}
+
                         <div className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50/80 rounded-xl shadow-sm border border-emerald-100">
                             <div className="flex flex-col">
                                 <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500 leading-none mb-1">HDC</span>
@@ -128,7 +141,7 @@ const TopPerformance = () => {
             </div>
 
             <div className="flex flex-col gap-3">
-                {items.length === 0 ? (
+                {!items || items.length === 0 ? (
                     <div className="p-8 text-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
                         <span className="text-xs font-bold text-slate-400">ยังไม่มีข้อมูลผลงานในกลุ่มนี้</span>
                     </div>
@@ -139,7 +152,7 @@ const TopPerformance = () => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.05 }}
-                            className="flex items-center justify-between p-3 bg-slate-50/50 border border-white rounded-[1.25rem] hover:bg-white hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 group"
+                            className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-slate-50/50 border border-white rounded-[1.5rem] hover:bg-white hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 group gap-4"
                         >
                             <div className="flex items-center gap-3 overflow-hidden">
                                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shrink-0 transition-all duration-300 group-hover:scale-110 shadow-sm border ${idx === 0 ? 'bg-gradient-to-br from-yellow-300 to-amber-500 text-amber-950 border-amber-200 shadow-amber-100' :
@@ -150,7 +163,7 @@ const TopPerformance = () => {
                                     {idx + 1}
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className={`text-[11px] font-black truncate transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px] md:max-w-none ${getAffiliationColor(item.affiliation)}`}>
+                                    <h3 className={`text-[12px] font-black truncate transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px] md:max-w-none ${getAffiliationColor(item.affiliation)}`}>
                                         {item.hospname.replace('โรงพยาบาลส่งเสริมสุขภาพตำบล', 'รพ.สต.').replace('โรงพยาบาล', 'รพ.')} ({item.hospcode})
                                     </h3>
                                     <div className="flex items-center gap-1 mt-0.5">
@@ -158,36 +171,50 @@ const TopPerformance = () => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
-                                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
                                             อ. {item.amp_name}
                                         </p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-1 pr-1">
-                                <div className="flex items-center gap-2">
-                                    <div className="flex flex-col items-end gap-1">
-                                        <div className="flex items-center gap-2 bg-blue-50/50 px-2.5 py-1 rounded-xl border border-blue-100 shadow-sm group-hover:bg-white transition-colors">
-                                            <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">HIS</span>
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-[13px] font-black text-blue-700 tabular-nums">{item.his_tele.toLocaleString()}</span>
-                                                <span className="text-[9px] font-bold text-blue-500/80">ครั้ง</span>
-                                            </div>
-                                            <div className="px-1.5 py-0.5 bg-blue-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-blue-100">
-                                                {formatPercent(item.his_percent)}
-                                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="flex items-center justify-between bg-blue-50/60 px-2.5 py-1.5 rounded-xl border border-blue-100/50 shadow-sm group-hover:bg-white transition-all duration-300 min-w-[140px]">
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center text-[9px] font-black text-blue-600">HIS</div>
+                                        <div className="flex items-baseline gap-0.5">
+                                            <span className="text-[14px] font-black text-blue-700 tabular-nums">{(item.his_tele || 0).toLocaleString()}</span>
+                                            <span className="text-[8px] font-bold text-blue-400">ครั้ง</span>
                                         </div>
-                                        <div className="flex items-center gap-2 bg-emerald-50/50 px-2.5 py-1 rounded-xl border border-emerald-100 shadow-sm group-hover:bg-white transition-colors">
-                                            <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">HDC</span>
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-[13px] font-black text-emerald-700 tabular-nums">{item.hdc_tele.toLocaleString()}</span>
-                                                <span className="text-[9px] font-bold text-emerald-500/80">ครั้ง</span>
-                                            </div>
-                                            <div className="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-emerald-100">
-                                                {formatPercent(item.performance_percent)}
-                                            </div>
+                                    </div>
+                                    <div className="px-1.5 py-0.5 bg-blue-500 text-white text-[9px] font-black rounded-lg shadow-sm">
+                                        {formatPercent(item.his_percent)}
+                                    </div>
+                                </div>
+
+                                {showDiff && (() => {
+                                    const diff = (item.hdc_tele || 0) - (item.his_tele || 0);
+                                    return (
+                                        <div className={`flex flex-col items-center justify-center min-w-[48px] h-[42px] px-1 rounded-xl border shadow-sm ${diff > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
+                                                diff < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
+                                                    'bg-slate-50 border-slate-100 text-slate-500'
+                                            }`}>
+                                            <span className="text-[7px] font-black uppercase tracking-tighter opacity-70 leading-none mb-0.5">Diff</span>
+                                            <span className="text-[12px] font-black tabular-nums leading-none">{diff > 0 ? `+${diff}` : diff}</span>
                                         </div>
+                                    );
+                                })()}
+
+                                <div className="flex items-center justify-between bg-emerald-50/60 px-2.5 py-1.5 rounded-xl border border-emerald-100/50 shadow-sm group-hover:bg-white transition-all duration-300 min-w-[140px]">
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center text-[9px] font-black text-emerald-600">HDC</div>
+                                        <div className="flex items-baseline gap-0.5">
+                                            <span className="text-[14px] font-black text-emerald-700 tabular-nums">{(item.hdc_tele || 0).toLocaleString()}</span>
+                                            <span className="text-[8px] font-bold text-emerald-400">ครั้ง</span>
+                                        </div>
+                                    </div>
+                                    <div className="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-black rounded-lg shadow-sm">
+                                        {formatPercent(item.performance_percent)}
                                     </div>
                                 </div>
                             </div>
@@ -201,8 +228,8 @@ const TopPerformance = () => {
     return (
         <div className="py-8 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
-                {renderList(data.hospitals, "โรงพยาบาล", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-emerald-500", data.hospSummary)}
-                {renderList(data.primaryCare, "รพ.สต./ศูนย์สุขภาพ", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-blue-500", data.pcSummary)}
+                {renderList(data.hospitals, "โรงพยาบาล", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-emerald-500", data.hospSummary, true)}
+                {renderList(data.primaryCare, "รพ.สต./ศูนย์สุขภาพ", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-blue-500", data.pcSummary, false)}
             </div>
 
             <div className="mt-12 flex justify-center">

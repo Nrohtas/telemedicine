@@ -264,42 +264,47 @@ export default async function DailyPage({
                 <p className="text-sm font-bold text-emerald-800 md:text-base">
                   {reportPeriodLabel}
                 </p>
-                <div className="flex items-center gap-4 ml-auto">
-                  <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 shadow-sm">
-                    <span className="text-[10px] font-black text-blue-800 uppercase tracking-widest whitespace-nowrap">HIS UPDATE :</span>
-                    <span className="text-[11px] font-black text-blue-600 whitespace-nowrap uppercase">
-                      {hisLastUpdate ? new Date(hisLastUpdate).toLocaleDateString('th-TH', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        calendar: 'buddhist'
-                      } as any) + ' ' + new Date(hisLastUpdate).toLocaleTimeString('th-TH', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false
-                      }) + ' น.' : '-'}
-                    </span>
-                  </div>
-                  {hdcLastUpdate && (
-                    <a
-                      href="https://app.powerbi.com/view?r=eyJrIjoiYjE4NGNjNzItYmM2ZS00MjFmLTlmNDEtOWQ1M2JiODk4N2M0IiwidCI6ImI3NmEyM2QzLThjZGYtNDNjMC1hNTNiLTYwYmNkMjM3OTg5NSIsImMiOjEwfQ%3D%3D"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 shadow-sm hover:bg-emerald-100 transition-all duration-300 group hover:shadow-md"
-                    >
-                      <span className="text-[10px] font-black text-emerald-800 uppercase tracking-widest whitespace-nowrap">ที่มา :</span>
-                      <span className="text-[11px] font-black text-emerald-600 whitespace-nowrap group-hover:text-emerald-800 transition-colors">HDC Update</span>
-                      <span className="w-1 h-1 rounded-full bg-emerald-300"></span>
-                      <span className="text-[10px] font-black text-emerald-500 uppercase tracking-tighter whitespace-nowrap">
-                        {new Date(hdcLastUpdate).toLocaleDateString('th-TH', {
+                <div className="flex flex-col items-end gap-1.5 ml-auto">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 shadow-sm">
+                      <span className="text-[10px] font-black text-blue-800 uppercase tracking-widest whitespace-nowrap">HIS UPDATE :</span>
+                      <span className="text-[11px] font-black text-blue-600 whitespace-nowrap uppercase">
+                        {hisLastUpdate ? new Date(hisLastUpdate).toLocaleDateString('th-TH', {
                           day: 'numeric',
                           month: 'short',
                           year: 'numeric',
                           calendar: 'buddhist'
-                        } as any)}
+                        } as any) + ' ' + new Date(hisLastUpdate).toLocaleTimeString('th-TH', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false
+                        }) + ' น.' : '-'}
                       </span>
-                    </a>
-                  )}
+                    </div>
+                    {hdcLastUpdate && (
+                      <a
+                        href="https://app.powerbi.com/view?r=eyJrIjoiYjE4NGNjNzItYmM2ZS00MjFmLTlmNDEtOWQ1M2JiODk4N2M0IiwidCI6ImI3NmEyM2QzLThjZGYtNDNjMC1hNTNiLTYwYmNkMjM3OTg5NSIsImMiOjEwfQ%3D%3D"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 shadow-sm hover:bg-emerald-100 transition-all duration-300 group hover:shadow-md"
+                      >
+                        <span className="text-[10px] font-black text-emerald-800 uppercase tracking-widest whitespace-nowrap">ที่มา :</span>
+                        <span className="text-[11px] font-black text-emerald-600 whitespace-nowrap group-hover:text-emerald-800 transition-colors">HDC Update</span>
+                        <span className="w-1 h-1 rounded-full bg-emerald-300"></span>
+                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-tighter whitespace-nowrap">
+                          {new Date(hdcLastUpdate).toLocaleDateString('th-TH', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            calendar: 'buddhist'
+                          } as any)}
+                        </span>
+                      </a>
+                    )}
+                  </div>
+                  <p className="text-[10px] font-bold italic">
+                    * <span className="text-blue-600 uppercase">HIS Update ทันที</span> , <span className="text-emerald-600 uppercase">HDC Update ภายใน 4 วันขึ้นกับปริมาณข้อมูล</span>
+                  </p>
                 </div>
               </div>
             </div>

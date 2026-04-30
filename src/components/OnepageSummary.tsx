@@ -76,10 +76,10 @@ export default function OnepageSummary({ data }: { data: any }) {
   };
 
   const renderCustomizedLabel = (props: any) => {
-    const { x, y, width, value } = props;
+    const { x, y, width, height, value } = props;
     if (value === undefined || value === null || value === 0) return null;
     return (
-      <text x={x + width + 5} y={y + 12} fill="#4B5563" fontSize={18} fontWeight="bold" textAnchor="start">
+      <text x={x + width + 5} y={y + height / 2 + 6} fill="#4B5563" fontSize={16} fontWeight="bold" textAnchor="start">
         {Number(value).toLocaleString()}
       </text>
     );
@@ -180,11 +180,11 @@ export default function OnepageSummary({ data }: { data: any }) {
         {/* Comparison Charts Row */}
         <motion.div variants={itemVariants} className="xl:col-span-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
+
             {/* HIS Summary Card */}
             <SoftCard className="p-4 flex flex-col items-center justify-center relative overflow-hidden group border-t-4 border-t-indigo-500">
               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-16 -mt-16 blur-2xl opacity-50" />
-              
+
               <div className="w-full flex justify-between items-center mb-6">
                 <h3 className="text-lg font-black text-indigo-950 flex items-center gap-2">
                   <div className="w-1.5 h-6 bg-indigo-600 rounded-full" />
@@ -249,7 +249,7 @@ export default function OnepageSummary({ data }: { data: any }) {
             {/* HDC Summary Card */}
             <SoftCard className="p-4 flex flex-col items-center justify-center relative overflow-hidden group border-t-4 border-t-emerald-500">
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 blur-2xl opacity-50" />
-              
+
               <div className="w-full flex justify-between items-center mb-6">
                 <h3 className="text-lg font-black text-emerald-950 flex items-center gap-2">
                   <div className="w-1.5 h-6 bg-emerald-600 rounded-full" />
@@ -321,11 +321,11 @@ export default function OnepageSummary({ data }: { data: any }) {
         {/* Liquid Progress Card - Comparison */}
         <motion.div variants={itemVariants} className="xl:col-span-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
+
             {/* HIS Ratio Card */}
             <SoftCard className="p-6 h-full flex flex-col justify-between relative overflow-hidden group">
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-50 rounded-full -ml-24 -mb-24 blur-2xl opacity-50" />
-              
+
               <div className="mb-6">
                 <h3 className="text-lg font-black text-indigo-950 flex items-center gap-2">
                   <div className="w-1.5 h-6 bg-indigo-600 rounded-full" />
@@ -375,7 +375,7 @@ export default function OnepageSummary({ data }: { data: any }) {
             {/* HDC Ratio Card */}
             <SoftCard className="p-6 h-full flex flex-col justify-between relative overflow-hidden group">
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-50 rounded-full -ml-24 -mb-24 blur-2xl opacity-50" />
-              
+
               <div className="mb-6">
                 <h3 className="text-lg font-black text-emerald-950 flex items-center gap-2">
                   <div className="w-1.5 h-6 bg-emerald-600 rounded-full" />
@@ -441,17 +441,17 @@ export default function OnepageSummary({ data }: { data: any }) {
                 {/* Spacer to match Hospital header height/gauge */}
                 <div className="w-36 h-20 hidden md:block" />
               </div>
-                <div className="flex gap-4 pt-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-violet-600" />
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">HIS</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
-                  </div>
+              <div className="flex gap-4 pt-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-violet-600" />
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">HIS</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
                 </div>
               </div>
+            </div>
 
             <ResponsiveContainer width="100%" height={500}>
               <BarChart
@@ -490,10 +490,10 @@ export default function OnepageSummary({ data }: { data: any }) {
                   <div className="w-2 h-7 bg-blue-600 rounded-full" />
                   ผลงานรายโรงพยาบาล
                 </h3>
-                
-                <div className="flex items-center gap-2 flex-grow justify-end">
+
+                <div className="flex items-center gap-4 flex-grow justify-end">
                   {/* HIS Gauge */}
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
                     <div className="w-32 h-20 relative flex items-center justify-center">
                       <svg viewBox="0 0 100 60" className="w-full">
                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e0e7ff" strokeWidth="16" strokeLinecap="round" />
@@ -514,13 +514,25 @@ export default function OnepageSummary({ data }: { data: any }) {
                         </span>
                       </div>
                     </div>
-                    <span className="text-[11px] font-black text-indigo-500 uppercase tracking-widest mr-2">HIS</span>
+                    <div className="flex flex-col">
+                      <span className="text-[11px] font-black text-indigo-500 uppercase tracking-widest leading-none mb-1">HIS</span>
+                      <span className="text-xs font-black text-indigo-900/60 leading-none">{(hTotals?.type5 || 0).toLocaleString()}</span>
+                    </div>
                   </div>
 
-                  <div className="w-[1px] h-8 bg-slate-100 hidden sm:block" />
+                  {/* Diff Total Badge */}
+                  <div className={`px-3 py-2 rounded-xl border flex flex-col items-center justify-center min-w-[65px] shadow-sm ${((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
+                      ((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
+                        'bg-slate-50 border-slate-100 text-slate-500'
+                    }`}>
+                    <span className="text-[8px] font-black uppercase tracking-widest leading-none mb-1 opacity-70">Diff</span>
+                    <span className="text-sm font-black tabular-nums leading-none">
+                      {((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) > 0 ? `+${(hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)}` : (hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)}
+                    </span>
+                  </div>
 
                   {/* HDC Gauge */}
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
                     <div className="w-32 h-20 relative flex items-center justify-center">
                       <svg viewBox="0 0 100 60" className="w-full">
                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#d1fae5" strokeWidth="16" strokeLinecap="round" />
@@ -541,7 +553,10 @@ export default function OnepageSummary({ data }: { data: any }) {
                         </span>
                       </div>
                     </div>
-                    <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">HDC</span>
+                    <div className="flex flex-col">
+                      <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">HDC</span>
+                      <span className="text-xs font-black text-emerald-900/60 leading-none">{(hTotals?.hdc_tele || 0).toLocaleString()}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -552,7 +567,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                 <BarChart
                   data={hospitalData}
                   layout="vertical"
-                  margin={{ top: 5, right: 60, left: 40, bottom: 5 }}
+                  margin={{ top: 5, right: 120, left: 40, bottom: 5 }}
                   barGap={2}
                 >
                   <XAxis type="number" hide />
@@ -566,7 +581,34 @@ export default function OnepageSummary({ data }: { data: any }) {
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
                   <Bar dataKey="dashboard" name="HIS" fill={COLORS.dashboard} barSize={12} radius={[0, 10, 10, 0]}>
-                    <LabelList dataKey="dashboard" content={renderCustomizedLabel} />
+                    <LabelList 
+                      dataKey="dashboard" 
+                      content={(props: any) => {
+                        const { x, y, width, height, value, index } = props;
+                        const item = hospitalData[index];
+                        if (!item) return null;
+                        const diff = (item.hdc || 0) - (item.dashboard || 0);
+                        const diffText = diff > 0 ? `(+${diff.toLocaleString()})` : diff < 0 ? `(${diff.toLocaleString()})` : '';
+                        const diffColor = diff > 0 ? '#10b981' : diff < 0 ? '#ef4444' : '#94a3b8';
+                        
+                        const valueStr = Number(value).toLocaleString();
+                        // Adjust offset based on string length (approximate)
+                        const offset = valueStr.length * 11 + 10;
+
+                        return (
+                          <g>
+                            <text x={x + width + 5} y={y + height / 2 + 6} fill="#4B5563" fontSize={16} fontWeight="bold" textAnchor="start">
+                              {valueStr}
+                            </text>
+                            {diff !== 0 && (
+                              <text x={x + width + offset} y={y + height / 2 + 5} fill={diffColor} fontSize={12} fontWeight={900} textAnchor="start" className="tabular-nums">
+                                {diffText}
+                              </text>
+                            )}
+                          </g>
+                        );
+                      }} 
+                    />
                   </Bar>
                   <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={12} radius={[0, 10, 10, 0]}>
                     <LabelList dataKey="hdc" content={renderCustomizedLabel} />
@@ -619,7 +661,10 @@ export default function OnepageSummary({ data }: { data: any }) {
                     </span>
                   </div>
                 </div>
-                <span className="text-[11px] font-black text-indigo-500 uppercase tracking-widest">HIS</span>
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-black text-indigo-500 uppercase tracking-widest leading-none mb-1">HIS</span>
+                  <span className="text-xs font-black text-indigo-900/60 leading-none">{(subhTotals?.type5 || 0).toLocaleString()}</span>
+                </div>
               </div>
 
               <div className="w-[1px] h-8 bg-slate-100" />
@@ -646,45 +691,51 @@ export default function OnepageSummary({ data }: { data: any }) {
                     </span>
                   </div>
                 </div>
-                <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">HDC</span>
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">HDC</span>
+                  <span className="text-xs font-black text-emerald-900/60 leading-none">{(subhTotals?.hdc_tele || 0).toLocaleString()}</span>
+                </div>
               </div>
             </div>
-          </div>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3 mt-8">
-            {top10Data.map((item: any, idx: number) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/50 border border-white hover:bg-white hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 group"
-              >
-                <div className="flex items-center gap-4 overflow-hidden">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 transition-all shadow-sm bg-white text-indigo-600 border border-slate-100 group-hover:bg-indigo-600 group-hover:text-white">
-                    {idx + 1}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3 mt-8">
+              {top10Data.map((item: any, idx: number) => {
+                const diff = (item.hdc || 0) - (item.dashboard || 0);
+                return (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/50 border border-white hover:bg-white hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 group"
+                  >
+                    <div className="flex items-center gap-4 overflow-hidden">
+                      <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 transition-all shadow-sm bg-white text-indigo-600 border border-slate-100 group-hover:bg-indigo-600 group-hover:text-white">
+                        {idx + 1}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[13px] font-black text-slate-700 truncate uppercase tracking-tight">
+                          {item.name}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6 shrink-0 pl-4">
+                      <div className="text-right">
+                        <p className="text-[10px] font-bold text-violet-500 uppercase leading-none mb-1">HIS</p>
+                        <p className="text-lg font-black text-violet-700 tabular-nums leading-none">
+                          {item.dashboard.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="w-[1px] h-8 bg-slate-200" />
+                      <div className="text-right">
+                        <p className="text-[10px] font-bold text-emerald-500 uppercase leading-none mb-1">HDC</p>
+                        <p className="text-lg font-black text-emerald-700 tabular-nums leading-none">
+                          {item.hdc.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-black text-slate-700 truncate uppercase tracking-tight">
-                      {item.name}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 shrink-0 pl-4">
-                  <div className="text-right">
-                    <p className="text-xs font-bold text-violet-500 uppercase leading-none mb-1">HIS</p>
-                    <p className="text-xl font-black text-violet-700 tabular-nums leading-none">
-                      {item.dashboard.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="w-[1px] h-8 bg-slate-200" />
-                  <div className="text-right">
-                    <p className="text-xs font-bold text-emerald-500 uppercase leading-none mb-1">HDC</p>
-                    <p className="text-xl font-black text-emerald-700 tabular-nums leading-none">
-                      {item.hdc.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
         </SoftCard>
       </motion.div>
 
