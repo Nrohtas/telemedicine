@@ -117,13 +117,13 @@ const TopPerformance = () => {
 
                         {showDiff && (
                             <div className="flex flex-col items-center justify-center shrink-0">
-                                <div className={`w-9 h-9 rounded-full shadow-lg border-2 flex flex-col items-center justify-center ${((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? 'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-emerald-100' :
+                                <div className={`w-12 h-12 rounded-full shadow-lg border-2 flex flex-col items-center justify-center ${((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? 'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-emerald-100' :
                                     ((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) < 0 ? 'bg-rose-50 border-rose-200 text-rose-700 shadow-rose-100' :
                                         'bg-slate-50 border-slate-200 text-slate-500 shadow-slate-100'
                                     }`}>
-                                    <span className="text-[5px] font-black uppercase tracking-tighter leading-none mb-0.5 opacity-70">Diff</span>
-                                    <span className="text-[11px] font-black tabular-nums leading-none">
-                                        {((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? `+${(summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)}` : (summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)}
+                                    <span className="text-[6px] font-black uppercase tracking-tighter leading-none mb-0.5 opacity-70">Diff</span>
+                                    <span className="text-[10px] font-black tabular-nums leading-none">
+                                        {((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? `+${((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)).toLocaleString()}` : ((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)).toLocaleString()}
                                     </span>
                                 </div>
                             </div>
@@ -189,7 +189,7 @@ const TopPerformance = () => {
                                     <div className="flex items-center gap-1.5">
                                         <div className="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center text-[9px] font-black text-blue-600">HIS</div>
                                         <div className="flex items-baseline gap-0.5">
-                                            <span className="text-[14px] font-black text-blue-700 tabular-nums">{(item.his_tele || 0).toLocaleString()}</span>
+                                            <span className="text-[14px] font-black text-blue-700 tabular-nums">{Number(item.his_tele || 0).toLocaleString()}</span>
                                             <span className="text-[8px] font-bold text-blue-400">ครั้ง</span>
                                         </div>
                                     </div>
@@ -206,7 +206,7 @@ const TopPerformance = () => {
                                                 'bg-slate-50 border-slate-100 text-slate-500'
                                             }`}>
                                             <span className="text-[4px] font-black uppercase tracking-tighter opacity-70 leading-none mb-0.5">Diff</span>
-                                            <span className="text-[9px] font-black tabular-nums leading-none">{diff > 0 ? `+${diff}` : diff}</span>
+                                            <span className="text-[9px] font-black tabular-nums leading-none">{diff > 0 ? `+${diff.toLocaleString()}` : diff.toLocaleString()}</span>
                                         </div>
                                     );
                                 })()}
@@ -215,7 +215,7 @@ const TopPerformance = () => {
                                     <div className="flex items-center gap-1.5">
                                         <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center text-[9px] font-black text-emerald-600">HDC</div>
                                         <div className="flex items-baseline gap-0.5">
-                                            <span className="text-[14px] font-black text-emerald-700 tabular-nums">{(item.hdc_tele || 0).toLocaleString()}</span>
+                                            <span className="text-[14px] font-black text-emerald-700 tabular-nums">{Number(item.hdc_tele || 0).toLocaleString()}</span>
                                             <span className="text-[8px] font-bold text-emerald-400">ครั้ง</span>
                                         </div>
                                     </div>
