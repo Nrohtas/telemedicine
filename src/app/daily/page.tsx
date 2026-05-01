@@ -309,7 +309,7 @@ export default async function DailyPage({
               </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1400px] divide-y divide-slate-100">
+              <table className="w-full min-w-[1100px] divide-y divide-slate-100">
                 <thead className="bg-slate-50">
                   <tr className="border-b border-slate-200 text-center text-[13px] font-black text-slate-600">
                     <th className="px-5 py-3 text-left" rowSpan={2}>
@@ -369,68 +369,68 @@ export default async function DailyPage({
                       ผลต่าง
                     </th>
                   </tr>
-                  <tr className="border-b border-slate-200 text-left text-[11px] font-black uppercase tracking-tight text-slate-500">
-                    <th className="border-l-2 border-indigo-300 bg-indigo-50/70 px-3 py-2 text-right">
+                  <tr className="border-b border-slate-200 text-left text-[10px] font-black uppercase tracking-tight text-slate-500">
+                    <th className="border-l-2 border-indigo-300 bg-indigo-50/70 px-2 py-2 text-right">
                       <Link href={getSortUrl("platform_target")} scroll={false} className="hover:text-indigo-700">
                         เป้าหมาย <SortIcon column="platform_target" />
                       </Link>
                     </th>
-                    <th className="bg-indigo-50/70 px-3 py-2 text-right">
+                    <th className="bg-indigo-50/70 px-2 py-2 text-right">
                       <Link href={getSortUrl("platform_result")} scroll={false} className="hover:text-indigo-700">
                         ผลงาน <SortIcon column="platform_result" />
                       </Link>
                     </th>
-                    <th className="bg-indigo-50/70 px-3 py-2 text-center">
-                      <Link href={getSortUrl("platform_percent")} scroll={false} className="hover:text-indigo-700 font-black text-[14px]">
+                    <th className="bg-indigo-50/70 px-2 py-2 text-center">
+                      <Link href={getSortUrl("platform_percent")} scroll={false} className="hover:text-indigo-700 font-black text-[13px]">
                         % <SortIcon column="platform_percent" />
                       </Link>
                     </th>
-                    <th className="border-l-2 border-cyan-300 bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap">
+                    <th className="border-l-2 border-cyan-300 bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap">
                       <Link href={getSortUrl("visit_type_2")} scroll={false} className="hover:text-cyan-600">
                         มาตามนัด(2) <SortIcon column="visit_type_2" />
                       </Link>
                     </th>
-                    <th className="bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap">
+                    <th className="bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap">
                       <Link href={getSortUrl("visit_type_3")} scroll={false} className="hover:text-cyan-600">
                         รับส่งต่อ(3) <SortIcon column="visit_type_3" />
                       </Link>
                     </th>
-                    <th className="bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap">
+                    <th className="bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap">
                       <Link href={getSortUrl("visit_type_5")} scroll={false} className="hover:text-cyan-600">
                         Tele(5) <SortIcon column="visit_type_5" />
                       </Link>
                     </th>
-                    <th className="bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap">
+                    <th className="bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap">
                       <Link href={getSortUrl("total")} scroll={false} className="hover:text-cyan-600">
                         รวม 2,3,5 <SortIcon column="total" />
                       </Link>
                     </th>
-                    <th className="bg-cyan-50/70 px-3 py-2 text-center">
-                      <Link href={getSortUrl("percent")} scroll={false} className="hover:text-cyan-600 font-black text-[14px]">
+                    <th className="bg-cyan-50/70 px-2 py-2 text-center">
+                      <Link href={getSortUrl("percent")} scroll={false} className="hover:text-cyan-600 font-black text-[13px]">
                         % <SortIcon column="percent" />
                       </Link>
                     </th>
-                    <th className="border-l-2 border-emerald-300 bg-emerald-50/70 px-3 py-2 text-right">
+                    <th className="border-l-2 border-emerald-300 bg-emerald-50/70 px-2 py-2 text-right">
                       <Link href={getSortUrl("hdc_opd")} scroll={false} className="hover:text-emerald-700">
                         OPD <SortIcon column="hdc_opd" />
                       </Link>
                     </th>
-                    <th className="bg-emerald-50/70 px-3 py-2 text-right">
+                    <th className="bg-emerald-50/70 px-2 py-2 text-right">
                       <Link href={getSortUrl("hdc_result")} scroll={false} className="hover:text-emerald-700">
                         Tele <SortIcon column="hdc_result" />
                       </Link>
                     </th>
-                    <th className="bg-emerald-50/70 px-3 py-2 text-center">
-                      <Link href={getSortUrl("hdc_percent")} scroll={false} className="hover:text-emerald-700 font-black text-[14px]">
+                    <th className="bg-emerald-50/70 px-2 py-2 text-center">
+                      <Link href={getSortUrl("hdc_percent")} scroll={false} className="hover:text-emerald-700 font-black text-[13px]">
                         % <SortIcon column="hdc_percent" />
                       </Link>
                     </th>
-                    <th className="border-l-2 border-amber-300 bg-amber-50/70 px-3 py-2 text-right">
+                    <th className="border-l-2 border-amber-300 bg-amber-50/70 px-2 py-2 text-right">
                       <Link href={getSortUrl("diff_hdc_platform")} scroll={false} className="hover:text-amber-700">
                         HDC - PLATFORM <SortIcon column="diff_hdc_platform" />
                       </Link>
                     </th>
-                    <th className="bg-amber-50/70 px-3 py-2 text-right">
+                    <th className="bg-amber-50/70 px-2 py-2 text-right">
                       <Link href={getSortUrl("diff_hdc_his")} scroll={false} className="hover:text-amber-700">
                         HDC - HIS <SortIcon column="diff_hdc_his" />
                       </Link>
@@ -532,8 +532,8 @@ function NumberCell({
   showDecimal?: boolean;
 }) {
   const baseClassName = footer
-    ? `px-3 py-4 text-right text-[12px] ${compact ? "font-bold text-slate-700" : "font-black text-slate-900"}`
-    : `whitespace-nowrap px-3 py-2 text-right ${compact ? "text-[11px] font-medium text-slate-600" : strong ? "text-[13px] font-black text-slate-950" : "text-[12px] font-bold text-slate-800"
+    ? `px-2 py-3 text-right text-[11px] ${compact ? "font-bold text-slate-700" : "font-black text-slate-900"}`
+    : `whitespace-nowrap px-2 py-2 text-right ${compact ? "text-[10px] font-medium text-slate-600" : strong ? "text-[12px] font-black text-slate-950" : "text-[11px] font-bold text-slate-800"
     }`;
 
   return <td className={`${baseClassName} ${className}`}>{showDecimal ? percentFormat.format(value) : numberFormat.format(value)}</td>;
@@ -557,7 +557,7 @@ function TelemedicineBadgeCell({
   const sizeClass = size === "sm" ? "min-w-[50px] text-[11px] px-2 py-0.5" : "min-w-[60px] text-[13px] px-3 py-1";
 
   return (
-    <td className={`whitespace-nowrap px-3 text-right ${footer ? `py-4 ${color === "emerald" ? "bg-emerald-50/50" : "bg-cyan-50/50"}` : "py-2"}`}>
+    <td className={`whitespace-nowrap px-2 text-right ${footer ? `py-3 ${color === "emerald" ? "bg-emerald-50/50" : "bg-cyan-50/50"}` : "py-2"}`}>
       <span className={`inline-flex justify-center rounded-full font-black ring-1 ${sizeClass} ${bgClass}`}>
         {numberFormat.format(value)}
       </span>
@@ -587,9 +587,9 @@ function PercentCell({
         : "text-slate-700";
 
   return (
-    <td className={`whitespace-nowrap px-3 text-right ${footer ? `py-4 ${color === "indigo" ? "bg-indigo-50/50" : color === "cyan" ? "bg-cyan-50/50" : color === "emerald" ? "bg-emerald-50/50" : "bg-slate-50"}` : "py-2"} ${className}`}>
+    <td className={`whitespace-nowrap px-2 text-right ${footer ? `py-3 ${color === "indigo" ? "bg-indigo-50/50" : color === "cyan" ? "bg-cyan-50/50" : color === "emerald" ? "bg-emerald-50/50" : "bg-slate-50"}` : "py-2"} ${className}`}>
       <span
-        className={`rounded-full px-2 py-0.5 font-black ring-1 ${bgClass} ${textClass} ${footer ? "text-[13px]" : "text-[11px] group-hover:bg-white"}`}
+        className={`rounded-full px-1.5 py-0.5 font-black ring-1 ${bgClass} ${textClass} ${footer ? "text-[12px]" : "text-[10px] group-hover:bg-white"}`}
       >
         {percentFormat.format(value)}%
       </span>
@@ -611,7 +611,7 @@ function DiffCell({
   const sign = value > 0 ? "+" : "";
 
   return (
-    <td className={`whitespace-nowrap px-3 text-right text-[11px] ${footer ? "py-4 font-black" : "py-2 font-black"} ${className}`}>
+    <td className={`whitespace-nowrap px-2 text-right text-[10px] ${footer ? "py-3 font-black" : "py-2 font-black"} ${className}`}>
       <span className={footer ? footerColorClass : colorClass}>
         {sign}
         {numberFormat.format(value)}

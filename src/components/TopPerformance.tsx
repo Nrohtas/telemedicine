@@ -133,11 +133,11 @@ const TopPerformance = () => {
                             <div className="flex flex-col items-end">
                                 <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500/70 leading-none mb-1">ผลงานรวม HDC</span>
                                 <div className="flex items-baseline gap-1.5">
-                                    <div className="px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-black rounded-lg shadow-sm mr-1">
-                                        {formatPercent(summaryData?.hdc_percent || 0)}
-                                    </div>
                                     <span className="text-xl font-black tabular-nums leading-none text-emerald-700">{(summaryData?.hdc_tele || 0).toLocaleString()}</span>
                                     <span className="text-[10px] font-bold text-emerald-500/70">ครั้ง</span>
+                                    <div className="px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-black rounded-lg shadow-sm ml-1">
+                                        {formatPercent(summaryData?.hdc_percent || 0)}
+                                    </div>
                                 </div>
                             </div>
                             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-[10px] font-black text-emerald-600 border border-emerald-100 shadow-inner">HDC</div>
@@ -185,7 +185,7 @@ const TopPerformance = () => {
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <div className="flex items-center justify-between bg-blue-50/60 px-2.5 py-1.5 rounded-xl border border-blue-100/50 shadow-sm group-hover:bg-white transition-all duration-300 min-w-[140px]">
+                                <div className="flex items-center justify-between bg-blue-50/60 px-2.5 py-1.5 rounded-xl border border-blue-100/50 shadow-sm group-hover:bg-white transition-all duration-300 min-w-[155px] shrink-0">
                                     <div className="flex items-center gap-1.5">
                                         <div className="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center text-[9px] font-black text-blue-600">HIS</div>
                                         <div className="flex items-baseline gap-0.5">
@@ -193,7 +193,7 @@ const TopPerformance = () => {
                                             <span className="text-[8px] font-bold text-blue-400">ครั้ง</span>
                                         </div>
                                     </div>
-                                    <div className="px-1.5 py-0.5 bg-blue-500 text-white text-[9px] font-black rounded-lg shadow-sm">
+                                    <div className="px-1.5 py-0.5 bg-blue-500 text-white text-[9px] font-black rounded-lg shadow-sm shrink-0">
                                         {formatPercent(item.his_percent)}
                                     </div>
                                 </div>
@@ -211,7 +211,7 @@ const TopPerformance = () => {
                                     );
                                 })()}
 
-                                <div className="flex items-center justify-between bg-emerald-50/60 px-2.5 py-1.5 rounded-xl border border-emerald-100/50 shadow-sm group-hover:bg-white transition-all duration-300 min-w-[140px]">
+                                <div className="flex items-center justify-between bg-emerald-50/60 px-2.5 py-1.5 rounded-xl border border-emerald-100/50 shadow-sm group-hover:bg-white transition-all duration-300 min-w-[155px] shrink-0">
                                     <div className="flex items-center gap-1.5">
                                         <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center text-[9px] font-black text-emerald-600">HDC</div>
                                         <div className="flex items-baseline gap-0.5">
@@ -219,7 +219,7 @@ const TopPerformance = () => {
                                             <span className="text-[8px] font-bold text-emerald-400">ครั้ง</span>
                                         </div>
                                     </div>
-                                    <div className="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-black rounded-lg shadow-sm">
+                                    <div className="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-black rounded-lg shadow-sm shrink-0">
                                         {formatPercent(item.performance_percent)}
                                     </div>
                                 </div>

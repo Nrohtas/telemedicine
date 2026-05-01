@@ -540,8 +540,8 @@ export default function OnepageSummary({ data }: { data: any }) {
 
                   {/* Diff Total Badge */}
                   <div className={`w-7 h-7 rounded-full border flex flex-col items-center justify-center shrink-0 shadow-sm ${((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
-                      ((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
-                        'bg-slate-50 border-slate-100 text-slate-500'
+                    ((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
+                      'bg-slate-50 border-slate-100 text-slate-500'
                     }`}>
                     <span className="text-[4px] font-black uppercase tracking-tighter leading-none mb-0.5 opacity-70">Diff</span>
                     <span className="text-[9px] font-black tabular-nums leading-none">
@@ -599,8 +599,8 @@ export default function OnepageSummary({ data }: { data: any }) {
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
                   <Bar dataKey="dashboard" name="HIS" fill={COLORS.dashboard} barSize={10} radius={[0, 10, 10, 0]}>
-                    <LabelList 
-                      dataKey="dashboard" 
+                    <LabelList
+                      dataKey="dashboard"
                       content={(props: any) => {
                         const { x, y, width, height, value, index } = props;
                         const item = hospitalData[index];
@@ -608,7 +608,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                         const diff = (item.hdc || 0) - (item.dashboard || 0);
                         const diffText = diff > 0 ? `(+${diff.toLocaleString()})` : diff < 0 ? `(${diff.toLocaleString()})` : '';
                         const diffColor = diff > 0 ? '#10b981' : diff < 0 ? '#ef4444' : '#94a3b8';
-                        
+
                         const valueStr = Number(value).toLocaleString();
                         // Smaller font for mobile
                         const valueFontSize = 12;
@@ -627,7 +627,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                             )}
                           </g>
                         );
-                      }} 
+                      }}
                     />
                   </Bar>
                   <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={10} radius={[0, 10, 10, 0]}>
@@ -724,45 +724,45 @@ export default function OnepageSummary({ data }: { data: any }) {
                 </div>
               </div>
             </div>
-            </div>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3 mt-8">
-              {top10Data.map((item: any, idx: number) => {
-                const diff = (item.hdc || 0) - (item.dashboard || 0);
-                return (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/50 border border-white hover:bg-white hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 group"
-                  >
-                    <div className="flex items-center gap-4 overflow-hidden">
-                      <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 transition-all shadow-sm bg-white text-indigo-600 border border-slate-100 group-hover:bg-indigo-600 group-hover:text-white">
-                        {idx + 1}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[13px] font-black text-slate-700 truncate uppercase tracking-tight">
-                          {item.name}
-                        </p>
-                      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3 mt-8">
+            {top10Data.map((item: any, idx: number) => {
+              const diff = (item.hdc || 0) - (item.dashboard || 0);
+              return (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/50 border border-white hover:bg-white hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 group"
+                >
+                  <div className="flex items-center gap-4 overflow-hidden">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 transition-all shadow-sm bg-white text-indigo-600 border border-slate-100 group-hover:bg-indigo-600 group-hover:text-white">
+                      {idx + 1}
                     </div>
-                    <div className="flex items-center gap-6 shrink-0 pl-4">
-                      <div className="text-right">
-                        <p className="text-[10px] font-bold text-violet-500 uppercase leading-none mb-1">HIS</p>
-                        <p className="text-lg font-black text-violet-700 tabular-nums leading-none">
-                          {item.dashboard.toLocaleString()}
-                        </p>
-                      </div>
-                      <div className="w-[1px] h-8 bg-slate-200" />
-                      <div className="text-right">
-                        <p className="text-[10px] font-bold text-emerald-500 uppercase leading-none mb-1">HDC</p>
-                        <p className="text-lg font-black text-emerald-700 tabular-nums leading-none">
-                          {item.hdc.toLocaleString()}
-                        </p>
-                      </div>
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-black text-slate-700 truncate uppercase tracking-tight">
+                        {item.name}
+                      </p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="flex items-center gap-6 shrink-0 pl-4">
+                    <div className="text-right">
+                      <p className="text-[10px] font-bold text-violet-500 uppercase leading-none mb-1">HIS</p>
+                      <p className="text-lg font-black text-violet-700 tabular-nums leading-none">
+                        {item.dashboard.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="w-[1px] h-8 bg-slate-200" />
+                    <div className="text-right">
+                      <p className="text-[10px] font-bold text-emerald-500 uppercase leading-none mb-1">HDC</p>
+                      <p className="text-lg font-black text-emerald-700 tabular-nums leading-none">
+                        {item.hdc.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </SoftCard>
       </motion.div>
 
