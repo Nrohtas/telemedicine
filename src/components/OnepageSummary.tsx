@@ -453,31 +453,49 @@ export default function OnepageSummary({ data }: { data: any }) {
               </div>
             </div>
 
-            <ResponsiveContainer width="100%" height={500}>
-              <BarChart
-                data={districtData}
-                layout="vertical"
-                margin={{ top: 5, right: 60, left: 20, bottom: 5 }}
-                barGap={2}
-              >
-                <XAxis type="number" hide />
-                <YAxis
-                  dataKey="name"
-                  type="category"
-                  width={130}
-                  tick={{ fontSize: 16, fill: '#64748b', fontWeight: 800 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
-                <Bar dataKey="dashboard" name="HIS" fill={COLORS.dashboard} barSize={14} radius={[0, 10, 10, 0]}>
-                  <LabelList dataKey="dashboard" content={renderCustomizedLabel} />
-                </Bar>
-                <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={14} radius={[0, 10, 10, 0]}>
-                  <LabelList dataKey="hdc" content={renderCustomizedLabel} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="relative overflow-hidden">
+              <ResponsiveContainer width="100%" height={500}>
+                <BarChart
+                  data={districtData}
+                  layout="vertical"
+                  margin={{ top: 5, right: 60, left: 0, bottom: 5 }}
+                  barGap={2}
+                >
+                  <XAxis type="number" hide />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    width={100}
+                    tick={{ fontSize: 12, fill: '#64748b', fontWeight: 800 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
+                  <Bar dataKey="dashboard" name="HIS" fill={COLORS.dashboard} barSize={14} radius={[0, 10, 10, 0]}>
+                    <LabelList dataKey="dashboard" content={(props: any) => {
+                      const { x, y, width, height, value } = props;
+                      if (value === 0) return null;
+                      return (
+                        <text x={x + width + 5} y={y + height / 2 + 5} fill="#4B5563" fontSize={12} fontWeight="bold" textAnchor="start">
+                          {Number(value).toLocaleString()}
+                        </text>
+                      );
+                    }} />
+                  </Bar>
+                  <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={14} radius={[0, 10, 10, 0]}>
+                    <LabelList dataKey="hdc" content={(props: any) => {
+                      const { x, y, width, height, value } = props;
+                      if (value === 0) return null;
+                      return (
+                        <text x={x + width + 5} y={y + height / 2 + 5} fill="#4B5563" fontSize={12} fontWeight="bold" textAnchor="start">
+                          {Number(value).toLocaleString()}
+                        </text>
+                      );
+                    }} />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </SoftCard>
         </motion.div>
 
@@ -485,13 +503,13 @@ export default function OnepageSummary({ data }: { data: any }) {
         <motion.div variants={itemVariants}>
           <SoftCard className="p-6 h-full">
             <div className="flex flex-col mb-4">
-              <div className="flex items-center justify-between mb-4 px-2">
-                <h3 className="text-xl font-black text-indigo-950 flex items-center gap-3 flex-shrink-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 px-2 gap-4">
+                <h3 className="text-lg md:text-xl font-black text-indigo-950 flex items-center gap-3 flex-shrink-0">
                   <div className="w-2 h-7 bg-blue-600 rounded-full" />
                   ผลงานรายโรงพยาบาล
                 </h3>
 
-                <div className="flex items-center gap-2 flex-grow justify-end">
+                <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-start sm:justify-end">
                   {/* HIS Gauge */}
                   <div className="flex items-center gap-1">
                     <div className="w-24 h-16 relative flex items-center justify-center">
@@ -521,12 +539,12 @@ export default function OnepageSummary({ data }: { data: any }) {
                   </div>
 
                   {/* Diff Total Badge */}
-                  <div className={`w-9 h-9 rounded-full border flex flex-col items-center justify-center shrink-0 shadow-sm ${((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
+                  <div className={`w-7 h-7 rounded-full border flex flex-col items-center justify-center shrink-0 shadow-sm ${((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
                       ((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
                         'bg-slate-50 border-slate-100 text-slate-500'
                     }`}>
-                    <span className="text-[5px] font-black uppercase tracking-tighter leading-none mb-0.5 opacity-70">Diff</span>
-                    <span className="text-[10px] font-black tabular-nums leading-none">
+                    <span className="text-[4px] font-black uppercase tracking-tighter leading-none mb-0.5 opacity-70">Diff</span>
+                    <span className="text-[9px] font-black tabular-nums leading-none">
                       {((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) > 0 ? `+${(hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)}` : (hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)}
                     </span>
                   </div>
@@ -562,25 +580,25 @@ export default function OnepageSummary({ data }: { data: any }) {
               </div>
             </div>
 
-            <div className="relative">
+            <div className="relative overflow-hidden">
               <ResponsiveContainer width="100%" height={500}>
                 <BarChart
                   data={hospitalData}
                   layout="vertical"
-                  margin={{ top: 5, right: 120, left: 40, bottom: 5 }}
+                  margin={{ top: 5, right: 90, left: 0, bottom: 5 }}
                   barGap={2}
                 >
                   <XAxis type="number" hide />
                   <YAxis
                     dataKey="name"
                     type="category"
-                    width={150}
-                    tick={{ fontSize: 16, fill: '#64748b', fontWeight: 800 }}
+                    width={100}
+                    tick={{ fontSize: 11, fill: '#64748b', fontWeight: 800 }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
-                  <Bar dataKey="dashboard" name="HIS" fill={COLORS.dashboard} barSize={12} radius={[0, 10, 10, 0]}>
+                  <Bar dataKey="dashboard" name="HIS" fill={COLORS.dashboard} barSize={10} radius={[0, 10, 10, 0]}>
                     <LabelList 
                       dataKey="dashboard" 
                       content={(props: any) => {
@@ -592,16 +610,18 @@ export default function OnepageSummary({ data }: { data: any }) {
                         const diffColor = diff > 0 ? '#10b981' : diff < 0 ? '#ef4444' : '#94a3b8';
                         
                         const valueStr = Number(value).toLocaleString();
-                        // Adjust offset based on string length (approximate)
-                        const offset = valueStr.length * 11 + 10;
+                        // Smaller font for mobile
+                        const valueFontSize = 12;
+                        const diffFontSize = 10;
+                        const offset = valueStr.length * 8 + 10;
 
                         return (
                           <g>
-                            <text x={x + width + 5} y={y + height / 2 + 6} fill="#4B5563" fontSize={16} fontWeight="bold" textAnchor="start">
+                            <text x={x + width + 5} y={y + height / 2 + 5} fill="#4B5563" fontSize={valueFontSize} fontWeight="black" textAnchor="start">
                               {valueStr}
                             </text>
                             {diff !== 0 && (
-                              <text x={x + width + offset} y={y + height / 2 + 5} fill={diffColor} fontSize={12} fontWeight={900} textAnchor="start" className="tabular-nums">
+                              <text x={x + width + offset} y={y + height / 2 + 5} fill={diffColor} fontSize={diffFontSize} fontWeight={900} textAnchor="start" className="tabular-nums">
                                 {diffText}
                               </text>
                             )}
@@ -610,12 +630,19 @@ export default function OnepageSummary({ data }: { data: any }) {
                       }} 
                     />
                   </Bar>
-                  <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={12} radius={[0, 10, 10, 0]}>
-                    <LabelList dataKey="hdc" content={renderCustomizedLabel} />
+                  <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={10} radius={[0, 10, 10, 0]}>
+                    <LabelList dataKey="hdc" content={(props: any) => {
+                      const { x, y, width, height, value } = props;
+                      if (value === 0) return null;
+                      return (
+                        <text x={x + width + 5} y={y + height / 2 + 5} fill="#4B5563" fontSize={12} fontWeight="bold" textAnchor="start">
+                          {Number(value).toLocaleString()}
+                        </text>
+                      );
+                    }} />
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
-
             </div>
           </SoftCard>
         </motion.div>
