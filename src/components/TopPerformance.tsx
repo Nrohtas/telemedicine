@@ -96,16 +96,19 @@ const TopPerformance = () => {
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {summaryData && (
-                    <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-50/80 rounded-xl shadow-sm border border-blue-100">
+            {summaryData && (
+                <div className="px-1">
+                    <div className="flex items-center justify-between p-4 bg-slate-100/40 border-2 border-slate-200 rounded-[2rem] shadow-sm gap-4">
+                        <div className="flex-1 flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-[10px] font-black text-blue-600 border border-blue-100 shadow-inner">HIS</div>
                             <div className="flex flex-col">
-                                <span className="text-[8px] font-black uppercase tracking-widest text-blue-500 leading-none mb-1">HIS</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-500/70 leading-none mb-1">ผลงานรวม HIS</span>
                                 <div className="flex items-baseline gap-1.5">
-                                    <span className="text-sm font-black tabular-nums leading-none text-blue-700">{(summaryData?.his_tele || 0).toLocaleString()}</span>
+                                    <span className="text-xl font-black tabular-nums leading-none text-blue-700">{(summaryData?.his_tele || 0).toLocaleString()}</span>
                                     <span className="text-[10px] font-bold text-blue-500/70">ครั้ง</span>
-                                    <div className="px-1.5 py-0.5 bg-blue-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-blue-100 ml-1">
+                                    <div className="px-2 py-0.5 bg-blue-500 text-white text-[10px] font-black rounded-lg shadow-sm ml-1">
                                         {formatPercent(summaryData?.his_percent || 0)}
                                     </div>
                                 </div>
@@ -113,32 +116,35 @@ const TopPerformance = () => {
                         </div>
 
                         {showDiff && (
-                            <div className={`w-10 h-10 rounded-full shadow-md border flex flex-col items-center justify-center shrink-0 ${((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
-                                    ((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
-                                        'bg-slate-50 border-slate-100 text-slate-500'
-                                }`}>
-                                <span className="text-[6px] font-black uppercase tracking-widest leading-none mb-0.5 opacity-70">Diff</span>
-                                <span className="text-[11px] font-black tabular-nums leading-none">
-                                    {((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? `+${(summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)}` : (summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)}
-                                </span>
+                            <div className="flex flex-col items-center justify-center shrink-0">
+                                <div className={`w-12 h-12 rounded-full shadow-lg border-2 flex flex-col items-center justify-center ${((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? 'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-emerald-100' :
+                                    ((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) < 0 ? 'bg-rose-50 border-rose-200 text-rose-700 shadow-rose-100' :
+                                        'bg-slate-50 border-slate-200 text-slate-500 shadow-slate-100'
+                                    }`}>
+                                    <span className="text-[8px] font-black uppercase tracking-widest leading-none mb-0.5 opacity-70">Diff</span>
+                                    <span className="text-[13px] font-black tabular-nums leading-none">
+                                        {((summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)) > 0 ? `+${(summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)}` : (summaryData?.hdc_tele || 0) - (summaryData?.his_tele || 0)}
+                                    </span>
+                                </div>
                             </div>
                         )}
 
-                        <div className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50/80 rounded-xl shadow-sm border border-emerald-100">
-                            <div className="flex flex-col">
-                                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500 leading-none mb-1">HDC</span>
+                        <div className="flex-1 flex items-center justify-end gap-3 text-right">
+                            <div className="flex flex-col items-end">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500/70 leading-none mb-1">ผลงานรวม HDC</span>
                                 <div className="flex items-baseline gap-1.5">
-                                    <span className="text-sm font-black tabular-nums leading-none text-emerald-700">{(summaryData?.hdc_tele || 0).toLocaleString()}</span>
-                                    <span className="text-[10px] font-bold text-emerald-500/70">ครั้ง</span>
-                                    <div className="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-black rounded-lg shadow-sm shadow-emerald-100 ml-1">
+                                    <div className="px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-black rounded-lg shadow-sm mr-1">
                                         {formatPercent(summaryData?.hdc_percent || 0)}
                                     </div>
+                                    <span className="text-xl font-black tabular-nums leading-none text-emerald-700">{(summaryData?.hdc_tele || 0).toLocaleString()}</span>
+                                    <span className="text-[10px] font-bold text-emerald-500/70">ครั้ง</span>
                                 </div>
                             </div>
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-[10px] font-black text-emerald-600 border border-emerald-100 shadow-inner">HDC</div>
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
             <div className="flex flex-col gap-3">
                 {!items || items.length === 0 ? (
