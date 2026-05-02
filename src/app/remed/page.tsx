@@ -45,7 +45,7 @@ async function getRemedData() {
       DATE_FORMAT(r.visit_date, '%Y-%m-%d') AS visit_date,
       COALESCE(r.count_case_dx_rx_same_prev_vst, 0) AS count_case_dx_rx_same_prev_vst
     FROM remed_count r
-    LEFT JOIN hospital h ON h.hospcode = r.hoscode
+    LEFT JOIN hospital h ON h.hospcode = r.hoscode COLLATE utf8mb4_general_ci
     ORDER BY h.hospname ASC, r.hoscode ASC, r.visit_date DESC
   `);
 
