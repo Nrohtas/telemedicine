@@ -12,6 +12,7 @@ export async function middleware(request: NextRequest) {
         checkPath.startsWith('/api/register') ||
         checkPath.startsWith('/api/auth') ||
         checkPath.startsWith('/api/visit-type-daily') ||
+        checkPath.startsWith('/api/remed-count') ||
         (request.method === 'GET' && (
             checkPath.startsWith('/api/hospital-directory') ||
             checkPath.startsWith('/api/affiliations') ||

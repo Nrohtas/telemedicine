@@ -237,6 +237,18 @@ const Navbar = ({
                                 <span>Daily</span>
                             </SoftButton>
                         </Link>
+                        <Link href="/remed" className="hover:opacity-80 transition-opacity">
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/remed'}
+                                className="flex items-center justify-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10.5 20.5l10-10a4.243 4.243 0 00-6-6l-10 10a4.243 4.243 0 006 6zM8 11l5 5" />
+                                </svg>
+                                <span>REMED</span>
+                            </SoftButton>
+                        </Link>
 
                         <Link
                             href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}` : ''}`}
@@ -321,6 +333,18 @@ const Navbar = ({
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3v18h18M7 15l3-3 3 2 5-7" />
                                 </svg>
                                 <span className="text-xs font-black uppercase tracking-widest">Daily</span>
+                            </SoftButton>
+                        </Link>
+                        <Link href="/remed" onClick={() => setIsMenuOpen(false)}>
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/remed'}
+                                className="flex items-center justify-center gap-3 w-full py-3"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10.5 20.5l10-10a4.243 4.243 0 00-6-6l-10 10a4.243 4.243 0 006 6zM8 11l5 5" />
+                                </svg>
+                                <span className="text-xs font-black uppercase tracking-widest">REMED</span>
                             </SoftButton>
                         </Link>
                         <Link
