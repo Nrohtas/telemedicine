@@ -22,37 +22,43 @@ def main():
     
     # 1. Fetch Data
     try:
+        # We use POST as tested in scratch scripts
         payload = {
             "tableName": "s_telemed_hosp",
             "year": "2569",
             "province": "65"
         }
-        response = requests.post(API_URL, json=payload, timeout=30)
+        print(f"Fetching data from {API_URL} for year 2569, province 65...")
+        response = requests.post(API_URL, json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
     except Exception as e:
         print(f"Error fetching API: {e}")
+        if 'response' in locals() and response is not None:
+            print(f"Response content: {response.text[:200]}")
         sys.exit(1)
 
-    # Validate data structure (assuming it's a list or has a 'data' array)
+    # Validate data structure
     records = data if isinstance(data, list) else data.get("data", [])
     
     if not records:
-        print("No data received from API.")
+        print("No data received from API or data is empty.")
+        log_to_db(0, 0, 0)
         sys.exit(0)
 
     # 2. Filter Data
-    # Condition: areacode starts with 65 AND b_year == 2569
+    # The API might already filter by province, but we double-check for safety
     filtered_data = []
     for row in records:
         areacode = str(row.get("areacode", ""))
         b_year = str(row.get("b_year", ""))
+        # Province 65 starts with "65" in areacode
         if areacode.startswith("65") and b_year == "2569":
             filtered_data.append(row)
 
     total_count = len(records)
     matched_count = len(filtered_data)
-    print(f"Fetched {total_count} records. Matched {matched_count} records for areacode=65*, b_year=2569.")
+    print(f"Total fetched: {total_count}. Matched (P65, Y2569): {matched_count}.")
 
     if matched_count == 0:
         log_to_db(total_count, 0, 0)
@@ -75,6 +81,7 @@ def main():
         )
         cursor = conn.cursor()
 
+        # Added 'target' column to the table earlier
         insert_sql = """
             INSERT INTO telemed_hdc (id, hospcode, areacode, date_com, b_year, target, result, d_update)
             VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
@@ -88,19 +95,24 @@ def main():
 
         for item in filtered_data:
             try:
-                # Use hospcode_byear as ID
-                record_id = f"{item.get('hospcode')}_{item.get('b_year')}"
+                hospcode = item.get("hospcode")
+                b_year = item.get("b_year")
+                if not hospcode or not b_year:
+                    continue
+
+                # Use hospcode_byear as unique ID
+                record_id = f"{hospcode}_{b_year}"
                 
-                # Handle numeric parsing gracefully
+                # Handle numeric parsing
                 target = int(item.get("target") or 0)
                 result = int(item.get("result") or 0)
                 
                 val = (
                     record_id,
-                    item.get("hospcode"),
+                    hospcode,
                     item.get("areacode"),
                     item.get("date_com"),
-                    item.get("b_year"),
+                    b_year,
                     target,
                     result
                 )
@@ -114,8 +126,8 @@ def main():
         print(f"Successfully processed {h_y} records. Failed: {h_n}.")
 
     except Exception as e:
-        print(f"Database error: {e}")
-        h_n = matched_count - h_y # Assume the rest failed
+        print(f"Database error during insert: {e}")
+        h_n = matched_count - h_y
     finally:
         if 'cursor' in locals():
             cursor.close()
@@ -126,7 +138,7 @@ def main():
     log_to_db(total_count, h_y, h_n)
 
 def log_to_db(h_count, h_y, h_n):
-    print("Writing log to hdc_api table...")
+    print(f"Logging result: total={h_count}, success={h_y}, error={h_n}")
     try:
         conn = pymysql.connect(
             host=DB_HOST,
@@ -153,3 +165,4 @@ def log_to_db(h_count, h_y, h_n):
 
 if __name__ == "__main__":
     main()
+
