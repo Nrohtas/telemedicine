@@ -364,97 +364,11 @@ export default function AdminPage() {
                 {/* System Updates Manager Section */}
                 <SystemUpdatesManager />
 
-                <ManualSyncManager />
-
                 <Footer />
             </div>
         </main>
     );
 }
-
-// ManualSyncManager Component
-const ManualSyncManager = () => {
-    const [isSyncing, setIsSyncing] = useState(false);
-    const [status, setStatus] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-
-    const handleSync = async () => {
-        if (!window.confirm('Do you want to sync data from MOPH OpenData?')) return;
-        
-        setIsSyncing(true);
-        setStatus(null);
-
-        try {
-            const res = await fetch('/telemedicine/api/scripts/sync-hdc', {
-                method: 'POST',
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                setStatus({ type: 'success', text: 'Sync completed: ' + data.message });
-            } else {
-                setStatus({ type: 'error', text: data.error || 'Sync failed' });
-            }
-        } catch (error) {
-            setStatus({ type: 'error', text: 'Connection error' });
-        } finally {
-            setIsSyncing(false);
-        }
-    };
-
-    return (
-        <SoftCard className="p-8">
-            <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shadow-sm border border-amber-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                </div>
-                <div>
-                    <h2 className="text-xl font-black text-slate-800 tracking-tight">Manual Data Sync</h2>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Sync from MOPH OpenData API</p>
-                </div>
-            </div>
-
-            <div className="space-y-6">
-                <p className="text-sm text-slate-600 leading-relaxed">
-                    This will fetch the latest data for **Telemedicine (s_telemed_hosp)** from the MOPH OpenData API for the current fiscal year.
-                </p>
-
-                {status && (
-                    <div className={`p-4 rounded-xl text-sm font-bold ${status.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
-                        <div className="flex gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${status.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                            {status.text}
-                        </div>
-                    </div>
-                )}
-
-                <button
-                    onClick={handleSync}
-                    disabled={isSyncing}
-                    className="flex items-center gap-2 px-6 py-4 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg shadow-slate-200 disabled:opacity-50 w-full justify-center"
-                >
-                    {isSyncing ? (
-                        <>
-                            <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                            </svg>
-                            <span>Syncing in progress...</span>
-                        </>
-                    ) : (
-                        <>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                            </svg>
-                            <span>Run Manual Sync Now</span>
-                        </>
-                    )}
-                </button>
-            </div>
-        </SoftCard>
-    );
-};
 
 // SystemUpdatesManager Component
 const SystemUpdatesManager = () => {
