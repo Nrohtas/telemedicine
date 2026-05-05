@@ -114,15 +114,15 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
           ) * 100
         ELSE 0
       END AS percent,
-      COALESCE(hdc.target, 0) AS hdc_opd,
-      COALESCE(hdc.result, 0) AS hdc_result,
+      COALESCE(hdc.opd, 0) AS hdc_opd,
+      COALESCE(hdc.telemedicine, 0) AS hdc_result,
       CASE
-        WHEN COALESCE(hdc.target, 0) > 0
-        THEN COALESCE(hdc.result, 0) / COALESCE(hdc.target, 0) * 100
+        WHEN COALESCE(hdc.opd, 0) > 0
+        THEN COALESCE(hdc.telemedicine, 0) / COALESCE(hdc.opd, 0) * 100
         ELSE 0
       END AS hdc_percent,
       COALESCE(vtd.visit_type_5, 0) - COALESCE(p.result, 0) AS diff_platform_his,
-      COALESCE(hdc.result, 0) - COALESCE(vtd.visit_type_5, 0) AS diff_hdc_his,
+      COALESCE(hdc.telemedicine, 0) - COALESCE(vtd.visit_type_5, 0) AS diff_hdc_his,
       latest.latest_date,
       latest_t.latest_time,
       ht.hostype_name,
@@ -161,7 +161,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
       WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
       GROUP BY hoscode
     ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
-    LEFT JOIN telemed_hdc hdc
+    LEFT JOIN telemed_opd_hdc hdc
       ON hdc.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       AND hdc.b_year = '2569'
     WHERE h.amp_code = ? COLLATE utf8mb4_general_ci
@@ -202,7 +202,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
 
 async function getHdcLatestUpdate(): Promise<string | null> {
   try {
-    const [rows]: any = await pool.query('SELECT MAX(hdc_update) as last_update FROM telemed_hdc');
+    const [rows]: any = await pool.query('SELECT MAX(hdc_update) as last_update FROM telemed_opd_hdc');
     return rows[0]?.last_update || null;
   } catch (err) {
     console.error('Error fetching HDC latest update:', err);

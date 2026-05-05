@@ -44,9 +44,9 @@ export async function GET() {
             LEFT JOIN (
                 SELECT 
                     hospcode,
-                    SUM(target) as hdc_opd,
-                    SUM(result) as hdc_result
-                FROM telemed_hdc
+                    SUM(opd) as hdc_opd,
+                    SUM(telemedicine) as hdc_result
+                FROM telemed_opd_hdc
                 WHERE b_year = '2569'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
@@ -72,9 +72,9 @@ export async function GET() {
             LEFT JOIN (
                 SELECT 
                     hospcode,
-                    SUM(target) as hdc_opd,
-                    SUM(result) as hdc_result
-                FROM telemed_hdc
+                    SUM(opd) as hdc_opd,
+                    SUM(telemedicine) as hdc_result
+                FROM telemed_opd_hdc
                 WHERE b_year = '2569'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
@@ -113,9 +113,9 @@ export async function GET() {
             LEFT JOIN (
                 SELECT 
                     hospcode,
-                    SUM(target) as hdc_opd,
-                    SUM(result) as hdc_result
-                FROM telemed_hdc
+                    SUM(opd) as hdc_opd,
+                    SUM(telemedicine) as hdc_result
+                FROM telemed_opd_hdc
                 WHERE b_year = '2569'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
@@ -143,15 +143,26 @@ export async function GET() {
         const hdcPcSummaryPercent = pc_hdc_opd > 0 ? (pc_hdc_res / pc_hdc_opd) * 100 : 0;
         const hisPcSummaryPercent = pc_his_opd > 0 ? (pc_his_res / pc_his_opd) * 100 : 0;
 
-        const [lastHdc]: any = await pool.query('SELECT hdc_update FROM telemed_hdc ORDER BY hdc_update DESC LIMIT 1');
-        const lastHdcUpdate = lastHdc[0]?.hdc_update || null;
+        const mapToNumber = (rows: any[]) => rows.map(r => ({
+            ...r,
+            his_tele: Number(r.his_tele) || 0,
+            hdc_tele: Number(r.hdc_tele) || 0,
+            current_total: Number(r.current_total) || 0,
+            total_all: Number(r.total_all) || 0,
+            performance_percent: Number(r.performance_percent) || 0,
+            his_percent: Number(r.his_percent) || 0,
+            target: Number(r.target) || 0,
+        }));
 
+        const [lastHdc]: any = await pool.query('SELECT hdc_update FROM telemed_opd_hdc ORDER BY hdc_update DESC LIMIT 1');
         const [lastHis]: any = await pool.query('SELECT d_update FROM visit_type_daily ORDER BY d_update DESC LIMIT 1');
+
+        const lastHdcUpdate = lastHdc[0]?.hdc_update || null;
         const lastHisUpdate = lastHis[0]?.d_update || null;
 
         return NextResponse.json({
-            hospitals,
-            primaryCare,
+            hospitals: mapToNumber(hospitals as any[]),
+            primaryCare: mapToNumber(primaryCare as any[]),
             lastHdcUpdate,
             lastHisUpdate,
             hospSummary: {

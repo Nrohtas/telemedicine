@@ -81,8 +81,8 @@ def main():
         )
         cursor = conn.cursor()
 
-        # Added 'target' column to the table earlier
-        insert_sql = """
+        # 1. Insert into telemed_hdc (Requested landing table)
+        insert_hdc_sql = """
             INSERT INTO telemed_hdc (id, hospcode, areacode, date_com, b_year, target, result, hdc_update, percent, d_update)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
             ON DUPLICATE KEY UPDATE 
@@ -95,6 +95,18 @@ def main():
                 d_update = NOW()
         """
 
+        # 2. Insert into telemed_opd_hdc (Dashboard table)
+        insert_opd_sql = """
+            INSERT INTO telemed_opd_hdc (id, hospcode, b_year, opd, telemedicine, percent, hdc_update, d_update)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+            ON DUPLICATE KEY UPDATE 
+                opd = VALUES(opd),
+                telemedicine = VALUES(telemedicine),
+                percent = VALUES(percent),
+                hdc_update = VALUES(hdc_update),
+                d_update = NOW()
+        """
+
         for item in filtered_data:
             try:
                 hospcode = item.get("hospcode")
@@ -102,15 +114,11 @@ def main():
                 if not hospcode or not b_year:
                     continue
 
-                # Use hospcode_byear as unique ID
                 record_id = f"{hospcode}_{b_year}"
-                
-                # Handle numeric parsing
                 target = int(item.get("target") or 0)
                 result = int(item.get("result") or 0)
                 percent = (result * 100 / target) if target > 0 else 0
                 
-                # Parse hdc_update from date_com (YYYYMMDDHHMM)
                 date_com = item.get("date_com", "")
                 hdc_update = None
                 if date_com and len(date_com) >= 8:
@@ -119,18 +127,14 @@ def main():
                     except:
                         pass
                 
-                val = (
-                    record_id,
-                    hospcode,
-                    item.get("areacode"),
-                    date_com,
-                    b_year,
-                    target,
-                    result,
-                    hdc_update,
-                    percent
-                )
-                cursor.execute(insert_sql, val)
+                # Insert into telemed_hdc
+                val_hdc = (record_id, hospcode, item.get("areacode"), date_com, b_year, target, result, hdc_update, percent)
+                cursor.execute(insert_hdc_sql, val_hdc)
+
+                # Insert into telemed_opd_hdc
+                val_opd = (record_id, hospcode, b_year, target, result, percent, hdc_update)
+                cursor.execute(insert_opd_sql, val_opd)
+
                 h_y += 1
             except Exception as e:
                 print(f"Failed to insert row {item.get('hospcode')}: {e}")

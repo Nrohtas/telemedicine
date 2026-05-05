@@ -11,8 +11,8 @@ export default async function OnepagePage() {
       COALESCE(SUM(vtd.visit_type_3), 0) AS visit_type_3,
       COALESCE(SUM(vtd.visit_type_5), 0) AS visit_type_5,
       MAX(vtd.visit_date) AS latest_date,
-      (SELECT COALESCE(SUM(target), 0) FROM telemed_hdc WHERE b_year = '2569') AS hdc_opd,
-      (SELECT COALESCE(SUM(result), 0) FROM telemed_hdc WHERE b_year = '2569') AS hdc_tele
+      (SELECT COALESCE(SUM(opd), 0) FROM telemed_opd_hdc WHERE b_year = '2569') AS hdc_opd,
+      (SELECT COALESCE(SUM(telemedicine), 0) FROM telemed_opd_hdc WHERE b_year = '2569') AS hdc_tele
     FROM visit_type_daily vtd
     WHERE vtd.visit_date BETWEEN '2026-03-23' AND CURDATE()
   `;
@@ -49,8 +49,8 @@ export default async function OnepagePage() {
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
-        SELECT hospcode, result
-        FROM telemed_hdc
+        SELECT hospcode, telemedicine AS result
+        FROM telemed_opd_hdc
         WHERE b_year = '2569'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       GROUP BY a.amp_code, a.amp_name
@@ -83,8 +83,8 @@ export default async function OnepagePage() {
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
-        SELECT hospcode, result, target AS opd
-        FROM telemed_hdc
+        SELECT hospcode, telemedicine AS result, opd
+        FROM telemed_opd_hdc
         WHERE b_year = '2569'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       WHERE h.status = '1' 
@@ -147,8 +147,8 @@ export default async function OnepagePage() {
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
-        SELECT hospcode, result, target AS opd
-        FROM telemed_hdc
+        SELECT hospcode, telemedicine AS result, opd
+        FROM telemed_opd_hdc
         WHERE b_year = '2569'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       WHERE h.status = '1' 
