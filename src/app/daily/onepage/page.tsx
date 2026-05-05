@@ -14,7 +14,7 @@ export default async function OnepagePage() {
       (SELECT COALESCE(SUM(opd), 0) FROM telemed_opd_hdc WHERE b_year = '2569') AS hdc_opd,
       (SELECT COALESCE(SUM(telemedicine), 0) FROM telemed_opd_hdc WHERE b_year = '2569') AS hdc_tele
     FROM visit_type_daily vtd
-    WHERE vtd.visit_date BETWEEN '2026-03-23' AND CURDATE()
+    WHERE vtd.visit_date BETWEEN '2026-01-01' AND CURDATE()
   `;
   try {
     const [overallRows]: any = await pool.query(overallQuery);
@@ -50,7 +50,7 @@ export default async function OnepagePage() {
       LEFT JOIN (
         SELECT hoscode, COALESCE(SUM(visit_type_5), 0) AS visit_type_5
         FROM visit_type_daily
-        WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
+        WHERE visit_date BETWEEN '2026-01-01' AND CURDATE()
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (

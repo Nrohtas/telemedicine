@@ -235,7 +235,7 @@ export default async function DailyPage({
     const platformTotalPercent = totals.platform_target > 0 ? (totals.platform_result / totals.platform_target) * 100 : 0;
     const totalPercent = totals.total > 0 ? (totals.visit_type_5 / totals.total) * 100 : 0;
     const hdcTotalPercent = totals.hdc_opd > 0 ? (totals.hdc_result / totals.hdc_opd) * 100 : 0;
-    const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ข้อมูลระหว่าง 23 มีนาคม 2569 - ${formatCurrentThaiDate()}`;
+    const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ข้อมูลระหว่าง 1 มกราคม 2569 - ${formatCurrentThaiDate()}`;
 
     const getSortUrl = (column: string) => {
       const nextOrder = sortBy === column && sortOrder === "ASC" ? "DESC" : "ASC";
