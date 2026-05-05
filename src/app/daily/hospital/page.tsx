@@ -411,7 +411,7 @@ export default async function DailyHospitalPage({
                         ผลงาน HDC
                         <div className="flex justify-center mt-1">
                           <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white/60 border border-emerald-200 text-emerald-900 shadow-sm">
-                            ( Telemedicine / OPD ) × 100
+                            ( Tele (5) / OPD (2,3,5) ) × 100
                           </span>
                         </div>
                       </th>
@@ -462,12 +462,12 @@ export default async function DailyHospitalPage({
                       </th>
                       <th className="border-l-2 border-emerald-300 bg-emerald-50/70 px-3 py-2 text-right text-emerald-950">
                         <Link href={getSortUrl("hdc_opd")} scroll={false} className="hover:text-emerald-950">
-                          OPD <SortIcon column="hdc_opd" />
+                          OPD (2,3,5) <SortIcon column="hdc_opd" />
                         </Link>
                       </th>
                       <th className="bg-emerald-50/70 px-3 py-2 text-right text-emerald-950">
                         <Link href={getSortUrl("hdc_result")} scroll={false} className="hover:text-emerald-950">
-                          Tele <SortIcon column="hdc_result" />
+                          Tele (5) <SortIcon column="hdc_result" />
                         </Link>
                       </th>
                       <th className="bg-emerald-50/70 px-3 py-2 text-center text-emerald-950">

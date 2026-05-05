@@ -412,12 +412,12 @@ export default async function DailyPage({
                     </th>
                     <th className="border-l-2 border-emerald-300 bg-emerald-50/70 px-2 py-2 text-right">
                       <Link href={getSortUrl("hdc_opd")} scroll={false} className="hover:text-emerald-700">
-                        OPD <SortIcon column="hdc_opd" />
+                        OPD (2,3,5) <SortIcon column="hdc_opd" />
                       </Link>
                     </th>
                     <th className="bg-emerald-50/70 px-2 py-2 text-right">
                       <Link href={getSortUrl("hdc_result")} scroll={false} className="hover:text-emerald-700">
-                        Tele <SortIcon column="hdc_result" />
+                        Tele (5) <SortIcon column="hdc_result" />
                       </Link>
                     </th>
                     <th className="bg-emerald-50/70 px-2 py-2 text-center">
