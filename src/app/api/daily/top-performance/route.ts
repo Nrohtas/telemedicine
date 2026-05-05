@@ -154,8 +154,8 @@ export async function GET() {
             target: Number(r.target) || 0,
         }));
 
-        const [lastHdc]: any = await pool.query('SELECT hdc_update FROM telemed_opd_hdc ORDER BY hdc_update DESC LIMIT 1');
-        const [lastHis]: any = await pool.query('SELECT d_update FROM visit_type_daily ORDER BY d_update DESC LIMIT 1');
+        const [lastHdc]: any = await pool.query("SELECT DATE_FORMAT(MAX(hdc_update), '%Y-%m-%d') as hdc_update FROM telemed_opd_hdc");
+        const [lastHis]: any = await pool.query("SELECT DATE_FORMAT(MAX(d_update), '%Y-%m-%d %H:%i:%s') as d_update FROM visit_type_daily");
 
         const lastHdcUpdate = lastHdc[0]?.hdc_update || null;
         const lastHisUpdate = lastHis[0]?.d_update || null;

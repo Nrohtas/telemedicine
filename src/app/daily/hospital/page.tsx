@@ -202,7 +202,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
 
 async function getHdcLatestUpdate(): Promise<string | null> {
   try {
-    const [rows]: any = await pool.query('SELECT MAX(hdc_update) as last_update FROM telemed_opd_hdc');
+    const [rows]: any = await pool.query("SELECT DATE_FORMAT(MAX(hdc_update), '%Y-%m-%d') as last_update FROM telemed_opd_hdc");
     return rows[0]?.last_update || null;
   } catch (err) {
     console.error('Error fetching HDC latest update:', err);

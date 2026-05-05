@@ -53,6 +53,11 @@ const TopPerformance = () => {
         const fetchPerformance = async () => {
             try {
                 const res = await fetch('/telemedicine/api/daily/top-performance', { cache: 'no-store' });
+                if (!res.ok) {
+                    console.error('Fetch error:', res.status, res.statusText);
+                    throw new Error(`Fetch failed: ${res.status}`);
+                }
+
 
                 if (!res.ok) throw new Error('Fetch failed');
                 const result = await res.json();
