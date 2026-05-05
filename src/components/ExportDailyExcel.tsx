@@ -41,6 +41,7 @@ const ExportDailyExcel = ({ data }: ExportDailyExcelProps) => {
             'OPD (HDC)': row.hdc_opd,
             'Tele (HDC)': row.hdc_result,
             '% (HDC)': Number(row.hdc_percent.toFixed(2)),
+            'HDC - PLATFORM': row.hdc_result - row.platform_result,
             'HDC - HIS': row.hdc_result - row.total
         }));
 

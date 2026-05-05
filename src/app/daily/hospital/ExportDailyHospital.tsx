@@ -47,7 +47,8 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
       "OPD (2,3,5) (HDC)": row.hdc_opd,
       "Tele (5) (HDC)": row.hdc_result,
       "ร้อยละ (HDC)": parseFloat(row.hdc_percent.toFixed(2)),
-      "ผลต่าง (HDC-HIS)": row.hdc_result - row.total,
+      "HDC - PLATFORM": row.hdc_result - row.platform_result,
+      "HDC - HIS": row.hdc_result - row.total,
       "อำเภอ": row.amp_name
     }));
 
@@ -93,7 +94,8 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
       "OPD (2,3,5) (HDC)": totals.hdc_opd,
       "Tele (5) (HDC)": totals.hdc_result,
       "ร้อยละ (HDC)": parseFloat(totalPercentHDC.toFixed(2)),
-      "ผลต่าง (HDC-HIS)": totals.hdc_result - totals.total,
+      "HDC - PLATFORM": totals.hdc_result - totals.platform_result,
+      "HDC - HIS": totals.hdc_result - totals.total,
       "อำเภอ": ""
     });
 
