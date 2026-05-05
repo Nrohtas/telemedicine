@@ -75,6 +75,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
     "hdc_percent",
     "diff_platform_his",
     "diff_hdc_his",
+    "diff_hdc_platform",
   ];
   const finalSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "hospcode";
   const finalSortOrder = sortOrder.toUpperCase() === "DESC" ? "DESC" : "ASC";
@@ -200,6 +201,16 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
   }
 }
 
+async function getPlatformLatestUpdate(): Promise<string | null> {
+  try {
+    const [rows]: any = await pool.query("SELECT DATE_FORMAT(MAX(file_time), '%Y-%m-%d %H:%i:%s') as last_update FROM fileupload WHERE file_platform = 'moph_buddycare'");
+    return rows[0]?.last_update || null;
+  } catch (err) {
+    console.error('Error fetching Platform latest update:', err);
+    return null;
+  }
+}
+
 async function getHdcLatestUpdate(): Promise<string | null> {
   try {
     const [rows]: any = await pool.query("SELECT DATE_FORMAT(MAX(hdc_update), '%Y-%m-%d') as last_update FROM telemed_opd_hdc");
@@ -223,6 +234,7 @@ export default async function DailyHospitalPage({
 
     const rows = ampCode ? await getDailyHospitalRows(ampCode, sortBy, sortOrder) : [];
     const hdcLastUpdate = await getHdcLatestUpdate();
+    const platformLastUpdate = await getPlatformLatestUpdate();
     const hisLastUpdate = rows[0]?.latest_date || null;
     const districtName = rows[0]?.amp_name ?? "-";
     const totals = rows.reduce<DailyHospitalTotals>(
@@ -311,25 +323,48 @@ export default async function DailyHospitalPage({
             <div className="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-xl shadow-slate-900/5">
               <div className="border-b border-slate-100 bg-white px-5 py-3">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <p className="text-sm font-bold text-emerald-800 md:text-base">
+                  <p className="text-sm font-bold text-emerald-800 md:text-base" suppressHydrationWarning>
                     {reportPeriodLabel}
                   </p>
                   <div className="flex items-center gap-4 ml-auto">
                     <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 shadow-sm">
                       <span className="text-[10px] font-black text-blue-800 uppercase tracking-widest whitespace-nowrap">HIS UPDATE :</span>
-                      <span className="text-[11px] font-black text-blue-600 whitespace-nowrap uppercase">
+                      <span className="text-[11px] font-black text-blue-600 whitespace-nowrap uppercase" suppressHydrationWarning>
                         {hisLastUpdate ? new Date(hisLastUpdate).toLocaleDateString('th-TH', {
+                          timeZone: 'Asia/Bangkok',
                           day: 'numeric',
                           month: 'short',
                           year: 'numeric',
                           calendar: 'buddhist'
                         } as any) + ' ' + new Date(hisLastUpdate).toLocaleTimeString('th-TH', {
+                          timeZone: 'Asia/Bangkok',
                           hour: '2-digit',
                           minute: '2-digit',
                           hour12: false
                         }) + ' น.' : '-'}
                       </span>
                     </div>
+                    {platformLastUpdate && (
+                      <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100 shadow-sm">
+                        <span className="text-[10px] font-black text-indigo-800 uppercase tracking-widest whitespace-nowrap">ที่มา :</span>
+                        <span className="text-[11px] font-black text-indigo-600 whitespace-nowrap">กองสนับสนุนระบบสุขภาพปฐมภูมิ</span>
+                        <span className="w-1 h-1 rounded-full bg-indigo-300"></span>
+                        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-tighter whitespace-nowrap" suppressHydrationWarning>
+                          Update : {new Date(platformLastUpdate).toLocaleDateString('th-TH', {
+                            timeZone: 'Asia/Bangkok',
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            calendar: 'buddhist'
+                          } as any)} {new Date(platformLastUpdate).toLocaleTimeString('th-TH', {
+                            timeZone: 'Asia/Bangkok',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                          })} น.
+                        </span>
+                      </div>
+                    )}
                     {hdcLastUpdate && (
                       <a
                         href="https://app.powerbi.com/view?r=eyJrIjoiYjE4NGNjNzItYmM2ZS00MjFmLTlmNDEtOWQ1M2JiODk4N2M0IiwidCI6ImI3NmEyM2QzLThjZGYtNDNjMC1hNTNiLTYwYmNkMjM3OTg5NSIsImMiOjEwfQ%3D%3D"
@@ -340,8 +375,9 @@ export default async function DailyHospitalPage({
                         <span className="text-[10px] font-black text-emerald-800 uppercase tracking-widest whitespace-nowrap">ที่มา :</span>
                         <span className="text-[11px] font-black text-emerald-600 whitespace-nowrap group-hover:text-emerald-800 transition-colors">HDC Update</span>
                         <span className="w-1 h-1 rounded-full bg-emerald-300"></span>
-                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-tighter whitespace-nowrap">
+                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-tighter whitespace-nowrap" suppressHydrationWarning>
                           {new Date(hdcLastUpdate).toLocaleDateString('th-TH', {
+                            timeZone: 'Asia/Bangkok',
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric',
