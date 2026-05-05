@@ -94,10 +94,10 @@ export async function GET() {
         `);
 
         const hospSummary = hospSummaryRows[0] || { hdc_result: 0, hdc_opd: 0, total_visit_5: 0, total_all: 0 };
-        const hdc_res = Number(hospSummary.hdc_result);
-        const hdc_opd = Number(hospSummary.hdc_opd);
-        const his_res = Number(hospSummary.total_visit_5);
-        const his_opd = Number(hospSummary.total_all);
+        const hdc_res = Number(hospSummary.hdc_result || 0);
+        const hdc_opd = Number(hospSummary.hdc_opd || 0);
+        const his_res = Number(hospSummary.total_visit_5 || 0);
+        const his_opd = Number(hospSummary.total_all || 0);
 
         const hdcSummaryPercent = hdc_opd > 0 ? (hdc_res / hdc_opd) * 100 : 0;
         const hisSummaryPercent = his_opd > 0 ? (his_res / his_opd) * 100 : 0;
@@ -135,10 +135,10 @@ export async function GET() {
         `);
 
         const pcSummary = pcSummaryRows[0] || { hdc_result: 0, hdc_opd: 0, total_visit_5: 0, total_all: 0 };
-        const pc_hdc_res = Number(pcSummary.hdc_result);
-        const pc_hdc_opd = Number(pcSummary.hdc_opd);
-        const pc_his_res = Number(pcSummary.total_visit_5);
-        const pc_his_opd = Number(pcSummary.total_all);
+        const pc_hdc_res = Number(pcSummary.hdc_result || 0);
+        const pc_hdc_opd = Number(pcSummary.hdc_opd || 0);
+        const pc_his_res = Number(pcSummary.total_visit_5 || 0);
+        const pc_his_opd = Number(pcSummary.total_all || 0);
 
         const hdcPcSummaryPercent = pc_hdc_opd > 0 ? (pc_hdc_res / pc_hdc_opd) * 100 : 0;
         const hisPcSummaryPercent = pc_his_opd > 0 ? (pc_his_res / pc_his_opd) * 100 : 0;
