@@ -4,6 +4,7 @@ import pool from "@/lib/db";
 import LastUpdate from "@/components/LastUpdate";
 import Link from "next/link";
 import TopPerformance from "@/components/TopPerformance";
+import ExportDailyExcel from "@/components/ExportDailyExcel";
 
 export const dynamic = "force-dynamic";
 
@@ -255,6 +256,7 @@ export default async function DailyPage({
                 </svg>
                 Onepage
               </Link>
+              <ExportDailyExcel data={rows} />
             </div>
           </div>
 
