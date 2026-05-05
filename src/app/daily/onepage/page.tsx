@@ -159,7 +159,7 @@ export default async function OnepagePage() {
     `;
     const [subhRows]: any = await pool.query(subhQuery);
     const subhSafeRows = subhRows || [];
-    
+
     const subhTotals = subhSafeRows.reduce((acc: any, r: any) => {
       acc.type5 += Number(r.v5) || 0;
       acc.total235 += (Number(r.v2) + Number(r.v3) + Number(r.v5));
@@ -169,7 +169,7 @@ export default async function OnepagePage() {
     }, { type5: 0, total235: 0, hdc_tele: 0, hdc_opd: 0 });
     const subhPercentType5 = subhTotals.total235 > 0 ? (subhTotals.type5 * 100 / subhTotals.total235) : 0;
     const subhHdcPercent = (subhTotals.hdc_opd + subhTotals.hdc_tele) > 0 ? (subhTotals.hdc_tele * 100 / (subhTotals.hdc_opd + subhTotals.hdc_tele)) : 0;
-    
+
     // Final aggregate for subhTotals to pass to component
     const subhTotalsFinal = {
       ...subhTotals,
@@ -188,17 +188,17 @@ export default async function OnepagePage() {
         { name: 'ส่งต่อ (3)', value: type3, fill: '#FCA5A5' },
         { name: 'แพทย์ทางไกล (5)', value: type5, fill: '#93C5FD' },
       ],
-      totals: { 
-        type5, 
-        total235, 
+      totals: {
+        type5,
+        total235,
         percentType5,
         hdc_opd: Number(overall.hdc_opd) || 0,
         hdc_tele: Number(overall.hdc_tele) || 0,
         hdc_percent: (Number(overall.hdc_opd) + Number(overall.hdc_tele)) > 0 ? (Number(overall.hdc_tele) / (Number(overall.hdc_opd) + Number(overall.hdc_tele))) * 100 : 0
       },
-      hTotals: { 
-        type5: hTotals.type5, 
-        total235: hTotals.total235, 
+      hTotals: {
+        type5: hTotals.type5,
+        total235: hTotals.total235,
         percentType5: hPercentType5,
         hdc_tele: hTotals.hdc_tele,
         hdc_opd: hTotals.hdc_opd,

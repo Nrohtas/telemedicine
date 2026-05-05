@@ -344,27 +344,6 @@ export default async function DailyHospitalPage({
                         }) + ' น.' : '-'}
                       </span>
                     </div>
-                    {platformLastUpdate && (
-                      <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100 shadow-sm">
-                        <span className="text-[10px] font-black text-indigo-800 uppercase tracking-widest whitespace-nowrap">ที่มา :</span>
-                        <span className="text-[11px] font-black text-indigo-600 whitespace-nowrap">กองสนับสนุนระบบสุขภาพปฐมภูมิ</span>
-                        <span className="w-1 h-1 rounded-full bg-indigo-300"></span>
-                        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-tighter whitespace-nowrap" suppressHydrationWarning>
-                          Update : {new Date(platformLastUpdate).toLocaleDateString('th-TH', {
-                            timeZone: 'Asia/Bangkok',
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            calendar: 'buddhist'
-                          } as any)} {new Date(platformLastUpdate).toLocaleTimeString('th-TH', {
-                            timeZone: 'Asia/Bangkok',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false
-                          })} น.
-                        </span>
-                      </div>
-                    )}
                     {hdcLastUpdate && (
                       <a
                         href="https://app.powerbi.com/view?r=eyJrIjoiYjE4NGNjNzItYmM2ZS00MjFmLTlmNDEtOWQ1M2JiODk4N2M0IiwidCI6ImI3NmEyM2QzLThjZGYtNDNjMC1hNTNiLTYwYmNkMjM3OTg5NSIsImMiOjEwfQ%3D%3D"

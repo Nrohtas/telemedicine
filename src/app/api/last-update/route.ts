@@ -10,7 +10,7 @@ export async function GET(request: Request) {
         if (type === 'daily') {
             query = `SELECT d_update as file_time FROM visit_type_daily ORDER BY d_update DESC LIMIT 1`;
         } else {
-            query = `SELECT file_time FROM fileupload ORDER BY file_time DESC LIMIT 1`;
+            query = `SELECT MAX(result_date) as file_time FROM telemed`;
         }
         
         const [rows]: any = await pool.query(query);
