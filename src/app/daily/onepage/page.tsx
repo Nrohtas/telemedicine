@@ -26,13 +26,18 @@ export default async function OnepagePage() {
     const percentType5 = total235 > 0 ? (type5 / total235) * 100 : 0;
     const latestDate = overall.latest_date;
 
+    // Query for latest update from telemed
+    const [lastUpdateRows]: any = await pool.query("SELECT MAX(result_date) as last_update FROM telemed");
+    const lastUpdateDate = lastUpdateRows[0]?.last_update;
+
     // Format date (Real Date)
-    const formattedDate = new Date().toLocaleDateString("th-TH", {
+    const formattedDate = lastUpdateDate ? new Date(lastUpdateDate).toLocaleDateString("th-TH", {
       timeZone: "Asia/Bangkok",
       day: "numeric",
       month: "short",
       year: "numeric",
-    });
+      calendar: 'buddhist'
+    } as any) : "-";
 
     // Query 2: District data (HDC vs Dashboard)
     const districtQuery = `
