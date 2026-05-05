@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { formatThaiDate } from "@/utils/date";
+import { formatThaiDate, formatThaiDateOnly } from "@/utils/date";
 
 interface LastUpdateProps {
     showLogo?: boolean;
@@ -69,7 +69,7 @@ export default function LastUpdate({ showLogo = true, type, sourceLink, sourceLa
                             </a>
                         </span>
                     )}
-                    Update : {formatThaiDate(lastUpdate)}
+                    Update : {type === 'daily' ? formatThaiDate(lastUpdate) : formatThaiDateOnly(lastUpdate)}
                 </span>
             </div>
         </div>

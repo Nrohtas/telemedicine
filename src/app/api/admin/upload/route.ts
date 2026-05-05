@@ -86,26 +86,42 @@ export async function POST(request: NextRequest) {
             importedCount = hdcValues.length;
 
         } else {
-            // Processing for Telemedicine (telemed table - Existing logic)
+            // Helper to find key by partial match
+            const findKeyInRow = (row: any, keywords: string[]) => {
+                return Object.keys(row).find(k =>
+                    keywords.some(kw => k.trim().replace(/\s+/g, ' ').includes(kw))
+                );
+            };
+
             const filteredData = rawData.filter(row => {
-                const province = String(row['จังหวัด'] || '').trim();
-                return province === 'พิษณุโลก';
+                const provinceKey = findKeyInRow(row, ['จังหวัด', 'province', 'provname']);
+                if (!provinceKey) return false;
+                const province = String(row[provinceKey] || '').trim();
+                return province === 'พิษณุโลก' || province.includes('พิษณุโลก');
             });
 
             if (filteredData.length === 0) {
-                return NextResponse.json({ error: 'No data found for พิษณุโลก' }, { status: 400 });
+                // If no "จังหวัด" column found or no matches, check if we should just skip filtering 
+                // if the file is known to be only for Phitsanulok
+                console.log("No data found for พิษณุโลก. Row keys:", Object.keys(rawData[0]));
+                return NextResponse.json({ error: 'ไม่พบข้อมูลจังหวัดพิษณุโลกในไฟล์ หรือ ชื่อคอลัมน์จังหวัดไม่ถูกต้อง' }, { status: 400 });
             }
 
             const aggregatedData: Record<string, any> = {};
 
             filteredData.forEach(row => {
-                const rawHospcode = String(row['รหัส 5 หลัก'] || row['รหัส'] || row['หน่วยบริการ'] || row['hospcode'] || '');
-                if (!rawHospcode || rawHospcode === 'undefined') return;
+                const hospcodeKey = findKeyInRow(row, ['รหัส 5 หลัก', 'รหัส', 'หน่วยบริการ', 'hospcode']);
+                const byearKey = findKeyInRow(row, ['ปีงบประมาณ', 'b_year']);
+                const platformKey = findKeyInRow(row, ['แพลตฟอร์ม', 'platform']);
+                const countKey = findKeyInRow(row, ['จำนวนนัด Telemed', 'จำนวน', 'count']);
+
+                const rawHospcode = String(row[hospcodeKey || ''] || '');
+                if (!rawHospcode || rawHospcode === 'undefined' || rawHospcode.includes('รวม')) return;
 
                 const hospcode = rawHospcode.padStart(5, '0');
-                const b_year = String(row['ปีงบประมาณ'] || row['b_year'] || '');
-                const platform = String(row['แพลตฟอร์ม'] || '').trim();
-                const count = parseInt(row['จำนวนนัด Telemed'] || row['จำนวน'] || '0') || 0;
+                const b_year = String(row[byearKey || ''] || '');
+                const platform = String(row[platformKey || ''] || '').trim().toLowerCase();
+                const count = parseInt(row[countKey || ''] || '0') || 0;
 
                 const id = `${hospcode}_${b_year}`;
 
@@ -113,9 +129,9 @@ export async function POST(request: NextRequest) {
                     aggregatedData[id] = { id, hospcode, b_year, moph: 0, buddycare: 0 };
                 }
 
-                if (platform === 'หมอพร้อม station' || platform === 'หมอพร้อม') {
+                if (platform.includes('หมอพร้อม') || platform.includes('moph')) {
                     aggregatedData[id].moph += count;
-                } else if (platform === 'สอน.บัดดี้' || platform === 'สอน.บัดดี') {
+                } else if (platform.includes('บัดดี้') || platform.includes('buddy')) {
                     aggregatedData[id].buddycare += count;
                 }
             });
@@ -124,9 +140,9 @@ export async function POST(request: NextRequest) {
                 INSERT INTO telemed (id, hospcode, b_year, moph, buddycare, result, moph_date, buddycare_date, result_date)
                 VALUES ?
                 ON DUPLICATE KEY UPDATE
-                    moph_compare = VALUES(moph) - moph,
-                    buddycare_compare = VALUES(buddycare) - buddycare,
-                    result_compare = VALUES(result) - result,
+                    moph_compare = CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) - moph ELSE 0 END,
+                    buddycare_compare = CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) - buddycare ELSE 0 END,
+                    result_compare = (CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) ELSE moph END + CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) ELSE buddycare END) - result,
                     percentage = CASE WHEN result > 0 THEN ((VALUES(result) - result) / result) * 100 ELSE 0 END,
                     moph_past = moph,
                     moph_past_date = moph_date,
@@ -135,11 +151,11 @@ export async function POST(request: NextRequest) {
                     result_past = result,
                     result_past_date = result_date,
                     b_year = VALUES(b_year),
-                    moph = VALUES(moph),
-                    buddycare = VALUES(buddycare),
-                    result = VALUES(result),
-                    moph_date = VALUES(moph_date),
-                    buddycare_date = VALUES(buddycare_date),
+                    moph = CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) ELSE moph END,
+                    buddycare = CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) ELSE buddycare END,
+                    result = (CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) ELSE moph END) + (CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) ELSE buddycare END),
+                    moph_date = CASE WHEN VALUES(moph) > 0 THEN VALUES(moph_date) ELSE moph_date END,
+                    buddycare_date = CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare_date) ELSE buddycare_date END,
                     result_date = VALUES(result_date)
             `;
 
