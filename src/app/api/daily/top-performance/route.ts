@@ -44,9 +44,9 @@ export async function GET() {
             LEFT JOIN (
                 SELECT 
                     hospcode,
-                    SUM(opd) as hdc_opd,
-                    SUM(telemedicine) as hdc_result
-                FROM telemed_opd_hdc
+                    SUM(target) as hdc_opd,
+                    SUM(result) as hdc_result
+                FROM telemed_hdc
                 WHERE b_year = '2569'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
@@ -72,9 +72,9 @@ export async function GET() {
             LEFT JOIN (
                 SELECT 
                     hospcode,
-                    SUM(opd) as hdc_opd,
-                    SUM(telemedicine) as hdc_result
-                FROM telemed_opd_hdc
+                    SUM(target) as hdc_opd,
+                    SUM(result) as hdc_result
+                FROM telemed_hdc
                 WHERE b_year = '2569'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
@@ -113,9 +113,9 @@ export async function GET() {
             LEFT JOIN (
                 SELECT 
                     hospcode,
-                    SUM(opd) as hdc_opd,
-                    SUM(telemedicine) as hdc_result
-                FROM telemed_opd_hdc
+                    SUM(target) as hdc_opd,
+                    SUM(result) as hdc_result
+                FROM telemed_hdc
                 WHERE b_year = '2569'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
@@ -143,7 +143,7 @@ export async function GET() {
         const hdcPcSummaryPercent = pc_hdc_opd > 0 ? (pc_hdc_res / pc_hdc_opd) * 100 : 0;
         const hisPcSummaryPercent = pc_his_opd > 0 ? (pc_his_res / pc_his_opd) * 100 : 0;
 
-        const [lastHdc]: any = await pool.query('SELECT hdc_update FROM telemed_opd_hdc ORDER BY hdc_update DESC LIMIT 1');
+        const [lastHdc]: any = await pool.query('SELECT hdc_update FROM telemed_hdc ORDER BY hdc_update DESC LIMIT 1');
         const lastHdcUpdate = lastHdc[0]?.hdc_update || null;
 
         const [lastHis]: any = await pool.query('SELECT d_update FROM visit_type_daily ORDER BY d_update DESC LIMIT 1');

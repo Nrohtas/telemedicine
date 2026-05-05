@@ -83,13 +83,15 @@ def main():
 
         # Added 'target' column to the table earlier
         insert_sql = """
-            INSERT INTO telemed_hdc (id, hospcode, areacode, date_com, b_year, target, result, d_update)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+            INSERT INTO telemed_hdc (id, hospcode, areacode, date_com, b_year, target, result, hdc_update, percent, d_update)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
             ON DUPLICATE KEY UPDATE 
                 areacode = VALUES(areacode),
                 date_com = VALUES(date_com),
                 target = VALUES(target),
                 result = VALUES(result),
+                hdc_update = VALUES(hdc_update),
+                percent = VALUES(percent),
                 d_update = NOW()
         """
 
@@ -106,15 +108,27 @@ def main():
                 # Handle numeric parsing
                 target = int(item.get("target") or 0)
                 result = int(item.get("result") or 0)
+                percent = (result * 100 / target) if target > 0 else 0
+                
+                # Parse hdc_update from date_com (YYYYMMDDHHMM)
+                date_com = item.get("date_com", "")
+                hdc_update = None
+                if date_com and len(date_com) >= 8:
+                    try:
+                        hdc_update = f"{date_com[:4]}-{date_com[4:6]}-{date_com[6:8]}"
+                    except:
+                        pass
                 
                 val = (
                     record_id,
                     hospcode,
                     item.get("areacode"),
-                    item.get("date_com"),
+                    date_com,
                     b_year,
                     target,
-                    result
+                    result,
+                    hdc_update,
+                    percent
                 )
                 cursor.execute(insert_sql, val)
                 h_y += 1

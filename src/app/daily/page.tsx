@@ -106,11 +106,11 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
           ) * 100
         ELSE 0
       END AS percent,
-      COALESCE(SUM(hdc.opd), 0) AS hdc_opd,
-      COALESCE(SUM(hdc.telemedicine), 0) AS hdc_result,
+      COALESCE(SUM(hdc.target), 0) AS hdc_opd,
+      COALESCE(SUM(hdc.result), 0) AS hdc_result,
       CASE
-        WHEN COALESCE(SUM(hdc.opd), 0) > 0
-        THEN COALESCE(SUM(hdc.telemedicine), 0) / COALESCE(SUM(hdc.opd), 0) * 100
+        WHEN COALESCE(SUM(hdc.target), 0) > 0
+        THEN COALESCE(SUM(hdc.result), 0) / COALESCE(SUM(hdc.target), 0) * 100
         ELSE 0
       END AS hdc_percent,
       COALESCE(SUM(vtd.visit_type_5), 0) - COALESCE(SUM(p.result), 0) AS diff_platform_his,
@@ -149,7 +149,7 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
       WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
       GROUP BY hoscode
     ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
-    LEFT JOIN telemed_opd_hdc hdc
+    LEFT JOIN telemed_hdc hdc
       ON hdc.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       AND hdc.b_year = '2569'
     GROUP BY a.amp_code, a.amp_name, latest.latest_date, latest_t.latest_time
@@ -185,7 +185,7 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
 
 async function getHdcLatestUpdate(): Promise<string | null> {
   try {
-    const [rows]: any = await pool.query('SELECT MAX(hdc_update) as last_update FROM telemed_opd_hdc');
+    const [rows]: any = await pool.query('SELECT MAX(hdc_update) as last_update FROM telemed_hdc');
     return rows[0]?.last_update || null;
   } catch (err) {
     console.error('Error fetching HDC latest update:', err);

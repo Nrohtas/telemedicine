@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         let importedCount = 0;
 
         if (type === 'HDC') {
-            // Processing for HDC (telemed_opd_hdc table)
+            // Processing for HDC (telemed_hdc table)
             const targetBYear = date ? (new Date(date).getFullYear() + 543).toString() : '2569';
 
             const hdcValues = rawData.map((row, index) => {
@@ -72,11 +72,11 @@ export async function POST(request: NextRequest) {
             }
 
             const hdcQuery = `
-                INSERT INTO telemed_opd_hdc (id, hospcode, b_year, opd, telemedicine, percent, hdc_update, d_update)
+                INSERT INTO telemed_hdc (id, hospcode, b_year, target, result, percent, hdc_update, d_update)
                 VALUES ?
                 ON DUPLICATE KEY UPDATE
-                    opd = VALUES(opd),
-                    telemedicine = VALUES(telemedicine),
+                    target = VALUES(target),
+                    result = VALUES(result),
                     percent = VALUES(percent),
                     hdc_update = VALUES(hdc_update),
                     d_update = VALUES(d_update)
