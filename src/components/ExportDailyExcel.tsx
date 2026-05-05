@@ -51,7 +51,7 @@ const ExportDailyExcel = ({ data }: ExportDailyExcelProps) => {
         // Generate filename with current date and time
         const now = new Date();
         const dateStr = now.toISOString().split('T')[0];
-        const timeStr = now.getHours().toString().padStart(2, '0') + '-' + 
+        const timeStr = now.getHours().toString().padStart(2, '0') + 
                        now.getMinutes().toString().padStart(2, '0');
         XLSX.writeFile(wb, `Telemedicine_Daily_Summary_${dateStr}_${timeStr}.xlsx`);
     };
