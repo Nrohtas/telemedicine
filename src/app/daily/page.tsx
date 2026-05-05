@@ -114,7 +114,7 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
         ELSE 0
       END AS hdc_percent,
       COALESCE(SUM(vtd.visit_type_5), 0) - COALESCE(SUM(p.result), 0) AS diff_platform_his,
-      COALESCE(SUM(hdc.telemedicine), 0) - COALESCE(SUM(vtd.visit_type_5), 0) AS diff_hdc_his,
+      COALESCE(SUM(hdc.result), 0) - COALESCE(SUM(vtd.visit_type_5), 0) AS diff_hdc_his,
       latest.latest_date,
       latest_t.latest_time
     FROM ampur a

@@ -122,7 +122,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
         ELSE 0
       END AS hdc_percent,
       COALESCE(vtd.visit_type_5, 0) - COALESCE(p.result, 0) AS diff_platform_his,
-      COALESCE(hdc.telemedicine, 0) - COALESCE(vtd.visit_type_5, 0) AS diff_hdc_his,
+      COALESCE(hdc.result, 0) - COALESCE(vtd.visit_type_5, 0) AS diff_hdc_his,
       latest.latest_date,
       latest_t.latest_time,
       ht.hostype_name,
