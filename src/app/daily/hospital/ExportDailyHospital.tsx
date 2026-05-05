@@ -17,6 +17,9 @@ interface DailyHospitalRow {
   visit_type_5: number;
   total: number;
   percent: number;
+  hdc_opd: number;
+  hdc_result: number;
+  hdc_percent: number;
   diff_platform_his: number;
 }
 
@@ -33,15 +36,18 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
       "ชื่อหน่วยบริการ": row.hospname,
       "สังกัด": row.hostype_name || '-',
       "ประเภท": row.hostype_level || '-',
-      "เป้าหมาย (1)": Math.round(row.platform_target),
-      "ผลงาน Platform (1)": row.platform_result,
-      "ร้อยละ (1)": parseFloat(row.platform_percent.toFixed(2)),
-      "มาตามนัด (2)": row.visit_type_2,
-      "รับส่งต่อ (3)": row.visit_type_3,
-      "แพทย์ทางไกล (5)": row.visit_type_5,
-      "รวม 2+3+5": row.total,
-      "ร้อยละ (5/รวม)": parseFloat(row.percent.toFixed(2)),
-      "ผลต่าง (HIS-Platform)": row.diff_platform_his,
+      "เป้าหมาย (Platform)": Math.round(row.platform_target),
+      "ผลงาน Platform": row.platform_result,
+      "ร้อยละ (Platform)": parseFloat(row.platform_percent.toFixed(2)),
+      "มาตามนัด (2) (HIS)": row.visit_type_2,
+      "รับส่งต่อ (3) (HIS)": row.visit_type_3,
+      "Tele (5) (HIS)": row.visit_type_5,
+      "รวม 2+3+5 (HIS)": row.total,
+      "ร้อยละ (HIS)": parseFloat(row.percent.toFixed(2)),
+      "OPD (2,3,5) (HDC)": row.hdc_opd,
+      "Tele (5) (HDC)": row.hdc_result,
+      "ร้อยละ (HDC)": parseFloat(row.hdc_percent.toFixed(2)),
+      "ผลต่าง (HDC-HIS)": row.hdc_result - row.total,
       "อำเภอ": row.amp_name
     }));
 
@@ -53,7 +59,8 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
       visit_type_3: acc.visit_type_3 + curr.visit_type_3,
       visit_type_5: acc.visit_type_5 + curr.visit_type_5,
       total: acc.total + curr.total,
-      diff_platform_his: acc.diff_platform_his + curr.diff_platform_his,
+      hdc_opd: acc.hdc_opd + curr.hdc_opd,
+      hdc_result: acc.hdc_result + curr.hdc_result,
     }), {
       platform_target: 0,
       platform_result: 0,
@@ -61,11 +68,13 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
       visit_type_3: 0,
       visit_type_5: 0,
       total: 0,
-      diff_platform_his: 0
+      hdc_opd: 0,
+      hdc_result: 0
     });
 
     const totalPercentPlatform = totals.platform_target > 0 ? (totals.platform_result / totals.platform_target * 100) : 0;
     const totalPercentHIS = totals.total > 0 ? (totals.visit_type_5 / totals.total * 100) : 0;
+    const totalPercentHDC = totals.hdc_opd > 0 ? (totals.hdc_result / totals.hdc_opd * 100) : 0;
 
     exportRows.push({
       "ลำดับ": null as any,
@@ -73,15 +82,18 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
       "ชื่อหน่วยบริการ": "รวมทั้งหมด",
       "สังกัด": "",
       "ประเภท": "",
-      "เป้าหมาย (1)": Math.round(totals.platform_target),
-      "ผลงาน Platform (1)": totals.platform_result,
-      "ร้อยละ (1)": parseFloat(totalPercentPlatform.toFixed(2)),
-      "มาตามนัด (2)": totals.visit_type_2,
-      "รับส่งต่อ (3)": totals.visit_type_3,
-      "แพทย์ทางไกล (5)": totals.visit_type_5,
-      "รวม 2+3+5": totals.total,
-      "ร้อยละ (5/รวม)": parseFloat(totalPercentHIS.toFixed(2)),
-      "ผลต่าง (HIS-Platform)": totals.diff_platform_his,
+      "เป้าหมาย (Platform)": Math.round(totals.platform_target),
+      "ผลงาน Platform": totals.platform_result,
+      "ร้อยละ (Platform)": parseFloat(totalPercentPlatform.toFixed(2)),
+      "มาตามนัด (2) (HIS)": totals.visit_type_2,
+      "รับส่งต่อ (3) (HIS)": totals.visit_type_3,
+      "Tele (5) (HIS)": totals.visit_type_5,
+      "รวม 2+3+5 (HIS)": totals.total,
+      "ร้อยละ (HIS)": parseFloat(totalPercentHIS.toFixed(2)),
+      "OPD (2,3,5) (HDC)": totals.hdc_opd,
+      "Tele (5) (HDC)": totals.hdc_result,
+      "ร้อยละ (HDC)": parseFloat(totalPercentHDC.toFixed(2)),
+      "ผลต่าง (HDC-HIS)": totals.hdc_result - totals.total,
       "อำเภอ": ""
     });
 
@@ -91,7 +103,9 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
 
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0];
-    const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/:/g, '-');
+    const timeStr = now.getHours().toString().padStart(2, '0') + 
+                   now.getMinutes().toString().padStart(2, '0');
+    
     writeFileXLSX(wb, `Daily_Telemedicine_อ_${districtName}_${dateStr}_${timeStr}.xlsx`);
   };
 
