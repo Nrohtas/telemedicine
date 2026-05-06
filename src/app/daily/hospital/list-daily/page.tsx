@@ -165,123 +165,152 @@ export default async function DailyHospitalListPage({
   };
 
   return (
-    <main className="min-h-screen bg-background pb-12">
+    <main className="min-h-screen bg-slate-50 pb-12">
       <Navbar showFilters={false} />
 
-      <section className="px-4 md:px-6 mt-4 md:mt-8">
-        <div className="mx-auto max-w-7xl space-y-6">
-          <div className="rounded-[2rem] border border-amber-100 bg-white/90 p-6 shadow-2xl shadow-amber-900/5 md:p-8">
-            <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-              <div>
-                <Link
-                  href={hospital ? `/daily/hospital?amp_code=${encodeURIComponent(hospital.amp_code)}` : "/daily"}
-                  className="inline-flex items-center rounded-full bg-slate-100 px-4 py-2 text-xs font-black text-slate-600 hover:bg-slate-200"
-                >
-                  กลับหน้ารายโรงพยาบาล
-                </Link>
-                <p className="mt-5 text-xs font-black uppercase tracking-[0.35em] text-amber-600">
-                  Daily Service List
-                </p>
-                <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 md:text-5xl">
-                  {hospital?.hospname ?? "ข้อมูลรายวันของหน่วยบริการ"}
-                </h1>
-                <p className="mt-2 text-sm font-bold text-slate-500">
-                  {hospital ? `${hospital.hospcode} | อ.${hospital.amp_name}` : hospcode || "-"}
-                </p>
-              </div>
+      <section className="px-3 md:px-6 mt-2 md:mt-3">
+        <div className="max-w-[1400px] mx-auto space-y-4">
+          
+          {/* Header Card */}
+          <div className="rounded-3xl border border-indigo-100 bg-white p-6 shadow-xl shadow-indigo-900/5 md:p-8 relative overflow-hidden group">
+             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full -mr-32 -mt-32 blur-3xl opacity-60" />
+             
+             <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Link
+                      href={hospital ? `/daily/hospital?amp_code=${encodeURIComponent(hospital.amp_code)}` : "/daily"}
+                      className="group/btn inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-xs font-black text-slate-600 hover:bg-indigo-600 hover:text-white transition-all duration-300"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                      </svg>
+                      ย้อนกลับ
+                    </Link>
+                    <span className="h-1 w-1 rounded-full bg-slate-300" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500">Daily Activity Log</span>
+                  </div>
+                  
+                  <h1 className="text-3xl font-black tracking-tight text-indigo-950 md:text-4xl leading-tight">
+                    {hospital?.hospname ?? "ข้อมูลรายวัน"}
+                  </h1>
+                  
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="px-3 py-1 rounded-lg bg-indigo-50 border border-indigo-100 text-[11px] font-black text-indigo-700">
+                      CODE: {hospital?.hospcode || hospcode}
+                    </div>
+                    <div className="px-3 py-1 rounded-lg bg-emerald-50 border border-emerald-100 text-[11px] font-black text-emerald-700">
+                      อ.{hospital?.amp_name || "-"}
+                    </div>
+                    <div className="px-3 py-1 rounded-lg bg-slate-100 border border-slate-200 text-[11px] font-black text-slate-600">
+                      ข้อมูลย้อนหลัง {rows.length} วัน
+                    </div>
+                  </div>
+                </div>
 
-              <div className="rounded-2xl border border-amber-100 bg-amber-50/80 px-5 py-4 text-right">
-                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-600">
-                  จำนวนวันที่มีข้อมูล
-                </p>
-                <p className="mt-1 text-xl font-black text-amber-900">
-                  {numberFormat.format(rows.length)} วัน
-                </p>
-              </div>
-            </div>
+                <div className="flex flex-col sm:flex-row gap-4">
+                   <StatItem label="รวมบริการ (2+3+5)" value={totals.total} color="slate" />
+                   <StatItem label="แพทย์ทางไกล (5)" value={totals.visit_type_5} color="indigo" />
+                   <StatItem label="สัดส่วนเฉลี่ย" value={`${percentFormat.format(totalPercent)}%`} color="emerald" isPercent />
+                </div>
+             </div>
           </div>
 
-          <div className="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-xl shadow-slate-900/5">
+          {/* Table Section */}
+          <div className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white shadow-2xl shadow-slate-900/5">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-100">
-                <thead className="bg-slate-50">
-                  <tr className="text-left text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
-                    <th className="px-5 py-4">
-                      <Link href={getSortUrl("visit_date")} className="hover:text-amber-600">
-                        วันที่ <SortIcon column="visit_date" />
+              <table className="w-full min-w-[1000px] divide-y divide-slate-100">
+                <thead className="bg-slate-50/80 backdrop-blur-sm sticky top-0 z-20">
+                  <tr className="text-center text-[11px] font-black uppercase tracking-widest text-slate-500 border-b border-slate-200">
+                    <th className="px-6 py-5 text-left bg-slate-100/50" rowSpan={2}>
+                      <Link href={getSortUrl("visit_date")} className="hover:text-indigo-600 flex items-center gap-1">
+                        วันที่รับบริการ <SortIcon column="visit_date" />
                       </Link>
                     </th>
-                    <th className="px-5 py-4 text-right">
-                      <Link href={getSortUrl("visit_type_2")} className="hover:text-amber-600">
-                        มาตามนัด(2) <SortIcon column="visit_type_2" />
+                    <th className="px-6 py-4 border-l border-slate-200 bg-indigo-50/30 text-indigo-800" colSpan={4}>
+                      จำนวนผู้รับบริการ (แยกประเภท)
+                    </th>
+                    <th className="px-6 py-4 border-l border-slate-200 bg-emerald-50/30 text-emerald-800" rowSpan={2}>
+                       <Link href={getSortUrl("percent")} className="hover:text-emerald-600 flex items-center justify-center gap-1">
+                        สัดส่วน % <SortIcon column="percent" />
                       </Link>
                     </th>
-                    <th className="px-5 py-4 text-right">
-                      <Link href={getSortUrl("visit_type_3")} className="hover:text-amber-600">
-                        รับส่งต่อ(3) <SortIcon column="visit_type_3" />
-                      </Link>
-                    </th>
-                    <th className="px-5 py-4 text-right">
-                      <Link href={getSortUrl("visit_type_5")} className="hover:text-amber-600">
-                        แพทย์ทางไกล(5) <SortIcon column="visit_type_5" />
-                      </Link>
-                    </th>
-                    <th className="px-5 py-4 text-right">
-                      <Link href={getSortUrl("total")} className="hover:text-amber-600">
-                        2+3+5 <SortIcon column="total" />
-                      </Link>
-                    </th>
-                    <th className="px-5 py-4 text-right">
-                      <Link href={getSortUrl("percent")} className="hover:text-amber-600">
-                        Percent <SortIcon column="percent" />
-                      </Link>
-                    </th>
-                    <th className="px-5 py-4 text-right">
-                      <Link href={getSortUrl("d_update")} className="hover:text-amber-600">
-                        อัปเดต <SortIcon column="d_update" />
+                    <th className="px-6 py-4 border-l border-slate-200 bg-slate-100/50 text-slate-600" rowSpan={2}>
+                      <Link href={getSortUrl("d_update")} className="hover:text-slate-900 flex items-center justify-end gap-1">
+                        บันทึกล่าสุด <SortIcon column="d_update" />
                       </Link>
                     </th>
                   </tr>
+                  <tr className="text-[10px] font-black uppercase tracking-tighter text-slate-400 bg-white/50">
+                    <th className="px-4 py-3 border-l border-slate-100 text-right">
+                       <Link href={getSortUrl("visit_type_2")} className="hover:text-indigo-600">มาตามนัด(2) <SortIcon column="visit_type_2" /></Link>
+                    </th>
+                    <th className="px-4 py-3 text-right">
+                       <Link href={getSortUrl("visit_type_3")} className="hover:text-indigo-600">รับส่งต่อ(3) <SortIcon column="visit_type_3" /></Link>
+                    </th>
+                    <th className="px-4 py-3 text-right text-indigo-700">
+                       <Link href={getSortUrl("visit_type_5")} className="hover:text-indigo-900">แพทย์ทางไกล(5) <SortIcon column="visit_type_5" /></Link>
+                    </th>
+                    <th className="px-4 py-3 text-right bg-indigo-50/20 text-slate-600">
+                       <Link href={getSortUrl("total")} className="hover:text-indigo-600">รวม 2+3+5 <SortIcon column="total" /></Link>
+                    </th>
+                  </tr>
                 </thead>
+                
                 <tbody className="divide-y divide-slate-100">
                   {rows.map((row) => (
-                    <tr key={row.visit_date} className="hover:bg-amber-50/40">
-                      <td className="whitespace-nowrap px-5 py-4 font-black text-slate-900">
-                        {formatThaiDate(row.visit_date)}
+                    <tr key={row.visit_date} className="group hover:bg-indigo-50/30 transition-colors duration-200">
+                      <td className="whitespace-nowrap px-6 py-4 font-black text-slate-900">
+                        <div className="flex flex-col">
+                           <span className="text-sm">{formatThaiDate(row.visit_date)}</span>
+                           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{new Date(row.visit_date).toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                        </div>
                       </td>
                       <NumberCell value={row.visit_type_2} />
                       <NumberCell value={row.visit_type_3} />
-                      <NumberCell value={row.visit_type_5} />
-                      <NumberCell value={row.total} strong />
-                      <td className="whitespace-nowrap px-5 py-4 text-right">
-                        <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-black text-slate-700">
+                      <td className="whitespace-nowrap px-4 py-4 text-right">
+                         <span className="inline-flex justify-center rounded-full font-black ring-1 min-w-[60px] text-[13px] px-3 py-1 bg-indigo-50 ring-indigo-200 text-indigo-700 group-hover:bg-indigo-100 group-hover:ring-indigo-300 transition-all">
+                            {numberFormat.format(row.visit_type_5)}
+                         </span>
+                      </td>
+                      <NumberCell value={row.total} strong className="bg-indigo-50/10" />
+                      <td className="whitespace-nowrap px-6 py-4 text-center">
+                        <span className={`rounded-full px-3 py-1 font-black ring-1 text-[12px] ${row.percent > 0 ? 'bg-emerald-50 ring-emerald-200 text-emerald-700' : 'bg-slate-50 ring-slate-100 text-slate-400'}`}>
                           {percentFormat.format(row.percent)}%
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-right text-[11px] font-bold text-slate-400 tabular-nums">
+                      <td className="whitespace-nowrap px-6 py-4 text-right text-[11px] font-bold text-slate-400 tabular-nums">
                         {formatThaiDateTime(row.d_update)}
                       </td>
                     </tr>
                   ))}
                   {rows.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-5 py-12 text-center font-bold text-slate-400">
-                        ไม่พบข้อมูลรายวันของหน่วยบริการนี้
+                      <td colSpan={7} className="px-6 py-20 text-center">
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-300">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                          </div>
+                          <p className="font-black text-slate-400 uppercase tracking-widest text-sm">ไม่พบข้อมูลรับบริการ</p>
+                        </div>
                       </td>
                     </tr>
                   )}
                 </tbody>
-                <tfoot className="bg-slate-950 text-white">
-                  <tr>
-                    <td className="px-5 py-4 font-black">รวม</td>
-                    <NumberCell value={totals.visit_type_2} footer />
-                    <NumberCell value={totals.visit_type_3} footer />
-                    <NumberCell value={totals.visit_type_5} footer />
-                    <NumberCell value={totals.total} footer />
-                    <td className="px-5 py-4 text-right font-black">{percentFormat.format(totalPercent)}%</td>
-                    <td className="px-5 py-4" />
-                  </tr>
-                </tfoot>
+
+                {rows.length > 0 && (
+                  <tfoot className="sticky bottom-0 z-10 bg-white border-t-2 border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] font-black">
+                    <tr>
+                      <td className="px-6 py-5 text-left text-[13px] uppercase tracking-widest bg-slate-50 text-slate-600">ยอดรวมทั้งหมด</td>
+                      <td className="px-4 py-5 text-right bg-indigo-50/20 text-indigo-600 text-[13px]">{numberFormat.format(totals.visit_type_2)}</td>
+                      <td className="px-4 py-5 text-right bg-indigo-50/20 text-indigo-600 text-[13px]">{numberFormat.format(totals.visit_type_3)}</td>
+                      <td className="px-4 py-5 text-right bg-indigo-50/50 text-indigo-900 text-[15px] underline decoration-indigo-400/30 underline-offset-8 decoration-4">{numberFormat.format(totals.visit_type_5)}</td>
+                      <td className="px-4 py-5 text-right bg-slate-50/50 text-slate-900 text-[13px]">{numberFormat.format(totals.total)}</td>
+                      <td className="px-6 py-5 text-center bg-emerald-50/50 text-emerald-700 text-base">{percentFormat.format(totalPercent)}%</td>
+                      <td className="px-6 py-5 bg-slate-50/50" />
+                    </tr>
+                  </tfoot>
+                )}
               </table>
             </div>
           </div>
@@ -293,18 +322,39 @@ export default async function DailyHospitalListPage({
   );
 }
 
+function StatItem({ label, value, color, isPercent = false }: { label: string; value: string | number; color: string; isPercent?: boolean }) {
+  const colors: Record<string, string> = {
+    indigo: "text-indigo-900 bg-indigo-50 border-indigo-100",
+    emerald: "text-emerald-900 bg-emerald-50 border-emerald-100",
+    slate: "text-slate-900 bg-slate-50 border-slate-100",
+  };
+  
+  const labelColors: Record<string, string> = {
+    indigo: "text-indigo-500",
+    emerald: "text-emerald-600",
+    slate: "text-slate-500",
+  };
+
+  return (
+    <div className={`flex flex-col items-end px-6 py-4 rounded-3xl border shadow-sm min-w-[160px] ${colors[color]}`}>
+      <span className={`text-[10px] font-black uppercase tracking-widest mb-1 ${labelColors[color]}`}>{label}</span>
+      <span className={`text-2xl font-black tabular-nums ${isPercent ? "text-3xl" : ""}`}>{value}</span>
+    </div>
+  );
+}
+
 function NumberCell({
   value,
   strong = false,
-  footer = false,
+  className = "",
 }: {
   value: number;
   strong?: boolean;
-  footer?: boolean;
+  className?: string;
 }) {
-  const className = footer
-    ? "px-5 py-4 text-right font-black"
-    : `whitespace-nowrap px-5 py-4 text-right ${strong ? "font-black text-slate-950" : "font-bold text-slate-700"}`;
-
-  return <td className={className}>{numberFormat.format(value)}</td>;
+  return (
+    <td className={`whitespace-nowrap px-4 py-4 text-right text-[13px] ${strong ? "font-black text-slate-950" : "font-bold text-slate-600"} ${className}`}>
+      {numberFormat.format(value)}
+    </td>
+  );
 }
