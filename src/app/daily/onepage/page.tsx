@@ -10,13 +10,13 @@ export default async function OnepagePage() {
       COALESCE(SUM(vtd.visit_type_2), 0) AS visit_type_2,
       COALESCE(SUM(vtd.visit_type_3), 0) AS visit_type_3,
       COALESCE(SUM(vtd.visit_type_5), 0) AS visit_type_5,
-      MAX(vtd.visit_date) AS latest_date,
       (SELECT COALESCE(SUM(opd), 0) FROM telemed_opd_hdc WHERE b_year = '2569') AS hdc_opd,
-      (SELECT COALESCE(SUM(telemedicine), 0) FROM telemed_opd_hdc WHERE b_year = '2569') AS hdc_tele
+      (SELECT COALESCE(SUM(telemedicine), 0) FROM telemed_opd_hdc WHERE b_year = '2569') AS hdc_tele,
+      (SELECT MAX(d_update) FROM visit_type_daily) AS last_update
     FROM visit_type_daily vtd
     WHERE vtd.visit_date BETWEEN '2026-01-01' AND CURDATE()
   `;
-  try {
+    try {
     const [overallRows]: any = await pool.query(overallQuery);
     const overall = (overallRows && overallRows[0]) || {};
     const type2 = Number(overall.visit_type_2) || 0;
@@ -24,20 +24,15 @@ export default async function OnepagePage() {
     const type5 = Number(overall.visit_type_5) || 0;
     const total235 = type2 + type3 + type5;
     const percentType5 = total235 > 0 ? (type5 / total235) * 100 : 0;
-    const latestDate = overall.latest_date;
 
-    // Query for latest update from telemed
-    const [lastUpdateRows]: any = await pool.query("SELECT MAX(result_date) as last_update FROM telemed");
-    const lastUpdateDate = lastUpdateRows[0]?.last_update;
-
-    // Format date (Real Date)
-    const formattedDate = lastUpdateDate ? new Date(lastUpdateDate).toLocaleDateString("th-TH", {
+    // Format date (Current Date)
+    const formattedDate = new Date().toLocaleDateString("th-TH", {
       timeZone: "Asia/Bangkok",
       day: "numeric",
       month: "short",
       year: "numeric",
       calendar: 'buddhist'
-    } as any) : "-";
+    } as any);
 
     // Query 2: District data (HDC vs Dashboard)
     const districtQuery = `

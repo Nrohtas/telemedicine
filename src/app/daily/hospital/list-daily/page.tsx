@@ -35,6 +35,26 @@ const percentFormat = new Intl.NumberFormat("th-TH", {
   maximumFractionDigits: 2,
 });
 
+function formatThaiDateTime(value: string | null) {
+  if (!value) return "-";
+
+  const date = new Date(value);
+  const dateStr = date.toLocaleDateString("th-TH", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    calendar: 'buddhist'
+  } as any);
+
+  const timeStr = date.toLocaleTimeString("th-TH", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+
+  return `${dateStr} ${timeStr} น.`;
+}
+
 function formatThaiDate(value: string | null) {
   if (!value) return "-";
 
@@ -42,7 +62,8 @@ function formatThaiDate(value: string | null) {
     day: "numeric",
     month: "short",
     year: "numeric",
-  });
+    calendar: 'buddhist'
+  } as any);
 }
 
 async function getHospitalInfo(hospcode: string): Promise<HospitalInfo | null> {
@@ -237,8 +258,8 @@ export default async function DailyHospitalListPage({
                           {percentFormat.format(row.percent)}%
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-right text-sm font-bold text-slate-400">
-                        {formatThaiDate(row.d_update)}
+                      <td className="whitespace-nowrap px-5 py-4 text-right text-[11px] font-bold text-slate-400 tabular-nums">
+                        {formatThaiDateTime(row.d_update)}
                       </td>
                     </tr>
                   ))}

@@ -55,7 +55,8 @@ function formatThaiDate(value: string | null) {
     day: "numeric",
     month: "long",
     year: "numeric",
-  });
+    calendar: 'buddhist'
+  } as any);
 }
 
 async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode", sortOrder: string = "ASC"): Promise<DailyHospitalRow[]> {

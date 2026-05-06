@@ -50,7 +50,8 @@ function formatCurrentThaiDate() {
     day: "numeric",
     month: "long",
     year: "numeric",
-  });
+    calendar: 'buddhist'
+  } as any);
 }
 
 async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: string = "ASC"): Promise<DailyDistrictRow[]> {
