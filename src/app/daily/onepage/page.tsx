@@ -68,7 +68,7 @@ export default async function OnepagePage() {
       dashboard: Number(r.hdc_visit_type_5) || 0,
       hdc: Number(r.dashboard_result) || 0,
       hdc_opd: Number(r.hdc_opd) || 0,
-    })).sort((a, b) => {
+    })).sort((a: any, b: any) => {
       const aPct = a.hdc_opd > 0 ? (a.hdc / a.hdc_opd) : 0;
       const bPct = b.hdc_opd > 0 ? (b.hdc / b.hdc_opd) : 0;
       return bPct - aPct;
@@ -123,7 +123,7 @@ export default async function OnepagePage() {
         ratio: ratio,
         hdc_opd: Number(r.hdc_opd) || 0,
       };
-    }).sort((a, b) => {
+    }).sort((a: any, b: any) => {
       const aPct = a.hdc_opd > 0 ? (a.hdc / a.hdc_opd) : 0;
       const bPct = b.hdc_opd > 0 ? (b.hdc / b.hdc_opd) : 0;
       return bPct - aPct;
