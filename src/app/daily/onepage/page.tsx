@@ -44,7 +44,8 @@ export default async function OnepagePage() {
       SELECT
         a.amp_name,
         COALESCE(SUM(vtd.visit_type_5), 0) AS hdc_visit_type_5,
-        COALESCE(SUM(p.result), 0) AS dashboard_result
+        COALESCE(SUM(p.result), 0) AS dashboard_result,
+        COALESCE(SUM(p.opd), 0) AS hdc_opd
       FROM ampur a
       LEFT JOIN hospital h ON h.amp_code = a.amp_code COLLATE utf8mb4_general_ci AND h.status = '1'
       LEFT JOIN (
@@ -54,7 +55,7 @@ export default async function OnepagePage() {
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
-        SELECT hospcode, telemedicine AS result
+        SELECT hospcode, telemedicine AS result, opd
         FROM telemed_opd_hdc
         WHERE b_year = '2569'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
@@ -66,7 +67,12 @@ export default async function OnepagePage() {
       name: 'อ.' + (r.amp_name || 'ไม่ระบุ'),
       dashboard: Number(r.hdc_visit_type_5) || 0,
       hdc: Number(r.dashboard_result) || 0,
-    }));
+      hdc_opd: Number(r.hdc_opd) || 0,
+    })).sort((a, b) => {
+      const aPct = a.hdc_opd > 0 ? (a.hdc / a.hdc_opd) : 0;
+      const bPct = b.hdc_opd > 0 ? (b.hdc / b.hdc_opd) : 0;
+      return bPct - aPct;
+    });
 
     // Query 3: Hospital data (Filtered for hostype_new = 5, 7)
     const hospitalQuery = `
@@ -117,6 +123,10 @@ export default async function OnepagePage() {
         ratio: ratio,
         hdc_opd: Number(r.hdc_opd) || 0,
       };
+    }).sort((a, b) => {
+      const aPct = a.hdc_opd > 0 ? (a.hdc / a.hdc_opd) : 0;
+      const bPct = b.hdc_opd > 0 ? (b.hdc / b.hdc_opd) : 0;
+      return bPct - aPct;
     });
 
     const hTotals = hospitalData.reduce((acc: any, r: any) => {
@@ -160,7 +170,8 @@ export default async function OnepagePage() {
         AND ht.hostype_new IN (8, 18, 21)
         AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข' COLLATE utf8mb4_general_ci
       GROUP BY h.hospcode, h.hospname, a.amp_name
-      ORDER BY v5 DESC, dashboard_result DESC
+      ORDER BY dashboard_result DESC, v5 DESC
+
     `;
     const [subhRows]: any = await pool.query(subhQuery);
     const subhSafeRows = subhRows || [];
@@ -186,6 +197,7 @@ export default async function OnepagePage() {
       name: (r.hospname || '').replace('โรงพยาบาลส่งเสริมสุขภาพตำบล', 'รพ.สต.') + ' (' + (r.amp_name || 'ไม่ระบุ') + ')',
       dashboard: Number(r.v5) || 0,
       hdc: Number(r.dashboard_result) || 0,
+      hdc_opd: Number(r.hdc_opd) || 0,
     }));
     const data = {
       pie: [

@@ -157,7 +157,7 @@ const TopImprovers = ({ source }: TopImproversProps = {}) => {
             <div className="absolute bottom-0 left-0 w-72 h-72 bg-teal-50/30 rounded-full -ml-36 -mb-36 blur-3xl pointer-events-none" />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
-                {renderList(data.primaryCare, "10 อันดับ รพ.สต./ศูนย์สุขภาพ", "ความก้าวหน้าผลงานสูงสุด")}
+                {renderList(data.primaryCare, "10 อันดับ หน่วยบริการปฐมภูมิ", "ความก้าวหน้าผลงานสูงสุด")}
                 {renderList(data.hospitals, "โรงพยาบาล", "ความก้าวหน้าผลงานสูงสุด")}
             </div>
 

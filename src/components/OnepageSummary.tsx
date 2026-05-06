@@ -432,23 +432,87 @@ export default function OnepageSummary({ data }: { data: any }) {
         {/* District Chart */}
         <motion.div variants={itemVariants}>
           <SoftCard className="p-6 h-full">
-            <div className="flex items-start justify-between mb-8 px-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 px-2 gap-4">
               <div className="flex items-center gap-6">
-                <h3 className="text-lg font-black text-indigo-950 flex items-center gap-2">
-                  <div className="w-1.5 h-6 bg-purple-600 rounded-full" />
+                <h3 className="text-lg md:text-xl font-black text-indigo-950 flex items-center gap-3">
+                  <div className="w-2 h-7 bg-purple-600 rounded-full" />
                   ผลงานรายอำเภอ
                 </h3>
-                {/* Spacer to match Hospital header height/gauge */}
-                <div className="w-36 h-20 hidden md:block" />
               </div>
-              <div className="flex gap-4 pt-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-violet-600" />
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">HIS</span>
+
+              <div className="flex items-center gap-4">
+                {/* District Overall Gauge */}
+                <div className="flex items-center gap-1">
+                  <div className="w-24 h-16 relative flex items-center justify-center">
+                    <svg viewBox="0 0 100 60" className="w-full">
+                      <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#f5f3ff" strokeWidth="16" strokeLinecap="round" />
+                      <motion.path
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: (districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) / (districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) + districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) || 1)) }}
+                        transition={{ duration: 2, ease: "circOut" }}
+                        d="M 10 50 A 40 40 0 0 1 90 50"
+                        fill="none"
+                        stroke="#7C3AED"
+                        strokeWidth="16"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center pt-4">
+                      <span className="text-base font-black text-violet-600 tabular-nums">
+                        {formatPercent((districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) / (districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) + districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) || 1)) * 100)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-black text-violet-500 uppercase tracking-widest leading-none mb-1">HIS</span>
+                    <span className="text-sm font-black text-violet-900 tabular-nums leading-none">
+                      {districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0).toLocaleString()}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">HDC</span>
+
+                {/* District Diff Badge */}
+                {(() => {
+                  const totalHis = districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0);
+                  const totalHdc = districtData.reduce((acc: number, d: any) => acc + d.hdc, 0);
+                  const diff = totalHdc - totalHis;
+                  return (
+                    <div className={`w-8 h-8 rounded-full border flex flex-col items-center justify-center shrink-0 shadow-sm ${diff >= 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-rose-50 border-rose-100 text-rose-700'}`}>
+                      <span className="text-[5px] font-black uppercase tracking-tighter leading-none mb-0.5 opacity-70">Diff</span>
+                      <span className="text-[8px] font-black tabular-nums leading-none">
+                        {diff > 0 ? '+' : ''}{diff.toLocaleString()}
+                      </span>
+                    </div>
+                  );
+                })()}
+
+                <div className="flex items-center gap-1">
+                  <div className="w-24 h-16 relative flex items-center justify-center">
+                    <svg viewBox="0 0 100 60" className="w-full">
+                      <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#ecfdf5" strokeWidth="16" strokeLinecap="round" />
+                      <motion.path
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: (districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) / (districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) + districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) || 1)) }}
+                        transition={{ duration: 2, ease: "circOut" }}
+                        d="M 10 50 A 40 40 0 0 1 90 50"
+                        fill="none"
+                        stroke="#10B981"
+                        strokeWidth="16"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center pt-4">
+                      <span className="text-base font-black text-emerald-600 tabular-nums">
+                        {formatPercent((districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) / (districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) + districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) || 1)) * 100)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest leading-none mb-1">HDC</span>
+                    <span className="text-sm font-black text-emerald-600 tabular-nums leading-none">
+                      {districtData.reduce((acc: number, d: any) => acc + d.hdc, 0).toLocaleString()}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -458,7 +522,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                 <BarChart
                   data={districtData}
                   layout="vertical"
-                  margin={{ top: 5, right: 60, left: 0, bottom: 5 }}
+                  margin={{ top: 5, right: 110, left: 0, bottom: 5 }}
                   barGap={2}
                 >
                   <XAxis type="number" hide />
@@ -466,30 +530,41 @@ export default function OnepageSummary({ data }: { data: any }) {
                     dataKey="name"
                     type="category"
                     width={100}
-                    tick={{ fontSize: 12, fill: '#64748b', fontWeight: 800 }}
+                    tick={{ fontSize: 11, fill: '#64748b', fontWeight: 800 }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
-                  <Bar dataKey="dashboard" name="HIS" fill={COLORS.dashboard} barSize={14} radius={[0, 10, 10, 0]}>
+                  <Bar dataKey="dashboard" name="HIS" fill={COLORS.dashboard} barSize={12} radius={[0, 10, 10, 0]}>
                     <LabelList dataKey="dashboard" content={(props: any) => {
                       const { x, y, width, height, value } = props;
                       if (value === 0) return null;
                       return (
-                        <text x={x + width + 5} y={y + height / 2 + 5} fill="#4B5563" fontSize={12} fontWeight="bold" textAnchor="start">
+                        <text x={x + width + 5} y={y + height / 2 + 4} fill="#4B5563" fontSize={11} fontWeight="black" textAnchor="start">
                           {Number(value).toLocaleString()}
                         </text>
                       );
                     }} />
                   </Bar>
-                  <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={14} radius={[0, 10, 10, 0]}>
+                  <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={12} radius={[0, 10, 10, 0]}>
                     <LabelList dataKey="hdc" content={(props: any) => {
-                      const { x, y, width, height, value } = props;
-                      if (value === 0) return null;
+                      const { x, y, width, height, value, index } = props;
+                      const item = districtData[index];
+                      if (!item || value === 0) return null;
+                      const hdcPercent = item.hdc_opd > 0 ? (item.hdc / item.hdc_opd) * 100 : 0;
+                      const hdcPercentText = `(${formatPercent(hdcPercent)})`;
+
+                      const valueStr = Number(value).toLocaleString();
+                      const offset = valueStr.length * 7 + 8;
                       return (
-                        <text x={x + width + 5} y={y + height / 2 + 5} fill="#4B5563" fontSize={12} fontWeight="bold" textAnchor="start">
-                          {Number(value).toLocaleString()}
-                        </text>
+                        <g>
+                          <text x={x + width + 5} y={y + height / 2 + 4} fill="#059669" fontSize={11} fontWeight="black" textAnchor="start">
+                            {valueStr}
+                          </text>
+                          <text x={x + width + offset} y={y + height / 2 + 4} fill="#10B981" fontSize={9} fontWeight={900} textAnchor="start" className="tabular-nums">
+                            {hdcPercentText}
+                          </text>
+                        </g>
                       );
                     }} />
                   </Bar>
@@ -534,18 +609,16 @@ export default function OnepageSummary({ data }: { data: any }) {
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-none mb-1">HIS</span>
-                      <span className="text-base font-black text-indigo-900 tabular-nums leading-none">{(hTotals?.type5 || 0).toLocaleString()}</span>
+                      <span className="text-base font-black text-indigo-600 tabular-nums leading-none">{(hTotals?.type5 || 0).toLocaleString()}</span>
                     </div>
                   </div>
 
                   {/* Diff Total Badge */}
-                  <div className={`w-7 h-7 rounded-full border flex flex-col items-center justify-center shrink-0 shadow-sm ${((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
-                    ((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
-                      'bg-slate-50 border-slate-100 text-slate-500'
-                    }`}>
-                    <span className="text-[4px] font-black uppercase tracking-tighter leading-none mb-0.5 opacity-70">Diff</span>
+                  <div className={`w-8 h-8 rounded-full border flex flex-col items-center justify-center shrink-0 shadow-sm ${(hTotals.hdc_tele - hTotals.type5) >= 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-rose-50 border-rose-100 text-rose-700'}`}>
+                    <span className="text-[5px] font-black uppercase tracking-tighter leading-none mb-0.5 opacity-70">Diff</span>
                     <span className="text-[9px] font-black tabular-nums leading-none">
-                      {((hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)) > 0 ? `+${(hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)}` : (hTotals?.hdc_tele || 0) - (hTotals?.type5 || 0)}
+                      {(hTotals.hdc_tele - hTotals.type5) > 0 ? '+' : ''}
+                      {(hTotals.hdc_tele - hTotals.type5).toLocaleString()}
                     </span>
                   </div>
 
@@ -573,7 +646,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">HDC</span>
-                      <span className="text-base font-black text-emerald-900 tabular-nums leading-none">{(hTotals?.hdc_tele || 0).toLocaleString()}</span>
+                      <span className="text-base font-black text-emerald-600 tabular-nums leading-none">{(hTotals?.hdc_tele || 0).toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -602,42 +675,35 @@ export default function OnepageSummary({ data }: { data: any }) {
                     <LabelList
                       dataKey="dashboard"
                       content={(props: any) => {
-                        const { x, y, width, height, value, index } = props;
-                        const item = hospitalData[index];
-                        if (!item) return null;
-                        const diff = (item.hdc || 0) - (item.dashboard || 0);
-                        const diffText = diff > 0 ? `(+${diff.toLocaleString()})` : diff < 0 ? `(${diff.toLocaleString()})` : '';
-                        const diffColor = diff > 0 ? '#10b981' : diff < 0 ? '#ef4444' : '#94a3b8';
-
-                        const valueStr = Number(value).toLocaleString();
-                        // Smaller font for mobile
-                        const valueFontSize = 12;
-                        const diffFontSize = 10;
-                        const offset = valueStr.length * 8 + 10;
-
+                        const { x, y, width, height, value } = props;
+                        if (value === 0) return null;
                         return (
-                          <g>
-                            <text x={x + width + 5} y={y + height / 2 + 5} fill="#4B5563" fontSize={valueFontSize} fontWeight="black" textAnchor="start">
-                              {valueStr}
-                            </text>
-                            {diff !== 0 && (
-                              <text x={x + width + offset} y={y + height / 2 + 5} fill={diffColor} fontSize={diffFontSize} fontWeight={900} textAnchor="start" className="tabular-nums">
-                                {diffText}
-                              </text>
-                            )}
-                          </g>
+                          <text x={x + width + 5} y={y + height / 2 + 5} fill="#4B5563" fontSize={11} fontWeight="black" textAnchor="start">
+                            {Number(value).toLocaleString()}
+                          </text>
                         );
                       }}
                     />
                   </Bar>
                   <Bar dataKey="hdc" name="HDC" fill={COLORS.hdc} barSize={10} radius={[0, 10, 10, 0]}>
                     <LabelList dataKey="hdc" content={(props: any) => {
-                      const { x, y, width, height, value } = props;
-                      if (value === 0) return null;
+                      const { x, y, width, height, value, index } = props;
+                      const item = hospitalData[index];
+                      if (!item || value === 0) return null;
+                      const hdcPercent = item.hdc_opd > 0 ? (item.hdc / item.hdc_opd) * 100 : 0;
+                      const hdcPercentText = `(${formatPercent(hdcPercent)})`;
+
+                      const valueStr = Number(value).toLocaleString();
+                      const offset = valueStr.length * 7 + 8;
                       return (
-                        <text x={x + width + 5} y={y + height / 2 + 5} fill="#4B5563" fontSize={12} fontWeight="bold" textAnchor="start">
-                          {Number(value).toLocaleString()}
-                        </text>
+                        <g>
+                          <text x={x + width + 5} y={y + height / 2 + 5} fill="#059669" fontSize={11} fontWeight="black" textAnchor="start">
+                            {valueStr}
+                          </text>
+                          <text x={x + width + offset} y={y + height / 2 + 5} fill="#10B981" fontSize={9} fontWeight={900} textAnchor="start" className="tabular-nums">
+                            {hdcPercentText}
+                          </text>
+                        </g>
                       );
                     }} />
                   </Bar>
@@ -661,7 +727,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                     <polyline points="17 6 23 6 23 12" />
                   </svg>
                 </div>
-                10 อันดับหน่วยบริการ
+                10 อันดับหน่วยบริการปฐมภูมิ (แพทย์ทางไกล)
               </h3>
               <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-1 ml-11">ความก้าวหน้าผลงานสูงสุด</p>
             </div>
@@ -690,11 +756,18 @@ export default function OnepageSummary({ data }: { data: any }) {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[11px] font-black text-indigo-500 uppercase tracking-widest leading-none mb-1">HIS</span>
-                  <span className="text-xs font-black text-indigo-900/60 leading-none">{(subhTotals?.type5 || 0).toLocaleString()}</span>
+                  <span className="text-xs font-black text-indigo-600 leading-none">{(subhTotals?.type5 || 0).toLocaleString()}</span>
                 </div>
               </div>
 
-              <div className="w-[1px] h-8 bg-slate-100" />
+              {/* Diff Total Badge */}
+              <div className={`w-8 h-8 rounded-full border flex flex-col items-center justify-center shrink-0 shadow-sm ${(subhTotals.hdc_tele - subhTotals.type5) >= 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-rose-50 border-rose-100 text-rose-700'}`}>
+                <span className="text-[5px] font-black uppercase tracking-tighter leading-none mb-0.5 opacity-70">Diff</span>
+                <span className="text-[9px] font-black tabular-nums leading-none">
+                  {(subhTotals.hdc_tele - subhTotals.type5) > 0 ? '+' : ''}
+                  {(subhTotals.hdc_tele - subhTotals.type5).toLocaleString()}
+                </span>
+              </div>
 
               {/* HDC Gauge in Header */}
               <div className="flex items-center gap-2">
@@ -720,7 +793,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">HDC</span>
-                  <span className="text-xs font-black text-emerald-900/60 leading-none">{(subhTotals?.hdc_tele || 0).toLocaleString()}</span>
+                  <span className="text-xs font-black text-emerald-600 leading-none">{(subhTotals?.hdc_tele || 0).toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -754,9 +827,14 @@ export default function OnepageSummary({ data }: { data: any }) {
                     <div className="w-[1px] h-8 bg-slate-200" />
                     <div className="text-right">
                       <p className="text-[10px] font-bold text-emerald-500 uppercase leading-none mb-1">HDC</p>
-                      <p className="text-lg font-black text-emerald-700 tabular-nums leading-none">
-                        {item.hdc.toLocaleString()}
-                      </p>
+                      <div className="flex flex-col items-end">
+                        <p className="text-lg font-black text-emerald-700 tabular-nums leading-none">
+                          {item.hdc.toLocaleString()}
+                        </p>
+                        <p className="text-[10px] font-black text-emerald-600/70 tabular-nums mt-0.5">
+                          {formatPercent(item.hdc_opd > 0 ? (item.hdc / item.hdc_opd) * 100 : 0)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>

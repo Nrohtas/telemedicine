@@ -240,7 +240,7 @@ const TopPerformance = () => {
         <div className="py-8 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
                 {renderList(data.hospitals, "โรงพยาบาล", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-emerald-500", data.hospSummary, true)}
-                {renderList(data.primaryCare, "รพ.สต./ศูนย์สุขภาพ", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-blue-500", data.pcSummary, true)}
+                {renderList(data.primaryCare, "หน่วยบริการปฐมภูมิ", "ผลงานแพทย์ทางไกลสูงสุด (TYPE 5)", "bg-blue-500", data.pcSummary, true)}
             </div>
 
             <div className="mt-12 flex justify-center">

@@ -195,9 +195,8 @@ export default async function RemedPage() {
 function CompactMetric({ label, value, tone }: { label: string; value: number; tone?: "strong" }) {
   return (
     <div
-      className={`rounded-md border px-3 py-2 text-right ${
-        tone === "strong" ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-slate-50"
-      }`}
+      className={`rounded-md border px-3 py-2 text-right ${tone === "strong" ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-slate-50"
+        }`}
     >
       <p className="text-[10px] font-black text-slate-500">{label}</p>
       <p className={`text-lg font-black ${tone === "strong" ? "text-emerald-800" : "text-slate-900"}`}>
@@ -228,9 +227,8 @@ function NumberCell({ value, strong = false }: { value: number; strong?: boolean
 
   return (
     <td
-      className={`border-b border-slate-100 px-3 py-2 text-right ${
-        strong ? "bg-emerald-50 font-black text-emerald-900" : "font-bold"
-      } ${isZero ? "text-slate-300" : "text-slate-800"}`}
+      className={`border-b border-slate-100 px-3 py-2 text-right ${strong ? "bg-emerald-50 font-black text-emerald-900" : "font-bold"
+        } ${isZero ? "text-slate-300" : "text-slate-800"}`}
     >
       {numberFormat.format(value)}
     </td>
