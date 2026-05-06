@@ -522,14 +522,14 @@ export default function OnepageSummary({ data }: { data: any }) {
                 <BarChart
                   data={districtData}
                   layout="vertical"
-                  margin={{ top: 5, right: 110, left: 0, bottom: 5 }}
+                  margin={{ top: 5, right: 110, left: 20, bottom: 5 }}
                   barGap={2}
                 >
                   <XAxis type="number" hide />
                   <YAxis
                     dataKey="name"
                     type="category"
-                    width={100}
+                    width={140}
                     tick={{ fontSize: 11, fill: '#64748b', fontWeight: 800 }}
                     axisLine={false}
                     tickLine={false}
@@ -658,14 +658,14 @@ export default function OnepageSummary({ data }: { data: any }) {
                 <BarChart
                   data={hospitalData}
                   layout="vertical"
-                  margin={{ top: 5, right: 90, left: 0, bottom: 5 }}
+                  margin={{ top: 5, right: 90, left: 20, bottom: 5 }}
                   barGap={2}
                 >
                   <XAxis type="number" hide />
                   <YAxis
                     dataKey="name"
                     type="category"
-                    width={100}
+                    width={160}
                     tick={{ fontSize: 11, fill: '#64748b', fontWeight: 800 }}
                     axisLine={false}
                     tickLine={false}
