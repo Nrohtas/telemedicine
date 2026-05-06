@@ -73,8 +73,9 @@ export default function Home() {
     return date.toLocaleDateString("th-TH", {
       day: "numeric",
       month: "short",
-      year: "2-digit",
-    });
+      year: "numeric",
+      calendar: 'buddhist'
+    } as any);
   };
 
   const stats: { label: string; value: string; unit: string; trend: string; color: string; icon: React.ReactNode; href?: string }[] = [

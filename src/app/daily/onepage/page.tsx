@@ -25,9 +25,7 @@ export default async function OnepagePage() {
     const total235 = type2 + type3 + type5;
     const percentType5 = total235 > 0 ? (type5 / total235) * 100 : 0;
 
-    // Format date (Current Date)
     const formattedDate = new Date().toLocaleDateString("th-TH", {
-      timeZone: "Asia/Bangkok",
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -196,9 +194,9 @@ export default async function OnepagePage() {
     }));
     const data = {
       pie: [
-        { name: 'ตามนัด (2)', value: type2, fill: '#6EE7B7' },
-        { name: 'ส่งต่อ (3)', value: type3, fill: '#FCA5A5' },
-        { name: 'แพทย์ทางไกล (5)', value: type5, fill: '#93C5FD' },
+        { name: 'ตามนัด (2)', value: type2, fill: '#6366F1' }, // Indigo
+        { name: 'ส่งต่อ (3)', value: type3, fill: '#F87171' }, // Rose/Red
+        { name: 'แพทย์ทางไกล (5)', value: type5, fill: '#0EA5E9' }, // Sky/Blue
       ],
       totals: {
         type5,

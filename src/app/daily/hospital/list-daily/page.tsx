@@ -46,13 +46,10 @@ function formatThaiDateTime(value: string | null) {
     calendar: 'buddhist'
   } as any);
 
-  const timeStr = date.toLocaleTimeString("th-TH", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  });
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
 
-  return `${dateStr} ${timeStr} น.`;
+  return `${dateStr} ${hours}:${minutes} น.`;
 }
 
 function formatThaiDate(value: string | null) {
