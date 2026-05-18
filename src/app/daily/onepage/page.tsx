@@ -139,7 +139,7 @@ export default async function OnepagePage({
       return acc;
     }, { type5: 0, total235: 0, hdc_tele: 0, hdc_opd: 0 });
     const hPercentType5 = hTotals.total235 > 0 ? (hTotals.type5 * 100 / hTotals.total235) : 0;
-    const hHdcPercent = (hTotals.hdc_opd + hTotals.hdc_tele) > 0 ? (hTotals.hdc_tele * 100 / (hTotals.hdc_opd + hTotals.hdc_tele)) : 0;
+    const hHdcPercent = hTotals.hdc_opd > 0 ? (hTotals.hdc_tele * 100 / hTotals.hdc_opd) : 0;
 
     // Query 4: Sub-hospitals (รพ.สต.) data for Top 10 and Gauge
     const subhQuery = `
@@ -186,7 +186,7 @@ export default async function OnepagePage({
       return acc;
     }, { type5: 0, total235: 0, hdc_tele: 0, hdc_opd: 0 });
     const subhPercentType5 = subhTotals.total235 > 0 ? (subhTotals.type5 * 100 / subhTotals.total235) : 0;
-    const subhHdcPercent = (subhTotals.hdc_opd + subhTotals.hdc_tele) > 0 ? (subhTotals.hdc_tele * 100 / (subhTotals.hdc_opd + subhTotals.hdc_tele)) : 0;
+    const subhHdcPercent = subhTotals.hdc_opd > 0 ? (subhTotals.hdc_tele * 100 / subhTotals.hdc_opd) : 0;
 
     // Final aggregate for subhTotals to pass to component
     const subhTotalsFinal = {
@@ -214,7 +214,7 @@ export default async function OnepagePage({
         percentType5,
         hdc_opd: Number(overall.hdc_opd) || 0,
         hdc_tele: Number(overall.hdc_tele) || 0,
-        hdc_percent: (Number(overall.hdc_opd) + Number(overall.hdc_tele)) > 0 ? (Number(overall.hdc_tele) / (Number(overall.hdc_opd) + Number(overall.hdc_tele))) * 100 : 0
+        hdc_percent: Number(overall.hdc_opd) > 0 ? (Number(overall.hdc_tele) / Number(overall.hdc_opd)) * 100 : 0
       },
       hTotals: {
         type5: hTotals.type5,

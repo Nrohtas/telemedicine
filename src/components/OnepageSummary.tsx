@@ -270,7 +270,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                   <PieChart>
                     <Pie
                       data={[
-                        { name: 'OPD', value: totals.hdc_opd, fill: '#10B981' },
+                        { name: 'OPD (ไม่รวม Telemed)', value: Math.max(0, totals.hdc_opd - totals.hdc_tele), fill: '#10B981' },
                         { name: 'Telemedicine', value: totals.hdc_tele, fill: '#3B82F6' }
                       ]}
                       cx="50%"
@@ -291,7 +291,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-[-10px]">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">TOTAL</span>
                   <span className="text-xl font-black text-emerald-950 tabular-nums">
-                    {(totals.hdc_opd + totals.hdc_tele).toLocaleString()}
+                    {(totals.hdc_opd).toLocaleString()}
                   </span>
                   <span className="text-[10px] font-bold text-slate-400">Services</span>
                 </div>
@@ -300,13 +300,13 @@ export default function OnepageSummary({ data }: { data: any }) {
               <div className="grid grid-cols-2 gap-2 w-full">
                 <div className="flex flex-col items-center p-4 rounded-2xl border bg-emerald-50/20 border-emerald-500/20 shadow-sm hover:shadow-md transition-all">
                   <span className="text-[11px] font-black uppercase tracking-wider mb-2 text-emerald-700">
-                    OPD
+                    OPD (ไม่รวม Telemed)
                   </span>
                   <span className="text-2xl font-black text-slate-900 leading-none">
-                    {formatPercent((totals.hdc_opd + totals.hdc_tele) > 0 ? (totals.hdc_opd / (totals.hdc_opd + totals.hdc_tele)) * 100 : 0)}
+                    {formatPercent(totals.hdc_opd > 0 ? ((Math.max(0, totals.hdc_opd - totals.hdc_tele)) / totals.hdc_opd) * 100 : 0)}
                   </span>
                   <span className="text-[10px] font-bold text-slate-500 mt-2 tabular-nums">
-                    {totals.hdc_opd.toLocaleString()} ราย
+                    {Math.max(0, totals.hdc_opd - totals.hdc_tele).toLocaleString()} ราย
                   </span>
                 </div>
                 <div className="flex flex-col items-center p-4 rounded-2xl border bg-blue-50/20 border-blue-500/20 shadow-sm hover:shadow-md transition-all">
@@ -314,7 +314,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                     Telemedicine
                   </span>
                   <span className="text-2xl font-black text-slate-900 leading-none">
-                    {formatPercent((totals.hdc_opd + totals.hdc_tele) > 0 ? (totals.hdc_tele / (totals.hdc_opd + totals.hdc_tele)) * 100 : 0)}
+                    {formatPercent(totals.hdc_opd > 0 ? (totals.hdc_tele / totals.hdc_opd) * 100 : 0)}
                   </span>
                   <span className="text-[10px] font-bold text-slate-500 mt-2 tabular-nums">
                     {totals.hdc_tele.toLocaleString()} ราย
@@ -401,7 +401,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                     <div className="w-full h-1 bg-emerald-500 rounded-full my-2 opacity-50 shadow-sm" />
                     <div className="w-full py-2 px-3 rounded-xl bg-slate-50/50 border border-slate-100 text-center shadow-sm">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter block mb-1">OPD ทั้งหมด (HDC)</span>
-                      <span className="text-2xl font-black text-slate-900 tabular-nums leading-none">{(totals.hdc_opd + totals.hdc_tele).toLocaleString()}</span>
+                      <span className="text-2xl font-black text-slate-900 tabular-nums leading-none">{(totals.hdc_opd).toLocaleString()}</span>
                     </div>
                   </div>
                   <span className="text-lg font-black text-slate-900">X 100</span>
@@ -422,7 +422,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center pt-6">
                       <span className="text-2xl font-black text-emerald-600 leading-none">
-                        {formatPercent((totals.hdc_opd + totals.hdc_tele) > 0 ? (totals.hdc_tele * 100 / (totals.hdc_opd + totals.hdc_tele)) : 0)}
+                        {formatPercent(totals.hdc_opd > 0 ? (totals.hdc_tele * 100 / totals.hdc_opd) : 0)}
                       </span>
                     </div>
                   </div>
