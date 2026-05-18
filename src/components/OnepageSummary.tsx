@@ -456,7 +456,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                       <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#f5f3ff" strokeWidth="16" strokeLinecap="round" />
                       <motion.path
                         initial={{ pathLength: 0 }}
-                        animate={{ pathLength: (districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) / (districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) + districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) || 1)) }}
+                        animate={{ pathLength: (totals?.percentType5 || 0) / 100 }}
                         transition={{ duration: 2, ease: "circOut" }}
                         d="M 10 50 A 40 40 0 0 1 90 50"
                         fill="none"
@@ -467,22 +467,22 @@ export default function OnepageSummary({ data }: { data: any }) {
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center pt-4">
                       <span className="text-base font-black text-violet-600 tabular-nums">
-                        {formatPercent((districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) / (districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) + districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) || 1)) * 100)}
+                        {formatPercent(totals?.percentType5 || 0)}
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[9px] font-black text-violet-500 uppercase tracking-widest leading-none mb-1">HIS</span>
                     <span className="text-sm font-black text-violet-900 tabular-nums leading-none">
-                      {districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0).toLocaleString()}
+                      {(totals?.type5 || 0).toLocaleString()}
                     </span>
                   </div>
                 </div>
 
                 {/* District Diff Badge */}
                 {(() => {
-                  const totalHis = districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0);
-                  const totalHdc = districtData.reduce((acc: number, d: any) => acc + d.hdc, 0);
+                  const totalHis = totals?.type5 || 0;
+                  const totalHdc = totals?.hdc_tele || 0;
                   const diff = totalHdc - totalHis;
                   return (
                     <div className={`w-8 h-8 rounded-full border flex flex-col items-center justify-center shrink-0 shadow-sm ${diff >= 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-rose-50 border-rose-100 text-rose-700'}`}>
@@ -500,7 +500,7 @@ export default function OnepageSummary({ data }: { data: any }) {
                       <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#ecfdf5" strokeWidth="16" strokeLinecap="round" />
                       <motion.path
                         initial={{ pathLength: 0 }}
-                        animate={{ pathLength: (districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) / (districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) + districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) || 1)) }}
+                        animate={{ pathLength: (totals?.hdc_percent || 0) / 100 }}
                         transition={{ duration: 2, ease: "circOut" }}
                         d="M 10 50 A 40 40 0 0 1 90 50"
                         fill="none"
@@ -511,14 +511,14 @@ export default function OnepageSummary({ data }: { data: any }) {
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center pt-4">
                       <span className="text-base font-black text-emerald-600 tabular-nums">
-                        {formatPercent((districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) / (districtData.reduce((acc: number, d: any) => acc + d.hdc, 0) + districtData.reduce((acc: number, d: any) => acc + d.dashboard, 0) || 1)) * 100)}
+                        {formatPercent(totals?.hdc_percent || 0)}
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest leading-none mb-1">HDC</span>
                     <span className="text-sm font-black text-emerald-600 tabular-nums leading-none">
-                      {districtData.reduce((acc: number, d: any) => acc + d.hdc, 0).toLocaleString()}
+                      {(totals?.hdc_tele || 0).toLocaleString()}
                     </span>
                   </div>
                 </div>
