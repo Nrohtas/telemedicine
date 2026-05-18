@@ -8,7 +8,7 @@ import SoftButton from '@/components/ui/SoftButton';
 function LoginContent() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [loginMethod, setLoginMethod] = useState<'moph' | 'local'>('moph');
+    const [loginMethod, setLoginMethod] = useState<'moph' | 'local'>('local');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -83,8 +83,9 @@ function LoginContent() {
                         {/* Toggle Switches */}
                         <div className="flex p-1 bg-gray-100 rounded-2xl">
                             <button
-                                onClick={() => setLoginMethod('moph')}
-                                className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all ${loginMethod === 'moph' ? 'bg-white shadow-md text-[#006837]' : 'text-gray-400 hover:text-gray-600'}`}
+                                disabled={true}
+                                className="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all text-gray-300 cursor-not-allowed"
+                                title="Provider ID is currently disabled"
                             >
                                 ProviderID
                             </button>

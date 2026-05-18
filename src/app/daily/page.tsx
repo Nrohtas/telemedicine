@@ -554,7 +554,7 @@ export default async function DailyPage({
           <div className="mb-4 px-1">
             <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">10 อันดับหน่วยบริการ (แพทย์ทางไกล)</h3>
           </div>
-          <TopPerformance />
+          <TopPerformance policy={policy} />
         </section>
 
         <Footer />

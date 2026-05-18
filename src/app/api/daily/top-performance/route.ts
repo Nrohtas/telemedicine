@@ -1,8 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
+        const { searchParams } = new URL(request.url);
+        const policy = searchParams.get('policy') === 'pheoc' ? 'pheoc' : 'normal';
+        const hdcTable = policy === 'pheoc' ? 'telemed_opd_hdc_pheoc' : 'telemed_opd_hdc';
+        const hisStartDate = policy === 'pheoc' ? '2026-03-23' : '2026-01-01';
+
         const getQuery = (types: number[], orderBy: string = 'current_total DESC, performance_percent DESC') => `
             SELECT 
                 h.hospcode, 
@@ -38,7 +43,7 @@ export async function GET() {
                     SUM(visit_type_3) as visit_type_3,
                     SUM(visit_type_5) as visit_type_5
                 FROM visit_type_daily
-                WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
+                WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
                 GROUP BY hoscode
             ) vtd ON h.hospcode = vtd.hoscode COLLATE utf8mb4_general_ci
             LEFT JOIN (
@@ -46,7 +51,7 @@ export async function GET() {
                     hospcode,
                     SUM(opd) as hdc_opd,
                     SUM(telemedicine) as hdc_result
-                FROM telemed_opd_hdc
+                FROM ${hdcTable}
                 WHERE b_year = '2569'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
@@ -74,7 +79,7 @@ export async function GET() {
                     hospcode,
                     SUM(opd) as hdc_opd,
                     SUM(telemedicine) as hdc_result
-                FROM telemed_opd_hdc
+                FROM ${hdcTable}
                 WHERE b_year = '2569'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
@@ -85,7 +90,7 @@ export async function GET() {
                     SUM(visit_type_3) as visit_type_3,
                     SUM(visit_type_5) as visit_type_5
                 FROM visit_type_daily
-                WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
+                WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
                 GROUP BY hoscode
             ) vtd ON h.hospcode = vtd.hoscode COLLATE utf8mb4_general_ci
             WHERE h.status = '1'
@@ -115,7 +120,7 @@ export async function GET() {
                     hospcode,
                     SUM(opd) as hdc_opd,
                     SUM(telemedicine) as hdc_result
-                FROM telemed_opd_hdc
+                FROM ${hdcTable}
                 WHERE b_year = '2569'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
@@ -126,7 +131,7 @@ export async function GET() {
                     SUM(visit_type_3) as visit_type_3,
                     SUM(visit_type_5) as visit_type_5
                 FROM visit_type_daily
-                WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
+                WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
                 GROUP BY hoscode
             ) vtd ON h.hospcode = vtd.hoscode COLLATE utf8mb4_general_ci
             WHERE h.status = '1'
@@ -154,7 +159,7 @@ export async function GET() {
             target: Number(r.target) || 0,
         }));
 
-        const [lastHdc]: any = await pool.query("SELECT DATE_FORMAT(MAX(hdc_update), '%Y-%m-%d') as hdc_update FROM telemed_opd_hdc");
+        const [lastHdc]: any = await pool.query(`SELECT DATE_FORMAT(MAX(hdc_update), '%Y-%m-%d') as hdc_update FROM ${hdcTable}`);
         const [lastHis]: any = await pool.query("SELECT DATE_FORMAT(MAX(d_update), '%Y-%m-%d %H:%i:%s') as d_update FROM visit_type_daily");
 
         const lastHdcUpdate = lastHdc[0]?.hdc_update || null;

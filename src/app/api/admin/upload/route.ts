@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
             // Determine fiscal year for logging
             const targetBYear = date ? (new Date(date).getFullYear() + 543).toString() : '2569';
             const excelBYear = rawData[0]['ปีงบประมาณ'] || rawData[0]['b_year'];
-            const logType = excelBYear ? String(excelBYear).trim() : (type === 'HDC' ? targetBYear : (type === 'HDC_PHEOC' ? 'PHEOC' : 'Telemed'));
+            const logType = excelBYear ? String(excelBYear).trim() : ((type === 'HDC' || type === 'HDC_PHEOC') ? targetBYear : 'Telemed');
 
             // Determine file_platform based on type
             const file_platform = type === 'HDC' ? 'hdc' : (type === 'HDC_PHEOC' ? 'hdc_pheoc' : 'moph_buddycare');
