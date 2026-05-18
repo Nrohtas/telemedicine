@@ -3,18 +3,27 @@ import OnepageSummary from "@/components/OnepageSummary";
 
 export const dynamic = "force-dynamic";
 
-export default async function OnepagePage() {
+export default async function OnepagePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ policy?: string }>;
+}) {
+  const params = await searchParams;
+  const policy = params.policy === 'pheoc' ? 'pheoc' : 'normal';
+  const hdcTable = policy === 'pheoc' ? 'telemed_opd_hdc_pheoc' : 'telemed_opd_hdc';
+  const hisStartDate = policy === 'pheoc' ? '2026-03-23' : '2026-01-01';
+
   // Query 1: Overall totals
   const overallQuery = `
     SELECT 
       COALESCE(SUM(vtd.visit_type_2), 0) AS visit_type_2,
       COALESCE(SUM(vtd.visit_type_3), 0) AS visit_type_3,
       COALESCE(SUM(vtd.visit_type_5), 0) AS visit_type_5,
-      (SELECT COALESCE(SUM(opd), 0) FROM telemed_opd_hdc WHERE b_year = '2569') AS hdc_opd,
-      (SELECT COALESCE(SUM(telemedicine), 0) FROM telemed_opd_hdc WHERE b_year = '2569') AS hdc_tele,
+      (SELECT COALESCE(SUM(opd), 0) FROM ${hdcTable} WHERE b_year = '2569') AS hdc_opd,
+      (SELECT COALESCE(SUM(telemedicine), 0) FROM ${hdcTable} WHERE b_year = '2569') AS hdc_tele,
       (SELECT MAX(d_update) FROM visit_type_daily) AS last_update
     FROM visit_type_daily vtd
-    WHERE vtd.visit_date BETWEEN '2026-01-01' AND CURDATE()
+    WHERE vtd.visit_date BETWEEN '${hisStartDate}' AND CURDATE()
   `;
     try {
     const [overallRows]: any = await pool.query(overallQuery);
@@ -44,12 +53,12 @@ export default async function OnepagePage() {
       LEFT JOIN (
         SELECT hoscode, COALESCE(SUM(visit_type_5), 0) AS visit_type_5
         FROM visit_type_daily
-        WHERE visit_date BETWEEN '2026-01-01' AND CURDATE()
+        WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
         SELECT hospcode, telemedicine AS result, opd
-        FROM telemed_opd_hdc
+        FROM ${hdcTable}
         WHERE b_year = '2569'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       GROUP BY a.amp_code, a.amp_name
@@ -83,12 +92,12 @@ export default async function OnepagePage() {
                COALESCE(SUM(visit_type_3), 0) AS visit_type_3,
                COALESCE(SUM(visit_type_5), 0) AS visit_type_5
         FROM visit_type_daily
-        WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
+        WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
         SELECT hospcode, telemedicine AS result, opd
-        FROM telemed_opd_hdc
+        FROM ${hdcTable}
         WHERE b_year = '2569'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       WHERE h.status = '1' 
@@ -151,12 +160,12 @@ export default async function OnepagePage() {
                COALESCE(SUM(visit_type_3), 0) AS visit_type_3,
                COALESCE(SUM(visit_type_5), 0) AS visit_type_5
         FROM visit_type_daily
-        WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
+        WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
         SELECT hospcode, telemedicine AS result, opd
-        FROM telemed_opd_hdc
+        FROM ${hdcTable}
         WHERE b_year = '2569'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       WHERE h.status = '1' 
@@ -192,6 +201,7 @@ export default async function OnepagePage() {
       hdc: Number(r.dashboard_result) || 0,
       hdc_opd: Number(r.hdc_opd) || 0,
     }));
+    const startDateThai = policy === "pheoc" ? "23 มี.ค. 69" : "1 ม.ค. 69";
     const data = {
       pie: [
         { name: 'ตามนัด (2)', value: type2, fill: '#6366F1' }, // Indigo
@@ -219,6 +229,8 @@ export default async function OnepagePage() {
       districtData,
       hospitalData,
       top10Data,
+      policy,
+      startDateThai,
     };
 
     return <OnepageSummary data={data} />;

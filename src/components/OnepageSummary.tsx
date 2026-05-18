@@ -19,7 +19,7 @@ const formatPercent = (val: number) => {
 };
 
 export default function OnepageSummary({ data }: { data: any }) {
-  const { pie, totals, hTotals, subhTotals, formattedDate, districtData, hospitalData, top10Data } = data;
+  const { pie, totals, hTotals, subhTotals, formattedDate, districtData, hospitalData, top10Data, policy, startDateThai } = data;
   const dashboardRef = useRef<HTMLDivElement>(null);
 
   const handleExport = useCallback(() => {
@@ -140,6 +140,14 @@ export default function OnepageSummary({ data }: { data: any }) {
               <p className="text-[13px] font-black text-indigo-600 uppercase tracking-tight">
                 กลุ่มงานสุขภาพดิจิทัล
               </p>
+              {policy === 'pheoc' && (
+                <>
+                  <div className="w-[1px] h-3 bg-slate-300 mx-1" />
+                  <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-orange-200">
+                    นโยบาย PHEOC
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -157,10 +165,10 @@ export default function OnepageSummary({ data }: { data: any }) {
 
           <div className="flex flex-col items-end">
             <div className="bg-white/80 backdrop-blur-md px-6 py-3 rounded-2xl shadow-sm border border-indigo-50 flex items-center gap-5">
-              <div className="flex items-center gap-2.5 pr-5 border-r border-indigo-100">
-                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none">ที่มา</span>
+              <div className="flex flex-col items-start pr-5 border-r border-indigo-100">
+                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none mb-1">ข้อมูลตั้งแต่</span>
                 <span className="text-xs font-black text-slate-600 leading-none">
-                  ระบบ HIS / HDC
+                  {startDateThai || "1 ม.ค. 69"}
                 </span>
               </div>
               <div className="flex items-center gap-2.5">
