@@ -24,7 +24,8 @@ const UploadCard = ({
     subtitle, 
     icons, 
     onUploadSuccess,
-    lastUpdateDate
+    lastUpdateDate,
+    theme = 'indigo'
 }: { 
     type: string; 
     title: string; 
@@ -32,6 +33,7 @@ const UploadCard = ({
     icons: React.ReactNode; 
     onUploadSuccess: () => void;
     lastUpdateDate?: string | null;
+    theme?: 'indigo' | 'emerald' | 'orange';
 }) => {
     const [file, setFile] = useState<File | null>(null);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -76,10 +78,32 @@ const UploadCard = ({
         }
     };
 
+    // Color theme classes mapping
+    const themeStyles = {
+        indigo: {
+            blob: "bg-indigo-50/50",
+            icon: "text-indigo-500",
+            button: "bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/50 shadow-indigo-100/50",
+            spinner: "text-indigo-400"
+        },
+        emerald: {
+            blob: "bg-emerald-50/50",
+            icon: "text-emerald-500",
+            button: "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/50 shadow-emerald-100/50",
+            spinner: "text-emerald-400"
+        },
+        orange: {
+            blob: "bg-orange-50/50",
+            icon: "text-orange-500",
+            button: "bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200/50 shadow-orange-100/50",
+            spinner: "text-orange-400"
+        }
+    }[theme];
+
     return (
         <SoftCard className="p-6 flex flex-col items-center text-center space-y-5 w-full max-w-sm border-none shadow-xl shadow-indigo-100/30 rounded-[2rem] bg-white relative overflow-hidden">
             {/* Background Decorative Blob */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-full -mr-12 -mt-12 blur-2xl pointer-events-none" />
+            <div className={`absolute top-0 right-0 w-24 h-24 rounded-full -mr-12 -mt-12 blur-2xl pointer-events-none ${themeStyles.blob}`} />
 
             <div className="flex flex-col items-center w-full mb-2">
                 <div className="flex gap-4 mb-4">
@@ -107,7 +131,7 @@ const UploadCard = ({
                                 }}
                                 className="w-full px-5 py-4 flex items-center gap-3 hover:bg-slate-50 transition-colors text-left"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${themeStyles.icon}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 <div className="min-w-0">
@@ -147,11 +171,11 @@ const UploadCard = ({
                     variant="none"
                     onClick={handleUpload}
                     disabled={!file || isUploading}
-                    className="w-full py-4 rounded-2xl font-black text-xs uppercase tracking-[0.25em] flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 shadow-lg shadow-indigo-100/50 transition-all duration-300 disabled:bg-slate-50 disabled:text-slate-300 disabled:shadow-none border border-indigo-200/50"
+                    className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-[0.25em] flex items-center justify-center gap-2 transition-all duration-300 disabled:bg-slate-50 disabled:text-slate-300 disabled:shadow-none ${themeStyles.button}`}
                 >
                     {isUploading ? (
                         <div className="flex items-center gap-3">
-                            <svg className="animate-spin h-4 w-4 text-indigo-400" viewBox="0 0 24 24">
+                            <svg className={`animate-spin h-4 w-4 ${themeStyles.spinner}`} viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                             </svg>
@@ -200,7 +224,13 @@ const HistoryItem = ({ item, idx }: { item: UploadHistory, idx: number }) => (
         className="flex items-center justify-between p-4 bg-white border border-slate-50 rounded-[1.5rem] hover:shadow-xl hover:shadow-slate-100 transition-all group"
     >
         <div className="flex items-center gap-4">
-            <div className={`w-10 h-10 rounded-xl ${item.file_log === 'HDC' ? 'bg-indigo-50 text-indigo-500' : 'bg-emerald-50 text-emerald-500'} flex items-center justify-center transition-all group-hover:scale-110 shadow-sm`}>
+            <div className={`w-10 h-10 rounded-xl ${
+                item.file_platform === 'hdc' 
+                    ? 'bg-emerald-50 text-emerald-500' 
+                    : item.file_platform === 'hdc_pheoc'
+                    ? 'bg-orange-50 text-orange-500'
+                    : 'bg-emerald-50 text-emerald-500'
+            } flex items-center justify-center transition-all group-hover:scale-110 shadow-sm`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                     <polyline points="14 2 14 8 20 8" />
@@ -233,6 +263,7 @@ const EmptyHistory = () => (
 export default function AdminPage() {
     const [history, setHistory] = useState<UploadHistory[]>([]);
     const [lastHdcUpdate, setLastHdcUpdate] = useState<string | null>(null);
+    const [lastHdcPheocUpdate, setLastHdcPheocUpdate] = useState<string | null>(null);
 
     useEffect(() => {
         fetchHistory();
@@ -245,6 +276,7 @@ export default function AdminPage() {
             if (data.success) {
                 setHistory(data.data);
                 setLastHdcUpdate(data.lastHdcUpdate);
+                setLastHdcPheocUpdate(data.lastHdcPheocUpdate);
             }
         } catch (err) {
             console.error('Failed to fetch history');
@@ -269,7 +301,7 @@ export default function AdminPage() {
             <div className="max-w-6xl mx-auto space-y-24 relative z-10 pt-12 px-6">
 
                 {/* Upload Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start justify-items-center">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start justify-items-center">
                     {/* Card 1: MohPhrom + SornBuddy */}
                     <UploadCard 
                         type="Telemedicine"
@@ -299,18 +331,38 @@ export default function AdminPage() {
                         }
                     />
 
-                    {/* Card 2: HDC */}
+                    {/* Card 2: HDC TMM */}
                     <UploadCard 
                         type="HDC"
-                        title="Upload File"
-                        subtitle="Health Data Center"
+                        title="Upload File TMM"
+                        subtitle="Health Data Center (TMM)"
                         onUploadSuccess={fetchHistory}
                         lastUpdateDate={lastHdcUpdate}
+                        theme="emerald"
                         icons={
                             <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center shadow-sm border border-emerald-100">
                                 <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <text x="50" y="55" dominantBaseline="middle" textAnchor="middle" fill="#2D845A" fontWeight="900" fontSize="34" fontFamily="Inter, sans-serif">HDC</text>
+                                    <text x="50" y="55" dominantBaseline="middle" textAnchor="middle" fill="#047857" fontWeight="900" fontSize="34" fontFamily="Inter, sans-serif">HDC</text>
                                     <path d="M25 75H75" stroke="#F6D76E" strokeWidth="8" strokeLinecap="round" />
+                                </svg>
+                            </div>
+                        }
+                    />
+
+                    {/* Card 3: HDC PHEOC */}
+                    <UploadCard 
+                        type="HDC_PHEOC"
+                        title="Upload File PHEOC"
+                        subtitle="Health Data Center (PHEOC)"
+                        onUploadSuccess={fetchHistory}
+                        lastUpdateDate={lastHdcPheocUpdate}
+                        theme="orange"
+                        icons={
+                            <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center shadow-sm border border-orange-100">
+                                <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <text x="50" y="45" dominantBaseline="middle" textAnchor="middle" fill="#C2410C" fontWeight="900" fontSize="32" fontFamily="Inter, sans-serif">HDC</text>
+                                    <text x="50" y="75" dominantBaseline="middle" textAnchor="middle" fill="#C2410C" fontWeight="900" fontSize="14" fontFamily="Inter, sans-serif">PHEOC</text>
+                                    <path d="M20 60H80" stroke="#F6D76E" strokeWidth="5" strokeLinecap="round" />
                                 </svg>
                             </div>
                         }
@@ -324,10 +376,10 @@ export default function AdminPage() {
                         <div className="h-px w-full bg-slate-200"></div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Column 1: Telemedicine */}
                         <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-2">
+                             <div className="flex items-center gap-3 mb-2">
                                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
                                 <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">หมอพร้อม + สอน.บัดดี้</h4>
                             </div>
@@ -345,12 +397,29 @@ export default function AdminPage() {
                         {/* Column 2: HDC */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-3 mb-2">
-                                <div className="w-2 h-2 rounded-full bg-indigo-500" />
-                                <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">HDC</h4>
+                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">HDC TMM</h4>
                             </div>
                             <div className="space-y-4">
                                 {history.filter(item => item.file_platform === 'hdc').length > 0 ? (
                                     history.filter(item => item.file_platform === 'hdc').slice(0, 5).map((item, idx) => (
+                                        <HistoryItem key={item.file_id} item={item} idx={idx} />
+                                    ))
+                                ) : (
+                                    <EmptyHistory />
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Column 3: HDC PHEOC */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="w-2 h-2 rounded-full bg-orange-500" />
+                                <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">HDC PHEOC</h4>
+                            </div>
+                            <div className="space-y-4">
+                                {history.filter(item => item.file_platform === 'hdc_pheoc').length > 0 ? (
+                                    history.filter(item => item.file_platform === 'hdc_pheoc').slice(0, 5).map((item, idx) => (
                                         <HistoryItem key={item.file_id} item={item} idx={idx} />
                                     ))
                                 ) : (

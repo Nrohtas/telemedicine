@@ -59,7 +59,7 @@ function formatThaiDate(value: string | null) {
   } as any);
 }
 
-async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode", sortOrder: string = "ASC"): Promise<DailyHospitalRow[]> {
+async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode", sortOrder: string = "ASC", policy: string = "normal"): Promise<DailyHospitalRow[]> {
   const allowedSortColumns = [
     "hospcode",
     "hospname",
@@ -80,6 +80,9 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
   ];
   const finalSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "hospcode";
   const finalSortOrder = sortOrder.toUpperCase() === "DESC" ? "DESC" : "ASC";
+
+  const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
+  const hisStartDate = policy === "pheoc" ? "2026-03-23" : "2026-01-01";
 
   const query = `
     SELECT
@@ -160,10 +163,10 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
         COALESCE(SUM(visit_type_3), 0) AS visit_type_3,
         COALESCE(SUM(visit_type_5), 0) AS visit_type_5
       FROM visit_type_daily
-      WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
+      WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
       GROUP BY hoscode
     ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
-    LEFT JOIN telemed_opd_hdc hdc
+    LEFT JOIN ${hdcTable} hdc
       ON hdc.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       AND hdc.b_year = '2569'
     WHERE h.amp_code = ? COLLATE utf8mb4_general_ci
@@ -212,9 +215,10 @@ async function getPlatformLatestUpdate(): Promise<string | null> {
   }
 }
 
-async function getHdcLatestUpdate(): Promise<string | null> {
+async function getHdcLatestUpdate(policy: string = "normal"): Promise<string | null> {
+  const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
   try {
-    const [rows]: any = await pool.query("SELECT DATE_FORMAT(MAX(hdc_update), '%Y-%m-%d') as last_update FROM telemed_opd_hdc");
+    const [rows]: any = await pool.query(`SELECT DATE_FORMAT(MAX(hdc_update), '%Y-%m-%d') as last_update FROM ${hdcTable}`);
     return rows[0]?.last_update || null;
   } catch (err) {
     console.error('Error fetching HDC latest update:', err);
@@ -225,16 +229,17 @@ async function getHdcLatestUpdate(): Promise<string | null> {
 export default async function DailyHospitalPage({
   searchParams,
 }: {
-  searchParams: Promise<{ amp_code?: string; sort_by?: string; sort_order?: string }>;
+  searchParams: Promise<{ amp_code?: string; sort_by?: string; sort_order?: string; policy?: string }>;
 }) {
   try {
     const params = await searchParams;
     const ampCode = params.amp_code ?? "";
     const sortBy = params.sort_by ?? "hospcode";
     const sortOrder = params.sort_order ?? "ASC";
+    const policy = params.policy === "pheoc" ? "pheoc" : "normal";
 
-    const rows = ampCode ? await getDailyHospitalRows(ampCode, sortBy, sortOrder) : [];
-    const hdcLastUpdate = await getHdcLatestUpdate();
+    const rows = ampCode ? await getDailyHospitalRows(ampCode, sortBy, sortOrder, policy) : [];
+    const hdcLastUpdate = await getHdcLatestUpdate(policy);
     const platformLastUpdate = await getPlatformLatestUpdate();
     const hisLastUpdate = rows[0]?.latest_date || null;
     const districtName = rows[0]?.amp_name ?? "-";
@@ -254,11 +259,13 @@ export default async function DailyHospitalPage({
     const platformTotalPercent = totals.platform_target > 0 ? (totals.platform_result / totals.platform_target) * 100 : 0;
     const totalPercent = totals.total > 0 ? (totals.visit_type_5 / totals.total) * 100 : 0;
     const hdcTotalPercent = totals.hdc_opd > 0 ? (totals.hdc_result / totals.hdc_opd) * 100 : 0;
-    const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ข้อมูลระหว่าง 1 มกราคม 2569 - ${rows.length > 0 ? formatThaiDate(rows[0].latest_date || new Date().toISOString()) : "-"}`;
+
+    const startDateThai = policy === "pheoc" ? "23 มีนาคม 2569" : "1 มกราคม 2569";
+    const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ข้อมูลระหว่าง ${startDateThai} - ${rows.length > 0 ? formatThaiDate(rows[0].latest_date || new Date().toISOString()) : "-"}`;
 
     const getSortUrl = (column: string) => {
       const nextOrder = sortBy === column && sortOrder === "ASC" ? "DESC" : "ASC";
-      return `/daily/hospital?amp_code=${ampCode}&sort_by=${column}&sort_order=${nextOrder}`;
+      return `/daily/hospital?amp_code=${ampCode}&sort_by=${column}&sort_order=${nextOrder}${policy !== "normal" ? `&policy=${policy}` : ""}`;
     };
 
     const SortIcon = ({ column }: { column: string }) => {
@@ -289,22 +296,46 @@ export default async function DailyHospitalPage({
         <section className="px-3 md:px-6 mt-2 md:mt-3">
           <div className="w-full space-y-3">
             <div className="rounded-2xl border border-emerald-100 bg-white/90 p-3 shadow-lg shadow-emerald-900/5 md:p-4">
-              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <Link
-                    href="/daily"
-                    className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black text-slate-600 hover:bg-slate-200"
-                  >
-                    กลับหน้าสรุปอำเภอ
-                  </Link>
-                  <h1 className="mt-2 text-xl font-black tracking-tight text-slate-950 md:text-2xl">
-                    {districtName === "-" ? "รายหน่วยบริการ" : `รายหน่วยบริการ อ.${districtName}`}
-                  </h1>
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div>
+                    <Link
+                      href={`/daily${policy !== "normal" ? `?policy=${policy}` : ""}`}
+                      className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black text-slate-600 hover:bg-slate-200"
+                    >
+                      กลับหน้าสรุปอำเภอ
+                    </Link>
+                    <h1 className="mt-2 text-xl font-black tracking-tight text-slate-950 md:text-2xl">
+                      {districtName === "-" ? "รายหน่วยบริการ" : `รายหน่วยบริการ อ.${districtName}`}
+                    </h1>
+                  </div>
+
+                  {/* Premium Switcher Pills on Hospital Page */}
+                  <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner mt-1 sm:mt-4">
+                    <Link
+                      href={`/daily/hospital?amp_code=${ampCode}&policy=normal${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${policy === "normal"
+                          ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
+                          : "text-slate-500 hover:text-slate-800"
+                        }`}
+                    >
+                      นโยบาย TMM (1 ม.ค. 2569)
+                    </Link>
+                    <Link
+                      href={`/daily/hospital?amp_code=${ampCode}&policy=pheoc${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${policy === "pheoc"
+                          ? "bg-white text-orange-600 shadow-sm border border-slate-200/50"
+                          : "text-slate-500 hover:text-slate-800"
+                        }`}
+                    >
+                      นโยบาย PHEOC (23 มี.ค. 2569)
+                    </Link>
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <Link
-                    href="/daily/onepage"
+                    href={`/daily/onepage${policy !== "normal" ? `?policy=${policy}` : ""}`}
                     className="inline-flex items-center gap-2 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-indigo-100 hover:scale-105 active:scale-95 transition-all"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -316,7 +347,7 @@ export default async function DailyHospitalPage({
                     </svg>
                     Onepage
                   </Link>
-                  <ExportDailyHospital rows={rows} districtName={districtName} />
+                  <ExportDailyHospital rows={rows} districtName={districtName} policy={policy} />
                 </div>
               </div>
             </div>
@@ -324,7 +355,7 @@ export default async function DailyHospitalPage({
             <div className="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-xl shadow-slate-900/5">
               <div className="border-b border-slate-100 bg-white px-5 py-3">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <p className="text-sm font-bold text-emerald-800 md:text-base" suppressHydrationWarning>
+                  <p className={`text-sm font-bold md:text-base ${policy === "pheoc" ? "text-orange-700" : "text-emerald-800"}`} suppressHydrationWarning>
                     {reportPeriodLabel}
                   </p>
                   <div className="flex items-center gap-4 ml-auto">

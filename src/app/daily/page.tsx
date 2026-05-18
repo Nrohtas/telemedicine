@@ -54,7 +54,7 @@ function formatCurrentThaiDate() {
   } as any);
 }
 
-async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: string = "ASC"): Promise<DailyDistrictRow[]> {
+async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: string = "ASC", policy: string = "normal"): Promise<DailyDistrictRow[]> {
   const allowedSortColumns = [
     "amp_code",
     "amp_name",
@@ -75,6 +75,9 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
   ];
   const finalSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "amp_code";
   const finalSortOrder = sortOrder.toUpperCase() === "DESC" ? "DESC" : "ASC";
+
+  const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
+  const hisStartDate = policy === "pheoc" ? "2026-03-23" : "2026-01-01";
 
   const query = `
     SELECT
@@ -149,10 +152,10 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
         COALESCE(SUM(visit_type_3), 0) AS visit_type_3,
         COALESCE(SUM(visit_type_5), 0) AS visit_type_5
       FROM visit_type_daily
-      WHERE visit_date BETWEEN '2026-03-23' AND CURDATE()
+      WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
       GROUP BY hoscode
     ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
-    LEFT JOIN telemed_opd_hdc hdc
+    LEFT JOIN ${hdcTable} hdc
       ON hdc.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       AND hdc.b_year = '2569'
     GROUP BY a.amp_code, a.amp_name, latest.latest_date, latest_t.latest_time
@@ -196,9 +199,10 @@ async function getPlatformLatestUpdate(): Promise<string | null> {
   }
 }
 
-async function getHdcLatestUpdate(): Promise<string | null> {
+async function getHdcLatestUpdate(policy: string = "normal"): Promise<string | null> {
+  const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
   try {
-    const [rows]: any = await pool.query("SELECT DATE_FORMAT(MAX(hdc_update), '%Y-%m-%d') as last_update FROM telemed_opd_hdc");
+    const [rows]: any = await pool.query(`SELECT DATE_FORMAT(MAX(hdc_update), '%Y-%m-%d') as last_update FROM ${hdcTable}`);
     return rows[0]?.last_update || null;
   } catch (err) {
     console.error('Error fetching HDC latest update:', err);
@@ -209,15 +213,16 @@ async function getHdcLatestUpdate(): Promise<string | null> {
 export default async function DailyPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sort_by?: string; sort_order?: string }>;
+  searchParams: Promise<{ sort_by?: string; sort_order?: string; policy?: string }>;
 }) {
   try {
     const params = await searchParams;
     const sortBy = params.sort_by ?? "amp_code";
     const sortOrder = params.sort_order ?? "ASC";
+    const policy = params.policy === "pheoc" ? "pheoc" : "normal";
 
-    const rows = await getDailyDistrictRows(sortBy, sortOrder);
-    const hdcLastUpdate = await getHdcLatestUpdate();
+    const rows = await getDailyDistrictRows(sortBy, sortOrder, policy);
+    const hdcLastUpdate = await getHdcLatestUpdate(policy);
     const platformLastUpdate = await getPlatformLatestUpdate();
     const hisLastUpdate = rows[0]?.latest_date || null;
     const totals = rows.reduce<DailyTotals>(
@@ -236,11 +241,13 @@ export default async function DailyPage({
     const platformTotalPercent = totals.platform_target > 0 ? (totals.platform_result / totals.platform_target) * 100 : 0;
     const totalPercent = totals.total > 0 ? (totals.visit_type_5 / totals.total) * 100 : 0;
     const hdcTotalPercent = totals.hdc_opd > 0 ? (totals.hdc_result / totals.hdc_opd) * 100 : 0;
-    const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ข้อมูลระหว่าง 1 มกราคม 2569 - ${formatCurrentThaiDate()}`;
+
+    const startDateThai = policy === "pheoc" ? "23 มีนาคม 2569" : "1 มกราคม 2569";
+    const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ข้อมูลระหว่าง ${startDateThai} - ${formatCurrentThaiDate()}`;
 
     const getSortUrl = (column: string) => {
       const nextOrder = sortBy === column && sortOrder === "ASC" ? "DESC" : "ASC";
-      return `/daily?sort_by=${column}&sort_order=${nextOrder}`;
+      return `/daily?sort_by=${column}&sort_order=${nextOrder}${policy !== "normal" ? `&policy=${policy}` : ""}`;
     };
 
     const SortIcon = ({ column }: { column: string }) => {
@@ -253,11 +260,36 @@ export default async function DailyPage({
         <Navbar showFilters={false} />
 
         <section className="px-3 md:px-6 mt-2 md:mt-3">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0 mb-3 px-1">
-            <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">สรุปรายอำเภอ</h3>
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4 px-1">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">สรุปรายอำเภอ</h3>
+
+              {/* Premium Policy Switcher Tabs */}
+              <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+                <Link
+                  href={`/daily?policy=normal${sortBy !== "amp_code" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${policy === "normal"
+                      ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
+                      : "text-slate-500 hover:text-slate-800"
+                    }`}
+                >
+                  นโยบาย TMM (1 ม.ค. 2569)
+                </Link>
+                <Link
+                  href={`/daily?policy=pheoc${sortBy !== "amp_code" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${policy === "pheoc"
+                      ? "bg-white text-orange-600 shadow-sm border border-slate-200/50"
+                      : "text-slate-500 hover:text-slate-800"
+                    }`}
+                >
+                  นโยบาย PHEOC (23 มี.ค. 2569)
+                </Link>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
               <Link
-                href="/daily/onepage"
+                href={`/daily/onepage${policy !== "normal" ? `?policy=${policy}` : ""}`}
                 className="inline-flex items-center gap-2 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-indigo-100 hover:scale-105 active:scale-95 transition-all"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -269,14 +301,14 @@ export default async function DailyPage({
                 </svg>
                 Onepage
               </Link>
-              <ExportDailyExcel data={rows} />
+              <ExportDailyExcel data={rows} policy={policy} />
             </div>
           </div>
 
           <div className="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-xl shadow-slate-900/5">
             <div className="border-b border-slate-100 bg-white px-5 py-3">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <p className="text-sm font-bold text-emerald-800 md:text-base" suppressHydrationWarning>
+                <p className={`text-sm font-bold md:text-base ${policy === "pheoc" ? "text-orange-700" : "text-emerald-800"}`} suppressHydrationWarning>
                   {reportPeriodLabel}
                 </p>
                 <div className="flex flex-col items-end gap-1.5 ml-auto">
@@ -463,7 +495,7 @@ export default async function DailyPage({
                       <tr key={row.amp_code} className="group hover:bg-slate-50">
                         <td className="whitespace-nowrap px-5 py-2.5">
                           <Link
-                            href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}`}
+                            href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}${policy !== "normal" ? `&policy=${policy}` : ""}`}
                             className="flex items-center gap-2 font-black text-slate-900 underline-offset-4 group-hover:text-emerald-700 group-hover:underline decoration-emerald-500/30"
                           >
                             {row.amp_name}

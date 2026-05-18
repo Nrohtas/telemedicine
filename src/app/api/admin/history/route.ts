@@ -9,10 +9,14 @@ export async function GET(request: NextRequest) {
         const [lastHdc]: any = await pool.query("SELECT DATE_FORMAT(MAX(hdc_update), '%Y-%m-%d') as hdc_update FROM telemed_opd_hdc");
         const lastHdcUpdate = lastHdc[0]?.hdc_update || null;
 
+        const [lastHdcPheoc]: any = await pool.query("SELECT DATE_FORMAT(MAX(hdc_update), '%Y-%m-%d') as hdc_update FROM telemed_opd_hdc_pheoc");
+        const lastHdcPheocUpdate = lastHdcPheoc[0]?.hdc_update || null;
+
         return NextResponse.json({
             success: true,
             data: rows,
-            lastHdcUpdate
+            lastHdcUpdate,
+            lastHdcPheocUpdate
         });
     } catch (error: any) {
         console.error('History fetch error:', error);

@@ -29,8 +29,9 @@ export async function POST(request: NextRequest) {
         let results: any;
         let importedCount = 0;
 
-        if (type === 'HDC') {
-            // Processing for HDC (telemed_opd_hdc table)
+        if (type === 'HDC' || type === 'HDC_PHEOC') {
+            const hdcTable = type === 'HDC' ? 'telemed_opd_hdc' : 'telemed_opd_hdc_pheoc';
+            // Processing for HDC (telemed_opd_hdc or telemed_opd_hdc_pheoc table)
             const targetBYear = date ? (new Date(date).getFullYear() + 543).toString() : '2569';
 
             const hdcValues = rawData.map((row, index) => {
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
             }
 
             const hdcQuery = `
-                INSERT INTO telemed_opd_hdc (id, hospcode, b_year, opd, telemedicine, percent, hdc_update, d_update)
+                INSERT INTO ${hdcTable} (id, hospcode, b_year, opd, telemedicine, percent, hdc_update, d_update)
                 VALUES ?
                 ON DUPLICATE KEY UPDATE
                     opd = VALUES(opd),
@@ -180,10 +181,10 @@ export async function POST(request: NextRequest) {
             // Determine fiscal year for logging
             const targetBYear = date ? (new Date(date).getFullYear() + 543).toString() : '2569';
             const excelBYear = rawData[0]['ปีงบประมาณ'] || rawData[0]['b_year'];
-            const logType = excelBYear ? String(excelBYear).trim() : (type === 'HDC' ? targetBYear : 'Telemed');
+            const logType = excelBYear ? String(excelBYear).trim() : (type === 'HDC' ? targetBYear : (type === 'HDC_PHEOC' ? 'PHEOC' : 'Telemed'));
 
             // Determine file_platform based on type
-            const file_platform = type === 'HDC' ? 'hdc' : 'moph_buddycare';
+            const file_platform = type === 'HDC' ? 'hdc' : (type === 'HDC_PHEOC' ? 'hdc_pheoc' : 'moph_buddycare');
 
             const logQuery = `
                 INSERT INTO fileupload 

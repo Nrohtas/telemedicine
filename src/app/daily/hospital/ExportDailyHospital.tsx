@@ -26,9 +26,10 @@ interface DailyHospitalRow {
 interface ExportDailyHospitalProps {
   rows: DailyHospitalRow[];
   districtName: string;
+  policy?: string;
 }
 
-export default function ExportDailyHospital({ rows, districtName }: ExportDailyHospitalProps) {
+export default function ExportDailyHospital({ rows, districtName, policy }: ExportDailyHospitalProps) {
   const handleExportExcel = () => {
     const exportRows = rows.map((row, index) => ({
       "ลำดับ": index + 1,
@@ -99,16 +100,17 @@ export default function ExportDailyHospital({ rows, districtName }: ExportDailyH
       "อำเภอ": ""
     });
 
+    const policyLabel = policy === "pheoc" ? "PHEOC" : "TMM";
     const ws = utils.json_to_sheet(exportRows);
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, "Daily_Hospital");
+    utils.book_append_sheet(wb, ws, `Daily_Hospital_${policyLabel}`);
 
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0];
     const timeStr = now.getHours().toString().padStart(2, '0') + 
                    now.getMinutes().toString().padStart(2, '0');
     
-    writeFileXLSX(wb, `Daily_Telemedicine_อ_${districtName}_${dateStr}_${timeStr}.xlsx`);
+    writeFileXLSX(wb, `Daily_Telemedicine_อ_${districtName}_${policyLabel}_${dateStr}_${timeStr}.xlsx`);
   };
 
   return (

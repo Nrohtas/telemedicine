@@ -23,9 +23,10 @@ interface DailyDistrictRow {
 
 interface ExportDailyExcelProps {
     data: DailyDistrictRow[];
+    policy?: string;
 }
 
-const ExportDailyExcel = ({ data }: ExportDailyExcelProps) => {
+const ExportDailyExcel = ({ data, policy }: ExportDailyExcelProps) => {
     const handleExport = () => {
         const exportData = data.map(row => ({
             'รหัสอำเภอ': row.amp_code,
@@ -47,14 +48,16 @@ const ExportDailyExcel = ({ data }: ExportDailyExcelProps) => {
 
         const ws = XLSX.utils.json_to_sheet(exportData);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "DailySummary");
+        
+        const policyLabel = policy === "pheoc" ? "PHEOC" : "TMM";
+        XLSX.utils.book_append_sheet(wb, ws, `DailySummary_${policyLabel}`);
         
         // Generate filename with current date and time
         const now = new Date();
         const dateStr = now.toISOString().split('T')[0];
         const timeStr = now.getHours().toString().padStart(2, '0') + 
                        now.getMinutes().toString().padStart(2, '0');
-        XLSX.writeFile(wb, `Telemedicine_Daily_Summary_${dateStr}_${timeStr}.xlsx`);
+        XLSX.writeFile(wb, `Telemedicine_Daily_Summary_${policyLabel}_${dateStr}_${timeStr}.xlsx`);
     };
 
     return (

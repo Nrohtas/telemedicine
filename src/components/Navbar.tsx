@@ -234,7 +234,7 @@ const Navbar = ({
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3v18h18M7 15l3-3 3 2 5-7" />
                                 </svg>
-                                <span>Daily</span>
+                                <span>Daily HDC</span>
                             </SoftButton>
                         </Link>
                         <Link href="/remed" className="hover:opacity-80 transition-opacity">
@@ -332,7 +332,7 @@ const Navbar = ({
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3v18h18M7 15l3-3 3 2 5-7" />
                                 </svg>
-                                <span className="text-xs font-black uppercase tracking-widest">Daily</span>
+                                <span className="text-xs font-black uppercase tracking-widest">Daily HDC</span>
                             </SoftButton>
                         </Link>
                         <Link href="/remed" onClick={() => setIsMenuOpen(false)}>
