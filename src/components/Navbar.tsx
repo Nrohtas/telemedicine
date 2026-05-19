@@ -206,7 +206,7 @@ const Navbar = ({
                         <div className="flex flex-col min-w-0">
                             <h1 className="text-base md:text-lg lg:text-xl font-black text-purple-950 tracking-tight truncate leading-tight">สำนักงานสาธารณสุขจังหวัดพิษณุโลก</h1>
                             <p className="text-[10px] md:text-[11px] lg:text-[12px] font-black uppercase mt-0.5 tracking-widest md:tracking-[0.12em] whitespace-normal md:whitespace-nowrap drop-shadow-sm leading-snug">
-                                <span className="text-gray-500">Dashboard</span> <span className="text-[#006837]">Telemedicine</span> <span className="text-gray-400 mx-1">:</span> <span className="text-[#00ADEF]">การแพทย์ทางไกล</span>
+                                <span className="text-gray-500">PLATFORM</span> <span className="text-[#006837]">Telemedicine</span> <span className="text-gray-400 mx-1">:</span> <span className="text-[#00ADEF]">การแพทย์ทางไกล</span>
                             </p>
                         </div>
                     </div>
@@ -222,7 +222,7 @@ const Navbar = ({
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
-                                <span>Dashboard</span>
+                                <span>PLATFORM</span>
                             </SoftButton>
                         </Link>
                         <Link href="/daily" className="hover:opacity-80 transition-opacity">
@@ -320,7 +320,7 @@ const Navbar = ({
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
-                                <span className="text-xs font-black uppercase tracking-widest">Dashboard</span>
+                                <span className="text-xs font-black uppercase tracking-widest">PLATFORM</span>
                             </SoftButton>
                         </Link>
                         <Link href="/daily" onClick={() => setIsMenuOpen(false)}>
