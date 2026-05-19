@@ -49,7 +49,7 @@ export default function ExportDailyHospital({ rows, districtName, policy }: Expo
       "Tele (5) (HDC)": row.hdc_result,
       "ร้อยละ (HDC)": parseFloat(row.hdc_percent.toFixed(2)),
       "HDC - PLATFORM": row.hdc_result - row.platform_result,
-      "HDC - HIS": row.hdc_result - row.total,
+      "HDC - HIS": row.hdc_result - row.visit_type_5,
       "อำเภอ": row.amp_name
     }));
 
@@ -96,7 +96,7 @@ export default function ExportDailyHospital({ rows, districtName, policy }: Expo
       "Tele (5) (HDC)": totals.hdc_result,
       "ร้อยละ (HDC)": parseFloat(totalPercentHDC.toFixed(2)),
       "HDC - PLATFORM": totals.hdc_result - totals.platform_result,
-      "HDC - HIS": totals.hdc_result - totals.total,
+      "HDC - HIS": totals.hdc_result - totals.visit_type_5,
       "อำเภอ": ""
     });
 

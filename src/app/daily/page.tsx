@@ -490,7 +490,7 @@ export default async function DailyPage({
                 <tbody className="divide-y divide-slate-100">
                   {rows.map((row) => {
                     const diff_hdc_platform = row.hdc_result - row.platform_result;
-                    const diff_hdc_his = row.hdc_result - row.total;
+                    const diff_hdc_his = row.hdc_result - row.visit_type_5;
                     return (
                       <tr key={row.amp_code} className="group hover:bg-slate-50">
                         <td className="whitespace-nowrap px-5 py-2.5">
@@ -542,7 +542,7 @@ export default async function DailyPage({
                     <TelemedicineBadgeCell value={totals.hdc_result} footer color="emerald" />
                     <PercentCell value={hdcTotalPercent} footer className="bg-emerald-50/50 text-emerald-900 font-black" color="emerald" />
                     <DiffCell value={totals.hdc_result - totals.platform_result} footer className="bg-amber-50/50 text-amber-700 font-black" />
-                    <DiffCell value={totals.hdc_result - totals.total} footer className="bg-amber-50/50 text-amber-700 font-black" />
+                    <DiffCell value={totals.hdc_result - totals.visit_type_5} footer className="bg-amber-50/50 text-amber-700 font-black" />
                   </tr>
                 </tfoot>
               </table>

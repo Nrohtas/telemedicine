@@ -43,7 +43,7 @@ const ExportDailyExcel = ({ data, policy }: ExportDailyExcelProps) => {
             'Tele (HDC)': row.hdc_result,
             '% (HDC)': Number(row.hdc_percent.toFixed(2)),
             'HDC - PLATFORM': row.hdc_result - row.platform_result,
-            'HDC - HIS': row.hdc_result - row.total
+            'HDC - HIS': row.hdc_result - row.visit_type_5
         }));
 
         const ws = XLSX.utils.json_to_sheet(exportData);
