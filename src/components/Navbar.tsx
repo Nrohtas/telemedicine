@@ -206,7 +206,7 @@ const Navbar = ({
                         <div className="flex flex-col min-w-0">
                             <h1 className="text-base md:text-lg lg:text-xl font-black text-purple-950 tracking-tight truncate leading-tight">สำนักงานสาธารณสุขจังหวัดพิษณุโลก</h1>
                             <p className="text-[10px] md:text-[11px] lg:text-[12px] font-black uppercase mt-0.5 tracking-widest md:tracking-[0.12em] whitespace-normal md:whitespace-nowrap drop-shadow-sm leading-snug">
-                                <span className="text-gray-500">PLATFORM</span> <span className="text-[#006837]">Telemedicine</span> <span className="text-gray-400 mx-1">:</span> <span className="text-[#00ADEF]">การแพทย์ทางไกล</span>
+                                <span className="text-gray-500">DASHBOARD</span> <span className="text-[#006837]">TELEMEDICINE</span> <span className="text-gray-400 mx-1">:</span> <span className="text-[#00ADEF]">การแพทย์ทางไกล</span>
                             </p>
                         </div>
                     </div>
