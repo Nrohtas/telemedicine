@@ -25,7 +25,8 @@ const UploadCard = ({
     icons, 
     onUploadSuccess,
     lastUpdateDate,
-    theme = 'indigo'
+    theme = 'indigo',
+    fileLabel
 }: { 
     type: string; 
     title: string; 
@@ -34,6 +35,7 @@ const UploadCard = ({
     onUploadSuccess: () => void;
     lastUpdateDate?: string | null;
     theme?: 'indigo' | 'emerald' | 'orange';
+    fileLabel?: string;
 }) => {
     const [file, setFile] = useState<File | null>(null);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -156,13 +158,15 @@ const UploadCard = ({
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                 </svg>
                                 <div className="min-w-0">
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Excel File</p>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                                        {fileLabel || 'Excel File'}
+                                    </p>
                                     <p className="text-xs font-black text-slate-700 truncate">
                                         {file ? file.name : 'Choose file'}
                                     </p>
                                 </div>
                             </button>
-                            <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx, .xls" onChange={handleFileChange} />
+                            <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx, .xls, .csv" onChange={handleFileChange} />
                         </div>
                     </div>
                 </div>
@@ -339,6 +343,7 @@ export default function AdminPage() {
                         onUploadSuccess={fetchHistory}
                         lastUpdateDate={lastHdcUpdate}
                         theme="emerald"
+                        fileLabel="EXCEL / CSV File"
                         icons={
                             <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center shadow-sm border border-emerald-100">
                                 <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -357,6 +362,7 @@ export default function AdminPage() {
                         onUploadSuccess={fetchHistory}
                         lastUpdateDate={lastHdcPheocUpdate}
                         theme="orange"
+                        fileLabel="EXCEL / CSV File"
                         icons={
                             <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center shadow-sm border border-orange-100">
                                 <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">

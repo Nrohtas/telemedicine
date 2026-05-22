@@ -13,14 +13,58 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
         }
 
-        const buffer = await file.arrayBuffer();
-        const workbook = XLSX.read(buffer, { type: 'buffer' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const rawData: any[] = XLSX.utils.sheet_to_json(worksheet);
+        const isCsv = file.name.toLowerCase().endsWith('.csv');
+        let rawData: any[] = [];
+
+        if (isCsv) {
+            const arrayBuffer = await file.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            
+            let csvText = '';
+            try {
+                const iconv = await import('iconv-lite');
+                // Detect if it is UTF-8 or TIS-620 by looking for common Thai or header words
+                const utf8Text = buffer.toString('utf8');
+                if (
+                    utf8Text.includes('พิษณุโลก') || 
+                    utf8Text.includes('จังหวัด') || 
+                    utf8Text.includes('hospcode') || 
+                    utf8Text.includes('opd') || 
+                    utf8Text.includes('telemedicine')
+                ) {
+                    csvText = utf8Text;
+                } else {
+                    const tis620Text = iconv.decode(buffer, 'tis-620');
+                    if (
+                        tis620Text.includes('พิษณุโลก') || 
+                        tis620Text.includes('จังหวัด') || 
+                        tis620Text.includes('hospcode') || 
+                        tis620Text.includes('opd') || 
+                        tis620Text.includes('telemedicine')
+                    ) {
+                        csvText = tis620Text;
+                    } else {
+                        csvText = utf8Text;
+                    }
+                }
+            } catch (err) {
+                csvText = buffer.toString('utf8');
+            }
+
+            const workbook = XLSX.read(csvText, { type: 'string' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            rawData = XLSX.utils.sheet_to_json(worksheet);
+        } else {
+            const buffer = await file.arrayBuffer();
+            const workbook = XLSX.read(buffer, { type: 'buffer' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            rawData = XLSX.utils.sheet_to_json(worksheet);
+        }
 
         if (rawData.length === 0) {
-            return NextResponse.json({ error: 'Excel file is empty' }, { status: 400 });
+            return NextResponse.json({ error: 'Excel/CSV file is empty' }, { status: 400 });
         }
 
         console.log("=== RAW DATA FIRST ROW ===");
@@ -35,41 +79,93 @@ export async function POST(request: NextRequest) {
             const targetBYear = date ? (new Date(date).getFullYear() + 543).toString() : '2569';
 
             const hdcValues = rawData.map((row, index) => {
-                // Helper to find key by partial match
+                // Helper to find key by partial match (case-insensitive)
                 const findKey = (keywords: string[]) => {
-                    return Object.keys(row).find(k =>
-                        keywords.some(kw => k.trim().replace(/\s+/g, ' ').includes(kw))
-                    );
+                    const lowerKeywords = keywords.map(kw => kw.toLowerCase());
+                    return Object.keys(row).find(k => {
+                        const normalizedKey = k.trim().replace(/\s+/g, ' ').toLowerCase();
+                        return lowerKeywords.some(kw => normalizedKey.includes(kw));
+                    });
                 };
 
-                const hospcodeKey = findKey(['รหัสหน่วยบริการ', 'hospcode']);
-                const opdKey = findKey(['ยอด OPD', 'opd', 'ยอดOPD']);
-                const teleKey = findKey(['Telemedicine', 'telemedicine']);
+                if (isCsv) {
+                    // NEW CONDITION FOR CSV UPLOADS:
+                    // 1. Filter by province = 'พิษณุโลก'
+                    const provinceKey = findKey(['จังหวัด', 'province', 'provname']);
+                    if (provinceKey) {
+                        const provinceVal = String(row[provinceKey] || '').trim();
+                        if (!provinceVal || !provinceVal.includes('พิษณุโลก')) {
+                            return null;
+                        }
+                    }
 
-                const rawHospcode = String(row[hospcodeKey || ''] || '');
-                if (!rawHospcode || rawHospcode === 'undefined' || rawHospcode.includes('รวม')) return null;
+                    // 2. Map new fields
+                    const hospcodeKey = findKey(['hospital_code', 'hospcode']);
+                    const opdKey = findKey(['OPD', 'opd']);
+                    const teleKey = findKey(['HDC', 'telemedicine']);
+                    const percentKey = findKey(['percent_hdc_opd', 'percent']);
 
-                const hospcode = rawHospcode.padStart(5, '0');
+                    const rawHospcode = String(row[hospcodeKey || ''] || '');
+                    if (!rawHospcode || rawHospcode === 'undefined' || rawHospcode.includes('รวม')) return null;
 
-                // Clean numeric strings (ensure absolute integer)
-                const cleanNumber = (val: any) => {
-                    if (val === undefined || val === null || val === '') return 0;
-                    if (typeof val === 'number') return Math.floor(val);
-                    // Remove commas and parse as float then floor to get integer
-                    const cleaned = String(val).replace(/,/g, '').trim();
-                    return Math.floor(parseFloat(cleaned) || 0);
-                };
+                    const hospcode = rawHospcode.padStart(5, '0');
 
-                const opd = cleanNumber(row[opdKey || '']);
-                const telemedicine = cleanNumber(row[teleKey || '']);
-                const id = `${hospcode}_${targetBYear}`;
-                const percent = opd > 0 ? (telemedicine * 100) / opd : 0;
+                    const cleanNumber = (val: any) => {
+                        if (val === undefined || val === null || val === '') return 0;
+                        if (typeof val === 'number') return Math.floor(val);
+                        const cleaned = String(val).replace(/,/g, '').trim();
+                        return Math.floor(parseFloat(cleaned) || 0);
+                    };
 
-                return [id, hospcode, targetBYear, opd, telemedicine, percent, date, new Date()];
+                    const cleanFloat = (val: any) => {
+                        if (val === undefined || val === null || val === '') return 0;
+                        if (typeof val === 'number') return val;
+                        const cleaned = String(val).replace(/,/g, '').trim();
+                        return parseFloat(cleaned) || 0;
+                    };
+
+                    const opd = cleanNumber(row[opdKey || '']);
+                    const telemedicine = cleanNumber(row[teleKey || '']);
+                    const id = `${hospcode}_${targetBYear}`;
+                    
+                    let percent = 0;
+                    if (percentKey && row[percentKey] !== undefined && row[percentKey] !== null && row[percentKey] !== '') {
+                        percent = cleanFloat(row[percentKey]);
+                    } else {
+                        percent = opd > 0 ? (telemedicine * 100) / opd : 0;
+                    }
+
+                    return [id, hospcode, targetBYear, opd, telemedicine, percent, date, new Date()];
+
+                } else {
+                    // ORIGINAL CONDITION FOR EXCEL UPLOADS (RETAINED):
+                    const hospcodeKey = findKey(['รหัสหน่วยบริการ', 'hospcode']);
+                    const opdKey = findKey(['ยอด OPD', 'opd', 'ยอดOPD']);
+                    const teleKey = findKey(['Telemedicine', 'telemedicine']);
+
+                    const rawHospcode = String(row[hospcodeKey || ''] || '');
+                    if (!rawHospcode || rawHospcode === 'undefined' || rawHospcode.includes('รวม')) return null;
+
+                    const hospcode = rawHospcode.padStart(5, '0');
+
+                    const cleanNumber = (val: any) => {
+                        if (val === undefined || val === null || val === '') return 0;
+                        if (typeof val === 'number') return Math.floor(val);
+                        const cleaned = String(val).replace(/,/g, '').trim();
+                        return Math.floor(parseFloat(cleaned) || 0);
+                    };
+
+                    const opd = cleanNumber(row[opdKey || '']);
+                    const telemedicine = cleanNumber(row[teleKey || '']);
+                    const id = `${hospcode}_${targetBYear}`;
+                    const percent = opd > 0 ? (telemedicine * 100) / opd : 0;
+
+                    return [id, hospcode, targetBYear, opd, telemedicine, percent, date, new Date()];
+                }
             }).filter(item => item !== null);
 
             if (hdcValues.length === 0) {
-                return NextResponse.json({ error: 'No valid HDC data found in file' }, { status: 400 });
+                return NextResponse.json({ error: 'ไม่พบข้อมูล HDC จังหวัดพิษณุโลก หรือรูปแบบไฟล์ไม่ถูกต้อง' }, { status: 400 });
             }
 
             const hdcQuery = `
