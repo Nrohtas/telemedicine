@@ -52,7 +52,7 @@ function LoginContent() {
 
             const data = await res.json();
             if (res.ok) {
-                router.push('/admin');
+                window.location.replace('/telemedicine/admin');
             } else {
                 setError(data.error || 'Login failed');
             }
