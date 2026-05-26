@@ -266,7 +266,7 @@ const Navbar = ({
                             </SoftButton>
                         </Link>
 
-                        <Link href="/admin" className="hover:opacity-80 transition-opacity">
+                        <a href="/telemedicine/admin" className="hover:opacity-80 transition-opacity">
                             <SoftButton
                                 variant="nav"
                                 active={pathname.startsWith('/admin')}
@@ -277,7 +277,7 @@ const Navbar = ({
                                 </svg>
                                 <span>Admin</span>
                             </SoftButton>
-                        </Link>
+                        </a>
 
                         {showSignOut && (
                             <button
@@ -362,7 +362,7 @@ const Navbar = ({
                                 <span className="text-xs font-black uppercase tracking-widest">หน่วยบริการ</span>
                             </SoftButton>
                         </Link>
-                        <Link href="/admin" onClick={() => setIsMenuOpen(false)}>
+                        <a href="/telemedicine/admin" onClick={() => setIsMenuOpen(false)}>
                             <SoftButton
                                 variant="nav"
                                 active={pathname.startsWith('/admin')}
@@ -373,7 +373,7 @@ const Navbar = ({
                                 </svg>
                                 <span className="text-xs font-black uppercase tracking-widest">Admin</span>
                             </SoftButton>
-                        </Link>
+                        </a>
                         {showSignOut && (
                             <button
                                 onClick={() => { onSignOut?.(); setIsMenuOpen(false); }}
