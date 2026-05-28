@@ -572,31 +572,31 @@ export default async function DailyPage({
                 </div>
               </div>
             </div>
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[70vh] border border-slate-100 rounded-2xl">
               <table className="w-full min-w-[1200px] divide-y divide-slate-100">
                 <thead className="bg-slate-50">
                   <tr className="border-b border-slate-200 text-center text-[13px] font-black text-slate-600">
                     {view === "hospital" ? (
                       <>
-                        <th className="px-5 py-3 text-left" rowSpan={2}>
+                        <th className="px-5 py-3 text-left sticky left-0 top-0 bg-slate-50 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" rowSpan={2}>
                           <Link href={getSortUrl("hospcode")} scroll={false} className="hover:text-emerald-600">
                             รหัส <SortIcon column="hospcode" />
                           </Link>
                         </th>
-                        <th className="px-5 py-3 text-left" rowSpan={2}>
+                        <th className="px-5 py-3 text-left sticky top-0 bg-slate-50 z-20" rowSpan={2}>
                           <Link href={getSortUrl("hospname")} scroll={false} className="hover:text-emerald-600">
                             หน่วยบริการ <SortIcon column="hospname" />
                           </Link>
                         </th>
                       </>
                     ) : (
-                      <th className="px-5 py-3 text-left" rowSpan={2}>
+                      <th className="px-5 py-3 text-left sticky left-0 top-0 bg-slate-50 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" rowSpan={2}>
                         <Link href={getSortUrl("amp_name")} scroll={false} className="hover:text-emerald-600">
                           อำเภอ <SortIcon column="amp_name" />
                         </Link>
                       </th>
                     )}
-                    <th className="border-l-2 border-indigo-300 bg-indigo-50 px-5 py-3 text-indigo-700" colSpan={3}>
+                    <th className="border-l-2 border-indigo-300 bg-indigo-50 px-5 py-3 text-indigo-700 sticky top-0 z-20" colSpan={3}>
                       <div className="flex flex-col items-center gap-1">
                         <span className="text-[13px] font-black uppercase">ผลงาน PLATFORM</span>
                         <div className="text-[10px] font-bold opacity-80">
@@ -628,7 +628,7 @@ export default async function DailyPage({
                         </div>
                       </div>
                     </th>
-                    <th className="border-l-2 border-cyan-300 bg-cyan-50 px-3 py-3 text-cyan-700" colSpan={5}>
+                    <th className="border-l-2 border-cyan-300 bg-cyan-50 px-3 py-3 text-cyan-700 sticky top-0 z-20" colSpan={5}>
                       ผลงาน HIS
                       <div className="flex justify-center mt-1">
                         <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white/60 border border-cyan-200 text-cyan-800 shadow-sm">
@@ -636,7 +636,7 @@ export default async function DailyPage({
                         </span>
                       </div>
                     </th>
-                    <th className="border-l-2 border-emerald-300 bg-emerald-50 px-3 py-3 text-emerald-700" colSpan={3}>
+                    <th className="border-l-2 border-emerald-300 bg-emerald-50 px-3 py-3 text-emerald-700 sticky top-0 z-20" colSpan={3}>
                       ผลงาน HDC
                       <div className="flex justify-center mt-1">
                         <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white/60 border border-emerald-200 text-emerald-800 shadow-sm">
@@ -644,72 +644,72 @@ export default async function DailyPage({
                         </span>
                       </div>
                     </th>
-                    <th className="border-l-2 border-amber-300 bg-amber-50 px-3 py-3 text-amber-700" colSpan={2}>
+                    <th className="border-l-2 border-amber-300 bg-amber-50 px-3 py-3 text-amber-700 sticky top-0 z-20" colSpan={2}>
                       ผลต่าง
                     </th>
                   </tr>
                   <tr className="border-b border-slate-200 text-left text-[10px] font-black uppercase tracking-tight text-slate-500">
-                    <th className="border-l-2 border-indigo-300 bg-indigo-50/70 px-2 py-2 text-right">
-                      <Link href={getSortUrl("platform_target")} scroll={false} className="hover:text-indigo-700">
+                    <th className="border-l-2 border-indigo-300 bg-indigo-50/70 px-2 py-2 text-right sticky top-[47px] z-20">
+                      <Link href={getSortUrl("platform_target")} scroll={false} className="hover:text-indigo-700 text-indigo-700">
                         เป้าหมาย <SortIcon column="platform_target" />
                       </Link>
                     </th>
-                    <th className="bg-indigo-50/70 px-2 py-2 text-right">
-                      <Link href={getSortUrl("platform_result")} scroll={false} className="hover:text-indigo-700">
+                    <th className="bg-indigo-50/70 px-2 py-2 text-right sticky top-[47px] z-20">
+                      <Link href={getSortUrl("platform_result")} scroll={false} className="hover:text-indigo-700 text-indigo-700">
                         ผลงาน <SortIcon column="platform_result" />
                       </Link>
                     </th>
-                    <th className="bg-indigo-50/70 px-2 py-2 text-center">
-                      <Link href={getSortUrl("platform_percent")} scroll={false} className="hover:text-indigo-700 font-black text-[13px]">
+                    <th className="bg-indigo-50/70 px-2 py-2 text-center sticky top-[47px] z-20">
+                      <Link href={getSortUrl("platform_percent")} scroll={false} className="hover:text-indigo-700 font-black text-[13px] text-indigo-700">
                         % <SortIcon column="platform_percent" />
                       </Link>
                     </th>
-                    <th className="border-l-2 border-cyan-300 bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap">
+                    <th className="border-l-2 border-cyan-300 bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap text-cyan-800 sticky top-[47px] z-20">
                       <Link href={getSortUrl("visit_type_2")} scroll={false} className="hover:text-cyan-600">
                         มาตามนัด(2) <SortIcon column="visit_type_2" />
                       </Link>
                     </th>
-                    <th className="bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap">
+                    <th className="bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap text-cyan-800 sticky top-[47px] z-20">
                       <Link href={getSortUrl("visit_type_3")} scroll={false} className="hover:text-cyan-600">
                         รับส่งต่อ(3) <SortIcon column="visit_type_3" />
                       </Link>
                     </th>
-                    <th className="bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap">
+                    <th className="bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap text-cyan-800 sticky top-[47px] z-20">
                       <Link href={getSortUrl("visit_type_5")} scroll={false} className="hover:text-cyan-600">
                         Tele(5) <SortIcon column="visit_type_5" />
                       </Link>
                     </th>
-                    <th className="bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap">
+                    <th className="bg-cyan-50/70 px-2 py-2 text-right whitespace-nowrap text-cyan-800 sticky top-[47px] z-20">
                       <Link href={getSortUrl("total")} scroll={false} className="hover:text-cyan-600">
                         รวม 2,3,5 <SortIcon column="total" />
                       </Link>
                     </th>
-                    <th className="bg-cyan-50/70 px-2 py-2 text-center">
+                    <th className="bg-cyan-50/70 px-2 py-2 text-center sticky top-[47px] z-20">
                       <Link href={getSortUrl("percent")} scroll={false} className="hover:text-cyan-600 font-black text-[13px]">
                         % <SortIcon column="percent" />
                       </Link>
                     </th>
-                    <th className="border-l-2 border-emerald-300 bg-emerald-50/70 px-2 py-2 text-right">
+                    <th className="border-l-2 border-emerald-300 bg-emerald-50/70 px-2 py-2 text-right text-emerald-800 sticky top-[47px] z-20">
                       <Link href={getSortUrl("hdc_opd")} scroll={false} className="hover:text-emerald-700">
                         OPD (2,3,5) <SortIcon column="hdc_opd" />
                       </Link>
                     </th>
-                    <th className="bg-emerald-50/70 px-2 py-2 text-right">
+                    <th className="bg-emerald-50/70 px-2 py-2 text-right text-emerald-800 sticky top-[47px] z-20">
                       <Link href={getSortUrl("hdc_result")} scroll={false} className="hover:text-emerald-700">
                         Tele (5) <SortIcon column="hdc_result" />
                       </Link>
                     </th>
-                    <th className="bg-emerald-50/70 px-2 py-2 text-center">
+                    <th className="bg-emerald-50/70 px-2 py-2 text-center text-emerald-800 sticky top-[47px] z-20">
                       <Link href={getSortUrl("hdc_percent")} scroll={false} className="hover:text-emerald-700 font-black text-[13px]">
                         % <SortIcon column="hdc_percent" />
                       </Link>
                     </th>
-                    <th className="border-l-2 border-amber-300 bg-amber-50/70 px-2 py-2 text-right">
+                    <th className="border-l-2 border-amber-300 bg-amber-50/70 px-2 py-2 text-right text-amber-800 sticky top-[47px] z-20">
                       <Link href={getSortUrl("diff_hdc_platform")} scroll={false} className="hover:text-amber-700">
                         HDC - PLATFORM <SortIcon column="diff_hdc_platform" />
                       </Link>
                     </th>
-                    <th className="bg-amber-50/70 px-2 py-2 text-right">
+                    <th className="bg-amber-50/70 px-2 py-2 text-right text-amber-800 sticky top-[47px] z-20">
                       <Link href={getSortUrl("diff_hdc_his")} scroll={false} className="hover:text-amber-700">
                         HDC - HIS <SortIcon column="diff_hdc_his" />
                       </Link>
@@ -724,7 +724,7 @@ export default async function DailyPage({
                       <tr key={view === "hospital" ? row.hospcode : row.amp_code} className="group hover:bg-slate-50">
                         {view === "hospital" ? (
                           <>
-                            <td className="whitespace-nowrap px-5 py-2.5 text-[11px] font-black text-slate-500">
+                            <td className="whitespace-nowrap px-5 py-2.5 text-[11px] font-black text-slate-500 sticky left-0 bg-white group-hover:bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                               {row.hospcode}
                             </td>
                             <td className="min-w-[220px] max-w-[350px] px-5 py-2.5">
@@ -737,7 +737,7 @@ export default async function DailyPage({
                             </td>
                           </>
                         ) : (
-                          <td className="whitespace-nowrap px-5 py-2.5">
+                          <td className="whitespace-nowrap px-5 py-2.5 sticky left-0 bg-white group-hover:bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                             <Link
                               href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}${policy !== "normal" ? `&policy=${policy}` : ""}`}
                               className="flex items-center gap-2 font-black text-slate-900 underline-offset-4 group-hover:text-emerald-700 group-hover:underline decoration-emerald-500/30"
@@ -769,7 +769,7 @@ export default async function DailyPage({
                 </tbody>
                 <tfoot className="sticky bottom-0 z-10 bg-white border-t-2 border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
                   <tr className="text-center">
-                    <td className="px-5 py-5 text-left font-black bg-slate-50" colSpan={view === "hospital" ? 2 : 1}>
+                    <td className="px-5 py-5 text-left font-black bg-slate-50 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" colSpan={view === "hospital" ? 2 : 1}>
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-1.5 rounded-full bg-slate-400"></div>
                         <span className="text-base font-black text-slate-700">

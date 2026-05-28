@@ -400,21 +400,21 @@ export default async function DailyHospitalPage({
                   </div>
                 </div>
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-auto max-h-[70vh] border border-slate-100 rounded-2xl">
                 <table className="w-full min-w-[1500px] divide-y divide-slate-100">
                   <thead className="bg-slate-50">
                     <tr className="border-b border-slate-200 text-center text-[13px] font-black text-slate-600">
-                      <th className="px-5 py-3 text-left" rowSpan={2}>
+                      <th className="px-5 py-3 text-left sticky left-0 top-0 bg-slate-50 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" rowSpan={2}>
                         <Link href={getSortUrl("hospcode")} scroll={false} className="hover:text-emerald-600">
                           รหัส <SortIcon column="hospcode" />
                         </Link>
                       </th>
-                      <th className="px-5 py-3 text-left" rowSpan={2}>
+                      <th className="px-5 py-3 text-left sticky top-0 bg-slate-50 z-20" rowSpan={2}>
                         <Link href={getSortUrl("hospname")} scroll={false} className="hover:text-emerald-600">
                           หน่วยบริการ <SortIcon column="hospname" />
                         </Link>
                       </th>
-                      <th className="border-l-2 border-indigo-300 bg-indigo-50 px-3 py-3 text-indigo-700" colSpan={3}>
+                      <th className="border-l-2 border-indigo-300 bg-indigo-50 px-3 py-3 text-indigo-700 sticky top-0 z-20" colSpan={3}>
                         <div className="flex flex-col items-center gap-1">
                           <span className="text-[13px] font-black uppercase">ผลงาน PLATFORM</span>
                           <div className="text-[9px] font-bold opacity-80 scale-90 origin-center">
@@ -425,7 +425,7 @@ export default async function DailyHospitalPage({
                               className="hover:underline flex items-center gap-1"
                             >
                               <div className="p-0.5 rounded-md bg-emerald-50 shadow-sm ring-1 ring-emerald-100/50">
-                                <svg width="10" height="10" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <circle cx="50" cy="22" r="14" fill="#006837" />
                                   <path d="M25 40H75V75C75 80 71 84 66 84H34C29 84 25 80 25 75V40Z" stroke="#F6D76E" strokeWidth="10" />
                                   <rect x="40" y="52" width="20" height="7" fill="#A5A7AA" />
@@ -433,20 +433,11 @@ export default async function DailyHospitalPage({
                                 </svg>
                               </div>
                               <span>หมอพร้อม Station + สอน.บัดดี้</span>
-                              <div className="p-0.5 rounded-md bg-sky-50 shadow-sm ring-1 ring-sky-100/50">
-                                <svg width="10" height="10" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M10 45L50 15L90 45" stroke="#00ADEF" strokeWidth="12" strokeLinecap="round" />
-                                  <rect x="40" y="32" width="20" height="7" fill="#A5A7AA" />
-                                  <rect x="46.5" y="26" width="7" height="19" fill="#A5A7AA" />
-                                  <path d="M25 55C25 55 25 85 50 85C75 85 75 60 75 60" stroke="#F6D76E" strokeWidth="10" fill="none" strokeLinecap="round" />
-                                  <circle cx="75" cy="62" r="8" fill="#0060A9" />
-                                </svg>
-                              </div>
                             </a>
                           </div>
                         </div>
                       </th>
-                      <th className="border-l-2 border-cyan-300 bg-cyan-50 px-3 py-3 text-cyan-900" colSpan={5}>
+                      <th className="border-l-2 border-cyan-300 bg-cyan-50 px-3 py-3 text-cyan-900 sticky top-0 z-20" colSpan={5}>
                         ผลงาน HIS
                         <div className="flex justify-center mt-1">
                           <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white/60 border border-cyan-200 text-cyan-900 shadow-sm">
@@ -454,7 +445,7 @@ export default async function DailyHospitalPage({
                           </span>
                         </div>
                       </th>
-                      <th className="border-l-2 border-emerald-300 bg-emerald-50 px-3 py-3 text-emerald-900" colSpan={3}>
+                      <th className="border-l-2 border-emerald-300 bg-emerald-50 px-3 py-3 text-emerald-900 sticky top-0 z-20" colSpan={3}>
                         ผลงาน HDC
                         <div className="flex justify-center mt-1">
                           <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white/60 border border-emerald-200 text-emerald-900 shadow-sm">
@@ -462,72 +453,72 @@ export default async function DailyHospitalPage({
                           </span>
                         </div>
                       </th>
-                      <th className="border-l-2 border-amber-300 bg-amber-50 px-3 py-3 text-amber-700" colSpan={2}>
+                      <th className="border-l-2 border-amber-300 bg-amber-50 px-3 py-3 text-amber-700 sticky top-0 z-20" colSpan={2}>
                         ผลต่าง
                       </th>
                     </tr>
                     <tr className="border-b border-slate-200 text-left text-[11px] font-black uppercase tracking-tight text-slate-500">
-                      <th className="border-l-2 border-indigo-300 bg-indigo-50/70 px-3 py-2 text-right">
+                      <th className="border-l-2 border-indigo-300 bg-indigo-50/70 px-3 py-2 text-right sticky top-[47px] z-20">
                         <Link href={getSortUrl("platform_target")} scroll={false} className="hover:text-indigo-700 text-indigo-700">
                           เป้าหมาย <SortIcon column="platform_target" />
                         </Link>
                       </th>
-                      <th className="bg-indigo-50/70 px-3 py-2 text-right">
+                      <th className="bg-indigo-50/70 px-3 py-2 text-right sticky top-[47px] z-20">
                         <Link href={getSortUrl("platform_result")} scroll={false} className="hover:text-indigo-700 text-indigo-700">
                           ผลงาน <SortIcon column="platform_result" />
                         </Link>
                       </th>
-                      <th className="bg-indigo-50/70 px-3 py-2 text-center">
+                      <th className="bg-indigo-50/70 px-3 py-2 text-center sticky top-[47px] z-20">
                         <Link href={getSortUrl("platform_percent")} scroll={false} className="hover:text-indigo-700 font-black text-[14px] text-indigo-700">
                           % <SortIcon column="platform_percent" />
                         </Link>
                       </th>
-                      <th className="border-l-2 border-cyan-300 bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap text-cyan-900">
+                      <th className="border-l-2 border-cyan-300 bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap text-cyan-900 sticky top-[47px] z-20">
                         <Link href={getSortUrl("visit_type_2")} scroll={false} className="hover:text-cyan-900">
                           มาตามนัด(2) <SortIcon column="visit_type_2" />
                         </Link>
                       </th>
-                      <th className="bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap text-cyan-900">
+                      <th className="bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap text-cyan-900 sticky top-[47px] z-20">
                         <Link href={getSortUrl("visit_type_3")} scroll={false} className="hover:text-cyan-900">
                           รับส่งต่อ(3) <SortIcon column="visit_type_3" />
                         </Link>
                       </th>
-                      <th className="bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap text-cyan-900">
+                      <th className="bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap text-cyan-900 sticky top-[47px] z-20">
                         <Link href={getSortUrl("visit_type_5")} scroll={false} className="hover:text-cyan-900">
                           Tele(5) <SortIcon column="visit_type_5" />
                         </Link>
                       </th>
-                      <th className="bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap text-cyan-900">
+                      <th className="bg-cyan-50/70 px-3 py-2 text-right whitespace-nowrap text-cyan-900 sticky top-[47px] z-20">
                         <Link href={getSortUrl("total")} scroll={false} className="hover:text-cyan-900">
                           รวม 2,3,5 <SortIcon column="total" />
                         </Link>
                       </th>
-                      <th className="bg-cyan-50/70 px-3 py-2 text-center">
+                      <th className="bg-cyan-50/70 px-3 py-2 text-center sticky top-[47px] z-20">
                         <Link href={getSortUrl("percent")} scroll={false} className="hover:text-cyan-600 font-black text-[14px]">
                           % <SortIcon column="percent" />
                         </Link>
                       </th>
-                      <th className="border-l-2 border-emerald-300 bg-emerald-50/70 px-3 py-2 text-right text-emerald-950">
+                      <th className="border-l-2 border-emerald-300 bg-emerald-50/70 px-3 py-2 text-right text-emerald-950 sticky top-[47px] z-20">
                         <Link href={getSortUrl("hdc_opd")} scroll={false} className="hover:text-emerald-950">
                           OPD (2,3,5) <SortIcon column="hdc_opd" />
                         </Link>
                       </th>
-                      <th className="bg-emerald-50/70 px-3 py-2 text-right text-emerald-950">
+                      <th className="bg-emerald-50/70 px-3 py-2 text-right text-emerald-950 sticky top-[47px] z-20">
                         <Link href={getSortUrl("hdc_result")} scroll={false} className="hover:text-emerald-950">
                           Tele (5) <SortIcon column="hdc_result" />
                         </Link>
                       </th>
-                      <th className="bg-emerald-50/70 px-3 py-2 text-center text-emerald-950">
+                      <th className="bg-emerald-50/70 px-3 py-2 text-center text-emerald-950 sticky top-[47px] z-20">
                         <Link href={getSortUrl("hdc_percent")} scroll={false} className="hover:text-emerald-950 font-black text-[14px]">
                           % <SortIcon column="hdc_percent" />
                         </Link>
                       </th>
-                      <th className="border-l-2 border-amber-300 bg-amber-50/70 px-3 py-2 text-right text-amber-900">
+                      <th className="border-l-2 border-amber-300 bg-amber-50/70 px-3 py-2 text-right text-amber-900 sticky top-[47px] z-20">
                         <Link href={getSortUrl("diff_hdc_platform")} scroll={false} className="hover:text-amber-900">
                           HDC - PLATFORM <SortIcon column="diff_hdc_platform" />
                         </Link>
                       </th>
-                      <th className="bg-amber-50/70 px-3 py-2 text-right text-amber-900">
+                      <th className="bg-amber-50/70 px-3 py-2 text-right text-amber-900 sticky top-[47px] z-20">
                         <Link href={getSortUrl("diff_hdc_his")} scroll={false} className="hover:text-amber-900">
                           HDC - HIS <SortIcon column="diff_hdc_his" />
                         </Link>
@@ -540,7 +531,7 @@ export default async function DailyHospitalPage({
                       const diff_hdc_his = row.hdc_result - row.visit_type_5;
                       return (
                         <tr key={row.hospcode} className="group hover:bg-slate-50">
-                          <td className="whitespace-nowrap px-5 py-4 text-[11px] font-black text-slate-500">
+                          <td className="whitespace-nowrap px-5 py-4 text-[11px] font-black text-slate-500 sticky left-0 bg-white group-hover:bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                             {row.hospcode}
                           </td>
                           <td className="min-w-[280px] max-w-[400px] px-5 py-4">
@@ -577,7 +568,7 @@ export default async function DailyHospitalPage({
                   </tbody>
                   <tfoot className="sticky bottom-0 z-10 bg-white border-t-2 border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
                     <tr className="text-center">
-                      <td className="px-5 py-5 text-left font-black bg-slate-50" colSpan={2}>
+                      <td className="px-5 py-5 text-left font-black bg-slate-50 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" colSpan={2}>
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-1.5 rounded-full bg-slate-400"></div>
                           <span className="text-base font-black text-slate-700">รวม</span>
