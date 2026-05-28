@@ -5,8 +5,32 @@ import LastUpdate from "@/components/LastUpdate";
 import Link from "next/link";
 import TopPerformance from "@/components/TopPerformance";
 import ExportDailyExcel from "@/components/ExportDailyExcel";
+import ExportDailyHospitalsExcel from "@/components/ExportDailyHospitalsExcel";
 
 export const dynamic = "force-dynamic";
+
+interface DailyHospitalRow {
+  hospcode: string;
+  hospname: string;
+  amp_code: string;
+  amp_name: string;
+  hostype_name: string;
+  hostype_level: string;
+  platform_target: number;
+  platform_result: number;
+  platform_percent: number;
+  visit_type_2: number;
+  visit_type_3: number;
+  visit_type_5: number;
+  total: number;
+  percent: number;
+  hdc_opd: number;
+  hdc_result: number;
+  hdc_percent: number;
+  diff_platform_his: number;
+  diff_hdc_his: number;
+  latest_date: string | null;
+}
 
 interface DailyDistrictRow {
   amp_code: string;
@@ -189,6 +213,153 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
   }
 }
 
+async function getDailyHospitalRowsAll(sortBy: string = "hospcode", sortOrder: string = "ASC", policy: string = "normal"): Promise<DailyHospitalRow[]> {
+  const allowedSortColumns = [
+    "hospcode",
+    "hospname",
+    "amp_name",
+    "platform_target",
+    "platform_result",
+    "platform_percent",
+    "visit_type_2",
+    "visit_type_3",
+    "visit_type_5",
+    "total",
+    "percent",
+    "hdc_opd",
+    "hdc_result",
+    "hdc_percent",
+    "diff_platform_his",
+    "diff_hdc_his",
+    "diff_hdc_platform",
+  ];
+  const finalSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "hospcode";
+  const finalSortOrder = sortOrder.toUpperCase() === "DESC" ? "DESC" : "ASC";
+
+  const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
+  const hisStartDate = policy === "pheoc" ? "2026-03-23" : "2026-01-01";
+
+  const query = `
+    SELECT
+      h.hospcode,
+      h.hospname,
+      h.amp_code,
+      h.amp_name,
+      COALESCE(tgt.target, 0) AS platform_target,
+      COALESCE(p.result, 0) AS platform_result,
+      CASE
+        WHEN COALESCE(tgt.target, 0) > 0
+        THEN COALESCE(p.result, 0) / COALESCE(tgt.target, 0) * 100
+        ELSE 0
+      END AS platform_percent,
+      COALESCE(vtd.visit_type_2, 0) AS visit_type_2,
+      COALESCE(vtd.visit_type_3, 0) AS visit_type_3,
+      COALESCE(vtd.visit_type_5, 0) AS visit_type_5,
+      (
+        COALESCE(vtd.visit_type_2, 0) +
+        COALESCE(vtd.visit_type_3, 0) +
+        COALESCE(vtd.visit_type_5, 0)
+      ) AS total,
+      CASE
+        WHEN (
+          COALESCE(vtd.visit_type_2, 0) +
+          COALESCE(vtd.visit_type_3, 0) +
+          COALESCE(vtd.visit_type_5, 0)
+        ) > 0
+        THEN COALESCE(vtd.visit_type_5, 0) /
+          (
+            COALESCE(vtd.visit_type_2, 0) +
+            COALESCE(vtd.visit_type_3, 0) +
+            COALESCE(vtd.visit_type_5, 0)
+          ) * 100
+        ELSE 0
+      END AS percent,
+      COALESCE(hdc.opd, 0) AS hdc_opd,
+      COALESCE(hdc.telemedicine, 0) AS hdc_result,
+      CASE
+        WHEN COALESCE(hdc.opd, 0) > 0
+        THEN COALESCE(hdc.telemedicine, 0) / COALESCE(hdc.opd, 0) * 100
+        ELSE 0
+      END AS hdc_percent,
+      COALESCE(vtd.visit_type_5, 0) - COALESCE(p.result, 0) AS diff_platform_his,
+      COALESCE(hdc.telemedicine, 0) - COALESCE(vtd.visit_type_5, 0) AS diff_hdc_his,
+      latest.latest_date,
+      latest_t.latest_time,
+      ht.hostype_name,
+      ht.hostype_level
+    FROM hospital h
+    LEFT JOIN (
+        SELECT hostype_new, hostype_name, MAX(CASE WHEN hostype = 'รพช.' THEN 'รพ.' ELSE hostype END) as hostype_level
+        FROM hostype
+        GROUP BY hostype_new, hostype_name
+    ) ht ON h.hostype_new = ht.hostype_new COLLATE utf8mb4_general_ci
+    LEFT JOIN (
+      SELECT hospcode, op_30 AS target
+      FROM target
+      WHERE b_year = '2568'
+    ) tgt ON tgt.hospcode = h.hospcode COLLATE utf8mb4_general_ci
+    LEFT JOIN (
+      SELECT hospcode, result
+      FROM telemed
+      WHERE b_year = '2569'
+    ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
+    LEFT JOIN (
+      SELECT MAX(visit_date) AS latest_date
+      FROM visit_type_daily
+    ) latest ON 1 = 1
+    LEFT JOIN (
+      SELECT MAX(d_update) AS latest_time
+      FROM visit_type_daily
+    ) latest_t ON 1 = 1
+    LEFT JOIN (
+      SELECT
+        hoscode,
+        COALESCE(SUM(visit_type_2), 0) AS visit_type_2,
+        COALESCE(SUM(visit_type_3), 0) AS visit_type_3,
+        COALESCE(SUM(visit_type_5), 0) AS visit_type_5
+      FROM visit_type_daily
+      WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
+      GROUP BY hoscode
+    ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
+    LEFT JOIN ${hdcTable} hdc
+      ON hdc.hospcode = h.hospcode COLLATE utf8mb4_general_ci
+      AND hdc.b_year = '2569'
+    WHERE h.hostype_new IN (5, 7)
+      AND h.status = '1'
+    ORDER BY ${finalSortBy} ${finalSortOrder}
+  `;
+
+  try {
+    const [rows]: any = await pool.query(query);
+
+    return rows.map((row: any): DailyHospitalRow => ({
+      hospcode: row.hospcode,
+      hospname: row.hospname,
+      amp_code: row.amp_code,
+      amp_name: row.amp_name,
+      platform_target: Number(row.platform_target) || 0,
+      platform_result: Number(row.platform_result) || 0,
+      platform_percent: Number(row.platform_percent) || 0,
+      visit_type_2: Number(row.visit_type_2) || 0,
+      visit_type_3: Number(row.visit_type_3) || 0,
+      visit_type_5: Number(row.visit_type_5) || 0,
+      total: Number(row.total) || 0,
+      percent: Number(row.percent) || 0,
+      hdc_opd: Number(row.hdc_opd) || 0,
+      hdc_result: Number(row.hdc_result) || 0,
+      hdc_percent: Number(row.hdc_percent) || 0,
+      diff_platform_his: Number(row.diff_platform_his) || 0,
+      diff_hdc_his: Number(row.diff_hdc_his) || 0,
+      latest_date: row.latest_time || row.latest_date,
+      hostype_name: row.hostype_name || '-',
+      hostype_level: row.hostype_level || '-',
+    }));
+  } catch (error) {
+    console.error('Error in getDailyHospitalRowsAll:', error);
+    return [];
+  }
+}
+
 async function getPlatformLatestUpdate(): Promise<string | null> {
   try {
     const [rows]: any = await pool.query("SELECT DATE_FORMAT(MAX(file_time), '%Y-%m-%d %H:%i:%s') as last_update FROM fileupload WHERE file_platform = 'moph_buddycare'");
@@ -213,15 +384,19 @@ async function getHdcLatestUpdate(policy: string = "normal"): Promise<string | n
 export default async function DailyPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sort_by?: string; sort_order?: string; policy?: string }>;
+  searchParams: Promise<{ sort_by?: string; sort_order?: string; policy?: string; view?: string }>;
 }) {
   try {
     const params = await searchParams;
-    const sortBy = params.sort_by ?? "amp_code";
+    const view = params.view === "hospital" ? "hospital" : "district";
+    const sortBy = params.sort_by ?? (view === "hospital" ? "hospcode" : "amp_code");
     const sortOrder = params.sort_order ?? "ASC";
     const policy = params.policy === "pheoc" ? "pheoc" : "normal";
 
-    const rows = await getDailyDistrictRows(sortBy, sortOrder, policy);
+    const rows = view === "hospital"
+      ? await getDailyHospitalRowsAll(sortBy, sortOrder, policy)
+      : await getDailyDistrictRows(sortBy, sortOrder, policy);
+
     const hdcLastUpdate = await getHdcLatestUpdate(policy);
     const platformLastUpdate = await getPlatformLatestUpdate();
     const hisLastUpdate = rows[0]?.latest_date || null;
@@ -247,12 +422,18 @@ export default async function DailyPage({
 
     const getSortUrl = (column: string) => {
       const nextOrder = sortBy === column && sortOrder === "ASC" ? "DESC" : "ASC";
-      return `/daily?sort_by=${column}&sort_order=${nextOrder}${policy !== "normal" ? `&policy=${policy}` : ""}`;
+      return `/daily?sort_by=${column}&sort_order=${nextOrder}${policy !== "normal" ? `&policy=${policy}` : ""}${view !== "district" ? `&view=${view}` : ""}`;
     };
 
     const SortIcon = ({ column }: { column: string }) => {
       if (sortBy !== column) return <span className="ml-1 opacity-20">↕</span>;
       return <span className="ml-1">{sortOrder === "ASC" ? "↑" : "↓"}</span>;
+    };
+
+    const getRowColor = (hostypeName: string) => {
+      if (hostypeName === 'กระทรวงสาธารณสุข') return 'text-green-600';
+      if (hostypeName === 'องค์กรปกครองส่วนท้องถิ่น') return 'text-purple-600';
+      return 'text-slate-900';
     };
 
     return (
@@ -262,12 +443,41 @@ export default async function DailyPage({
         <section className="px-3 md:px-6 mt-2 md:mt-3">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4 px-1">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">สรุปรายอำเภอ</h3>
+              {/* Premium View Switcher Tabs */}
+              <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+                <Link
+                  href={`/daily?view=district${policy !== "normal" ? `&policy=${policy}` : ""}`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                    view === "district"
+                      ? "bg-white text-blue-600 shadow-sm border border-slate-200/50"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  รายอำเภอ
+                </Link>
+                <Link
+                  href={`/daily?view=hospital${policy !== "normal" ? `&policy=${policy}` : ""}`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                    view === "hospital"
+                      ? "bg-white text-teal-700 shadow-sm border border-slate-200/50"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  รายโรงพยาบาล
+                </Link>
+              </div>
 
               {/* Premium Policy Switcher Tabs */}
               <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
                 <Link
-                  href={`/daily?policy=normal${sortBy !== "amp_code" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}`}
+                  href={`/daily?policy=normal${sortBy !== "amp_code" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "district" ? `&view=${view}` : ""}`}
                   className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${policy === "normal"
                       ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
                       : "text-slate-500 hover:text-slate-800"
@@ -276,7 +486,7 @@ export default async function DailyPage({
                   นโยบาย TMM (1 ม.ค. 2569)
                 </Link>
                 <Link
-                  href={`/daily?policy=pheoc${sortBy !== "amp_code" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}`}
+                  href={`/daily?policy=pheoc${sortBy !== "amp_code" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "district" ? `&view=${view}` : ""}`}
                   className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${policy === "pheoc"
                       ? "bg-white text-orange-600 shadow-sm border border-slate-200/50"
                       : "text-slate-500 hover:text-slate-800"
@@ -301,7 +511,11 @@ export default async function DailyPage({
                 </svg>
                 Onepage
               </Link>
-              <ExportDailyExcel data={rows} policy={policy} />
+              {view === "hospital" ? (
+                <ExportDailyHospitalsExcel data={rows as DailyHospitalRow[]} policy={policy} />
+              ) : (
+                <ExportDailyExcel data={rows as DailyDistrictRow[]} policy={policy} />
+              )}
             </div>
           </div>
 
@@ -359,14 +573,29 @@ export default async function DailyPage({
               </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1100px] divide-y divide-slate-100">
+              <table className="w-full min-w-[1200px] divide-y divide-slate-100">
                 <thead className="bg-slate-50">
                   <tr className="border-b border-slate-200 text-center text-[13px] font-black text-slate-600">
-                    <th className="px-5 py-3 text-left" rowSpan={2}>
-                      <Link href={getSortUrl("amp_name")} scroll={false} className="hover:text-emerald-600">
-                        อำเภอ <SortIcon column="amp_name" />
-                      </Link>
-                    </th>
+                    {view === "hospital" ? (
+                      <>
+                        <th className="px-5 py-3 text-left" rowSpan={2}>
+                          <Link href={getSortUrl("hospcode")} scroll={false} className="hover:text-emerald-600">
+                            รหัส <SortIcon column="hospcode" />
+                          </Link>
+                        </th>
+                        <th className="px-5 py-3 text-left" rowSpan={2}>
+                          <Link href={getSortUrl("hospname")} scroll={false} className="hover:text-emerald-600">
+                            หน่วยบริการ <SortIcon column="hospname" />
+                          </Link>
+                        </th>
+                      </>
+                    ) : (
+                      <th className="px-5 py-3 text-left" rowSpan={2}>
+                        <Link href={getSortUrl("amp_name")} scroll={false} className="hover:text-emerald-600">
+                          อำเภอ <SortIcon column="amp_name" />
+                        </Link>
+                      </th>
+                    )}
                     <th className="border-l-2 border-indigo-300 bg-indigo-50 px-5 py-3 text-indigo-700" colSpan={3}>
                       <div className="flex flex-col items-center gap-1">
                         <span className="text-[13px] font-black uppercase">ผลงาน PLATFORM</span>
@@ -488,23 +717,39 @@ export default async function DailyPage({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {rows.map((row) => {
+                  {rows.map((row: any) => {
                     const diff_hdc_platform = row.hdc_result - row.platform_result;
                     const diff_hdc_his = row.hdc_result - row.visit_type_5;
                     return (
-                      <tr key={row.amp_code} className="group hover:bg-slate-50">
-                        <td className="whitespace-nowrap px-5 py-2.5">
-                          <Link
-                            href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}${policy !== "normal" ? `&policy=${policy}` : ""}`}
-                            className="flex items-center gap-2 font-black text-slate-900 underline-offset-4 group-hover:text-emerald-700 group-hover:underline decoration-emerald-500/30"
-                          >
-                            {row.amp_name}
-                            <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-4px] group-hover:translate-x-0 bg-emerald-50 text-emerald-600 text-[10px] px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-1">
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                              หน่วยบริการ
-                            </span>
-                          </Link>
-                        </td>
+                      <tr key={view === "hospital" ? row.hospcode : row.amp_code} className="group hover:bg-slate-50">
+                        {view === "hospital" ? (
+                          <>
+                            <td className="whitespace-nowrap px-5 py-2.5 text-[11px] font-black text-slate-500">
+                              {row.hospcode}
+                            </td>
+                            <td className="min-w-[220px] max-w-[350px] px-5 py-2.5">
+                              <Link
+                                href={`/daily/hospital/list-daily?hospcode=${encodeURIComponent(row.hospcode)}`}
+                                className={`block whitespace-normal break-words text-[11px] font-bold leading-snug underline-offset-4 hover:underline ${getRowColor(row.hostype_name)}`}
+                              >
+                                {row.hospname}
+                              </Link>
+                            </td>
+                          </>
+                        ) : (
+                          <td className="whitespace-nowrap px-5 py-2.5">
+                            <Link
+                              href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}${policy !== "normal" ? `&policy=${policy}` : ""}`}
+                              className="flex items-center gap-2 font-black text-slate-900 underline-offset-4 group-hover:text-emerald-700 group-hover:underline decoration-emerald-500/30"
+                            >
+                              {row.amp_name}
+                              <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-4px] group-hover:translate-x-0 bg-emerald-50 text-emerald-600 text-[10px] px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-1">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                หน่วยบริการ
+                              </span>
+                            </Link>
+                          </td>
+                        )}
                         <NumberCell value={Math.round(row.platform_target)} className="border-l-2 border-indigo-200 bg-indigo-50/20" compact />
                         <NumberCell value={row.platform_result} className="bg-indigo-50/20" compact />
                         <PercentCell value={row.platform_percent} className="bg-indigo-50/20" color="indigo" />
@@ -524,10 +769,12 @@ export default async function DailyPage({
                 </tbody>
                 <tfoot className="sticky bottom-0 z-10 bg-white border-t-2 border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
                   <tr className="text-center">
-                    <td className="px-5 py-5 text-left font-black bg-slate-50">
+                    <td className="px-5 py-5 text-left font-black bg-slate-50" colSpan={view === "hospital" ? 2 : 1}>
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-1.5 rounded-full bg-slate-400"></div>
-                        <span className="text-base font-black text-slate-700">รวมทั้งจังหวัด</span>
+                        <span className="text-base font-black text-slate-700">
+                          {view === "hospital" ? "รวมทั้งหมด" : "รวมทั้งจังหวัด"}
+                        </span>
                       </div>
                     </td>
                     <NumberCell value={Math.round(totals.platform_target)} footer compact className="bg-indigo-50/50 text-indigo-700 font-normal" />
