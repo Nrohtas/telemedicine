@@ -88,6 +88,32 @@ export async function POST(request: NextRequest) {
                     });
                 };
 
+                const cleanPercent = (val: any) => {
+                    if (val === undefined || val === null || val === '') return 0;
+                    
+                    // If the value is a number (e.g. parsed from Excel percentage formats as 0.1469)
+                    if (typeof val === 'number') {
+                        // If it's a ratio <= 1.0 (excluding 0), convert it to raw percentage number (e.g. 14.69)
+                        if (val > 0 && val <= 1.0) {
+                            return val * 100;
+                        }
+                        return val;
+                    }
+                    
+                    // Strip % sign and commas, then parse as float
+                    let cleaned = String(val).replace(/%/g, '').replace(/,/g, '').trim();
+                    let num = parseFloat(cleaned) || 0;
+                    
+                    // If the string was already a ratio like "0.1469" without % sign
+                    if (num > 0 && num <= 1.0 && String(val).includes('.')) {
+                        if (!String(val).includes('%')) {
+                            return num * 100;
+                        }
+                    }
+                    
+                    return num;
+                };
+
                 if (isCsv) {
                     // NEW CONDITION FOR CSV UPLOADS:
                     // 1. Filter by province = 'พิษณุโลก'
@@ -117,20 +143,13 @@ export async function POST(request: NextRequest) {
                         return Math.floor(parseFloat(cleaned) || 0);
                     };
 
-                    const cleanFloat = (val: any) => {
-                        if (val === undefined || val === null || val === '') return 0;
-                        if (typeof val === 'number') return val;
-                        const cleaned = String(val).replace(/,/g, '').trim();
-                        return parseFloat(cleaned) || 0;
-                    };
-
                     const opd = cleanNumber(row[opdKey || '']);
                     const telemedicine = cleanNumber(row[teleKey || '']);
                     const id = `${hospcode}_${targetBYear}`;
                     
                     let percent = 0;
                     if (percentKey && row[percentKey] !== undefined && row[percentKey] !== null && row[percentKey] !== '') {
-                        percent = cleanFloat(row[percentKey]);
+                        percent = cleanPercent(row[percentKey]);
                     } else {
                         percent = opd > 0 ? (telemedicine * 100) / opd : 0;
                     }
@@ -142,6 +161,7 @@ export async function POST(request: NextRequest) {
                     const hospcodeKey = findKey(['รหัสหน่วยบริการ', 'hospcode']);
                     const opdKey = findKey(['ยอด OPD', 'opd', 'ยอดOPD']);
                     const teleKey = findKey(['Telemedicine', 'telemedicine']);
+                    const percentKey = findKey(['percent_hdc_opd', 'percent']);
 
                     const rawHospcode = String(row[hospcodeKey || ''] || '');
                     if (!rawHospcode || rawHospcode === 'undefined' || rawHospcode.includes('รวม')) return null;
@@ -158,7 +178,13 @@ export async function POST(request: NextRequest) {
                     const opd = cleanNumber(row[opdKey || '']);
                     const telemedicine = cleanNumber(row[teleKey || '']);
                     const id = `${hospcode}_${targetBYear}`;
-                    const percent = opd > 0 ? (telemedicine * 100) / opd : 0;
+                    
+                    let percent = 0;
+                    if (percentKey && row[percentKey] !== undefined && row[percentKey] !== null && row[percentKey] !== '') {
+                        percent = cleanPercent(row[percentKey]);
+                    } else {
+                        percent = opd > 0 ? (telemedicine * 100) / opd : 0;
+                    }
 
                     return [id, hospcode, targetBYear, opd, telemedicine, percent, date, new Date()];
                 }
