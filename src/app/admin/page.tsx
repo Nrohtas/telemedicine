@@ -288,7 +288,7 @@ export default function AdminPage() {
     };
 
     return (
-        <main className="min-h-screen bg-background font-sans relative overflow-hidden pb-12">
+        <main className="min-h-screen flex flex-col bg-background font-sans relative overflow-hidden">
             <Navbar
                 showFilters={false}
                 showSignOut={true}

@@ -86,7 +86,7 @@ export default async function RemedPage() {
     dates.length > 0 ? `ข้อมูล ${formatThaiDate(dates[0])} ย้อนไปถึง ${formatThaiDate(dates[dates.length - 1])}` : "-";
 
   return (
-    <main className="min-h-screen bg-slate-50 pb-8">
+    <main className="min-h-screen flex flex-col bg-slate-50">
       <Navbar showFilters={false} />
 
       <section className="px-4 md:px-6 mt-4">

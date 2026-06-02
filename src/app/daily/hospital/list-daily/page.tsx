@@ -162,7 +162,7 @@ export default async function DailyHospitalListPage({
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 pb-12">
+    <main className="min-h-screen flex flex-col bg-slate-50">
       <Navbar showFilters={false} />
 
       <section className="px-3 md:px-6 mt-2 md:mt-3">

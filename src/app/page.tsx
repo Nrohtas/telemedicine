@@ -113,7 +113,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen pb-12 bg-background">
+    <main className="min-h-screen flex flex-col bg-background">
       <Navbar
         selectedDistrict={selectedDistrict}
         onDistrictChange={setSelectedDistrict}

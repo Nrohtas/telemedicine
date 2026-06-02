@@ -290,7 +290,7 @@ export default async function DailyHospitalPage({
     };
 
     return (
-      <main className="min-h-screen bg-background pb-12">
+      <main className="min-h-screen flex flex-col bg-background">
         <Navbar showFilters={false} />
 
         <section className="px-3 md:px-6 mt-2 md:mt-3">
