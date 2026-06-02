@@ -641,7 +641,7 @@ function HospitalDirectoryContent() {
                                                                         {hospital.hospcode}
                                                                     </td>
                                                                     <td className="px-6 py-3">
-                                                                        <span className={`text-sm font-black transition-colors whitespace-nowrap ${rowColor.replace('600', '700').replace('500', '600')}`}>
+                                                                        <span className={`text-sm font-black transition-colors whitespace-nowrap ${rowColor}`}>
                                                                             {hospital.hospname}
                                                                         </span>
                                                                     </td>
