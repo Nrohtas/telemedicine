@@ -46,6 +46,50 @@ const ExportDailyExcel = ({ data, policy }: ExportDailyExcelProps) => {
             'HDC - HIS': row.hdc_result - row.visit_type_5
         }));
 
+        // คํานวณยอดรวมทั้งหมด (Grand Totals)
+        const totals = data.reduce((acc, curr) => ({
+            platform_target: acc.platform_target + curr.platform_target,
+            platform_result: acc.platform_result + curr.platform_result,
+            visit_type_2: acc.visit_type_2 + curr.visit_type_2,
+            visit_type_3: acc.visit_type_3 + curr.visit_type_3,
+            visit_type_5: acc.visit_type_5 + curr.visit_type_5,
+            total: acc.total + curr.total,
+            hdc_opd: acc.hdc_opd + curr.hdc_opd,
+            hdc_result: acc.hdc_result + curr.hdc_result,
+        }), {
+            platform_target: 0,
+            platform_result: 0,
+            visit_type_2: 0,
+            visit_type_3: 0,
+            visit_type_5: 0,
+            total: 0,
+            hdc_opd: 0,
+            hdc_result: 0
+        });
+
+        const totalPercentPlatform = totals.platform_target > 0 ? (totals.platform_result / totals.platform_target * 100) : 0;
+        const totalPercentHIS = totals.total > 0 ? (totals.visit_type_5 / totals.total * 100) : 0;
+        const totalPercentHDC = totals.hdc_opd > 0 ? (totals.hdc_result / totals.hdc_opd * 100) : 0;
+
+        // เพิ่มแถวรวมทั้งหมดใน exportData
+        exportData.push({
+            'รหัสอำเภอ': '',
+            'อำเภอ': 'รวมทั้งหมด',
+            'เป้าหมาย (Platform)': Math.round(totals.platform_target),
+            'ผลงาน (Platform)': totals.platform_result,
+            '% (Platform)': Number(totalPercentPlatform.toFixed(2)),
+            'มาตามนัด(2)': totals.visit_type_2,
+            'รับส่งต่อ(3)': totals.visit_type_3,
+            'Tele(5)': totals.visit_type_5,
+            'รวม 2,3,5 (HIS)': totals.total,
+            '% (HIS)': Number(totalPercentHIS.toFixed(2)),
+            'OPD (HDC)': totals.hdc_opd,
+            'Tele (HDC)': totals.hdc_result,
+            '% (HDC)': Number(totalPercentHDC.toFixed(2)),
+            'HDC - PLATFORM': totals.hdc_result - totals.platform_result,
+            'HDC - HIS': totals.hdc_result - totals.visit_type_5
+        });
+
         const ws = XLSX.utils.json_to_sheet(exportData);
         const wb = XLSX.utils.book_new();
         
