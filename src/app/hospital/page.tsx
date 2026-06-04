@@ -355,9 +355,6 @@ function HospitalDirectoryContent() {
                 onSortChange={setSelectedSort}
             />
 
-            <div className="px-6 max-w-7xl mx-auto pt-6 flex justify-end items-center gap-3">
-                <LastUpdate />
-            </div>
 
             <div className="px-6 max-w-7xl mx-auto mt-4">
                 {/* Search Bar */}
@@ -391,6 +388,7 @@ function HospitalDirectoryContent() {
                                     </div>
                                     <h3 className="text-lg font-bold text-nm-primary opacity-80">สรุปข้อมูลทั้งจังหวัด</h3>
                                     <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
+                                    <LastUpdate className="mb-0 flex-shrink-0" />
                                     <button
                                         onClick={handleExportExcel}
                                         className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-full transition-all duration-200 group text-emerald-700 hover:text-emerald-800 leading-none shadow-sm"
@@ -494,10 +492,10 @@ function HospitalDirectoryContent() {
                                                                 </td>
                                                                 <td className="px-6 py-3 whitespace-nowrap">
                                                                     {(() => {
-                                                                        const label = hospital.hostype_level || (hospital.hostype === '05' ? 'รพ.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.');
+                                                                        const label = hospital.hostype_level || (hospital.hostype === '05' ? 'รพศ.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพช.' : 'รพ.สต.');
                                                                         const colorClass = getHostColor(label);
                                                                         return (
-                                                                            <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${colorClass.replace('text-', 'bg-')} ${colorClass} whitespace-nowrap`}>
+                                                                            <span className={`text-xs font-bold whitespace-nowrap ${colorClass}`}>
                                                                                 {label}
                                                                             </span>
                                                                         );
@@ -563,7 +561,7 @@ function HospitalDirectoryContent() {
                             </div>
                         ) : (
                             /* Existing District-Grouped Tables */
-                            filteredData.map((group) => (
+                            filteredData.map((group, groupIndex) => (
                                 <div key={group.amp_code} className="space-y-4">
                                     <div className="flex items-center gap-2 px-2">
                                         <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
@@ -574,6 +572,7 @@ function HospitalDirectoryContent() {
                                         </div>
                                         <h3 className="text-lg font-bold text-nm-primary opacity-80">อำเภอ{group.amp_name}</h3>
                                         <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
+                                        {groupIndex === 0 && <LastUpdate className="mb-0 flex-shrink-0" />}
                                         <button
                                             onClick={handleExportExcel}
                                             className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-full transition-all duration-200 group text-emerald-700 hover:text-emerald-800 leading-none shadow-sm ml-1"
@@ -675,12 +674,12 @@ function HospitalDirectoryContent() {
                                                                     </td>
                                                                     <td className="px-6 py-3 whitespace-nowrap">
                                                                         {(() => {
-                                                                            const label = hospital.hostype_level || (hospital.hostype === '05' ? 'รพ.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพศ.' : 'รพ.สต.');
+                                                                            const label = hospital.hostype_level || (hospital.hostype === '05' ? 'รพศ.' : hospital.hostype === '06' ? 'รพท.' : hospital.hostype === '07' ? 'รพช.' : 'รพ.สต.');
                                                                             const colorClass = getHostColor(label);
                                                                             return (
-                                                                                <span className={`text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ${colorClass.replace('text-', 'bg-')} ${colorClass} whitespace-nowrap`}>
+                                                                                <span className={`text-xs font-bold whitespace-nowrap ${colorClass}`}>
                                                                                     {label}
-                                                                                </span>
+                                                                                    </span>
                                                                             );
                                                                         })()}
                                                                     </td>

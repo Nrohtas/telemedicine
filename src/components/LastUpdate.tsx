@@ -8,9 +8,10 @@ interface LastUpdateProps {
     type?: string;
     sourceLink?: string;
     sourceLabel?: string;
+    className?: string;
 }
 
-export default function LastUpdate({ showLogo = true, type, sourceLink, sourceLabel }: LastUpdateProps) {
+export default function LastUpdate({ showLogo = true, type, sourceLink, sourceLabel, className = "mb-2 md:mb-1" }: LastUpdateProps) {
     const [lastUpdate, setLastUpdate] = useState<string | null>(null);
 
     useEffect(() => {
@@ -28,7 +29,7 @@ export default function LastUpdate({ showLogo = true, type, sourceLink, sourceLa
     if (!lastUpdate) return null;
 
     return (
-        <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1.5 sm:gap-4 mb-2 md:mb-1">
+        <div className={`flex flex-col sm:flex-row items-center sm:items-center gap-1.5 sm:gap-4 ${className}`}>
             {showLogo && (
                 <a
                     href="https://lookerstudio.google.com/u/0/reporting/33f2a1d7-2f28-43b1-85ea-6cf3e8d579ac/page/p_q5mrcvqeyd"
