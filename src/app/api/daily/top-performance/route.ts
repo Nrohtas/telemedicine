@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
                     THEN (COALESCE(vtd.visit_type_5, 0) / (COALESCE(vtd.visit_type_2, 0) + COALESCE(vtd.visit_type_3, 0) + COALESCE(vtd.visit_type_5, 0))) * 100
                     ELSE 0
                 END as his_percent,
-                COALESCE(tg.op_30, 0) as target
+                CEILING(COALESCE(tg.op_30, 0)) as target
             FROM hospital h
             LEFT JOIN (
                 SELECT hostype_new, MAX(hostype) as hostype_label, MAX(hostype_name) as affiliation

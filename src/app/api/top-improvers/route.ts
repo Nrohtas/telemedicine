@@ -21,7 +21,11 @@ export async function GET() {
                 GROUP BY hostype_new
             ) ht ON h.hostype_new = ht.hostype_new
             JOIN telemed t ON h.hospcode = t.hospcode
-            LEFT JOIN target tg ON h.hospcode = tg.hospcode AND tg.b_year = '2568'
+            LEFT JOIN (
+                SELECT hospcode, CEILING(COALESCE(op_30, 0)) as op_30
+                FROM target
+                WHERE b_year = '2568'
+            ) tg ON h.hospcode = tg.hospcode
             WHERE h.status = '1' AND t.b_year = '2569'
             AND h.hostype_new IN (${types.join(',')})
             GROUP BY h.hospcode, ht.hostype_label, ht.affiliation, tg.op_30

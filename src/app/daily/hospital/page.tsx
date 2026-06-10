@@ -139,7 +139,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
         GROUP BY hostype_new, hostype_name
     ) ht ON h.hostype_new = ht.hostype_new COLLATE utf8mb4_general_ci
     LEFT JOIN (
-      SELECT hospcode, op_30 AS target
+      SELECT hospcode, CEILING(COALESCE(op_30, 0)) AS target
       FROM target
       WHERE b_year = '2568'
     ) tgt ON tgt.hospcode = h.hospcode COLLATE utf8mb4_general_ci

@@ -16,7 +16,7 @@ export async function GET(request: Request) {
                 SUM(COALESCE(t.buddycare, 0)) as sornbuddy_count,
                 SUM(COALESCE(t.result, 0)) as total_result,
                 SUM(COALESCE(t.result_past, 0)) as total_result_past,
-                (SELECT SUM(COALESCE(tg.op_30, 0)) FROM target tg INNER JOIN hospital h2 ON tg.hospcode = h2.hospcode WHERE h2.amp_code = a.amp_code AND tg.b_year = '2568') as target_30
+                (SELECT SUM(CEILING(COALESCE(tg.op_30, 0))) FROM target tg INNER JOIN hospital h2 ON tg.hospcode = h2.hospcode WHERE h2.amp_code = a.amp_code AND tg.b_year = '2568') as target_30
             FROM ampur a
             LEFT JOIN hospital h ON a.amp_code = h.amp_code AND h.status = '1'
             ${type ? 'LEFT JOIN hostype ht ON h.hostype = ht.hostype_new' : ''}
