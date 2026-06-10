@@ -20,7 +20,7 @@ export async function GET(request: Request) {
                     WHERE t.b_year = ? AND h.status = '1'
                     ${type ? 'AND ht.hostype_list = ?' : ''}
                 ) as total_result,
-                SUM(CEILING(COALESCE(tg.op_30, 0))) as target_30,
+                SUM(tg.op_30) as target_30,
                 SUM(tg.op) as target
             FROM target tg
             INNER JOIN hospital h ON tg.hospcode = h.hospcode
