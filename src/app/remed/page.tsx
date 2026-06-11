@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import pool from "@/lib/db";
+import RemedMonthFilter from "./RemedMonthFilter";
 
 export const dynamic = "force-dynamic";
 
@@ -28,17 +29,72 @@ function formatThaiDate(value: string) {
   });
 }
 
-async function getRemedData() {
-  const [dateRows]: any = await pool.query(`
+const THAI_MONTHS = [
+  "", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+  "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+];
+
+function formatThaiMonth(ym: string) {
+  const [y, m] = ym.split('-');
+  const monthIndex = parseInt(m, 10);
+  const thaiMonth = THAI_MONTHS[monthIndex] || m;
+  const thaiYear = parseInt(y, 10) + 543;
+  return `${thaiMonth} ${thaiYear}`;
+}
+
+async function getRemedData(monthParam?: string, allParam?: string) {
+  // 1. Fetch unique months
+  const [monthRows]: any = await pool.query(`
+    SELECT DISTINCT DATE_FORMAT(visit_date, '%Y-%m') AS ym
+    FROM remed_count
+    ORDER BY ym DESC
+  `);
+  const uniqueMonths: string[] = monthRows.map((row: any) => row.ym as string);
+
+  // Generate month options
+  const monthOptions = [
+    { value: 'ล่าสุด', label: 'เดือนล่าสุด' },
+    ...uniqueMonths.map(ym => ({
+      value: ym,
+      label: formatThaiMonth(ym)
+    })),
+    { value: 'ทั้งหมด', label: 'ทั้งหมด' }
+  ];
+
+  // Determine active month
+  let activeMonth = 'ล่าสุด';
+  let dbFilterMonth = '';
+
+  if (allParam === 'true') {
+    activeMonth = 'ทั้งหมด';
+  } else if (monthParam && uniqueMonths.includes(monthParam)) {
+    activeMonth = monthParam;
+    dbFilterMonth = monthParam;
+  } else if (uniqueMonths.length > 0) {
+    // Default to latest
+    dbFilterMonth = uniqueMonths[0];
+  }
+
+  // 2. Fetch dates for the active month (or all dates)
+  let dateQuery = `
     SELECT DATE_FORMAT(visit_date, '%Y-%m-%d') AS visit_date
     FROM remed_count
+  `;
+  const dateParams: any[] = [];
+  if (dbFilterMonth) {
+    dateQuery += ` WHERE DATE_FORMAT(visit_date, '%Y-%m') = ? `;
+    dateParams.push(dbFilterMonth);
+  }
+  dateQuery += `
     GROUP BY visit_date
     ORDER BY visit_date DESC
-  `);
+  `;
 
+  const [dateRows]: any = await pool.query(dateQuery, dateParams);
   const dates: string[] = dateRows.map((row: any) => row.visit_date as string);
 
-  const [recordRows]: any = await pool.query(`
+  // 3. Fetch records
+  let recordQuery = `
     SELECT
       r.hoscode,
       COALESCE(h.hospname, 'ไม่พบชื่อหน่วยบริการ') AS hosname,
@@ -46,8 +102,15 @@ async function getRemedData() {
       COALESCE(r.count_case_dx_rx_same_prev_vst, 0) AS count_case_dx_rx_same_prev_vst
     FROM remed_count r
     LEFT JOIN hospital h ON h.hospcode = r.hoscode COLLATE utf8mb4_general_ci
-    ORDER BY h.hospname ASC, r.hoscode ASC, r.visit_date DESC
-  `);
+  `;
+  const recordParams: any[] = [];
+  if (dbFilterMonth) {
+    recordQuery += ` WHERE DATE_FORMAT(r.visit_date, '%Y-%m') = ? `;
+    recordParams.push(dbFilterMonth);
+  }
+  recordQuery += ` ORDER BY h.hospname ASC, r.hoscode ASC, r.visit_date DESC `;
+
+  const [recordRows]: any = await pool.query(recordQuery, recordParams);
 
   const rowMap = new Map<string, RemedGridRow>();
 
@@ -77,11 +140,19 @@ async function getRemedData() {
 
   const grandTotal = rows.reduce((sum, row) => sum + row.total, 0);
 
-  return { dates, rows, dateTotals, grandTotal };
+  return { dates, rows, dateTotals, grandTotal, monthOptions, activeMonth };
 }
 
-export default async function RemedPage() {
-  const { dates, rows, dateTotals, grandTotal } = await getRemedData();
+export default async function RemedPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string; all?: string }>;
+}) {
+  const resolvedParams = await searchParams;
+  const monthParam = resolvedParams.month;
+  const allParam = resolvedParams.all;
+
+  const { dates, rows, dateTotals, grandTotal, monthOptions, activeMonth } = await getRemedData(monthParam, allParam);
   const dateRange =
     dates.length > 0 ? `ข้อมูล ${formatThaiDate(dates[0])} ย้อนไปถึง ${formatThaiDate(dates[dates.length - 1])}` : "-";
 
@@ -96,7 +167,7 @@ export default async function RemedPage() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <h1 className="text-xl font-black text-slate-950 md:text-2xl">เคสที่ได้รับยา REMED</h1>
-                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">
+                  <span className="rounded-full bg-purple-50 px-3 py-1 text-xs font-black text-purple-700 border border-purple-100/50">
                     {dateRange}
                   </span>
                 </div>
@@ -111,6 +182,8 @@ export default async function RemedPage() {
               </div>
             </div>
           </div>
+
+          <RemedMonthFilter months={monthOptions} activeMonth={activeMonth} />
 
           <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-2">
@@ -128,22 +201,22 @@ export default async function RemedPage() {
                     <ColumnHead className="min-w-56">
                       หน่วยบริการ
                     </ColumnHead>
-                    <ColumnHead className="min-w-24 bg-emerald-50 text-right text-emerald-800">
+                    <ColumnHead className="min-w-24 bg-purple-50 text-right text-purple-800 border-b border-purple-100">
                       รวม
                     </ColumnHead>
                     {dates.map((date, index) => (
                       <ColumnHead key={date} className="min-w-24 text-right">
                         <span className="block">{formatThaiDate(date)}</span>
-                        {index === 0 && <span className="block text-[10px] font-bold text-emerald-600">ล่าสุด</span>}
+                        {index === 0 && <span className="block text-[10px] font-bold text-purple-600">ล่าสุด</span>}
                       </ColumnHead>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((row) => (
-                    <tr key={row.hoscode} className="group hover:bg-emerald-50/40">
-                      <td className="min-w-24 border-b border-slate-100 bg-white px-3 py-2 font-black text-slate-950 group-hover:bg-emerald-50">{row.hoscode}</td>
-                      <td className="min-w-56 max-w-72 truncate border-b border-slate-100 bg-white px-3 py-2 font-bold text-slate-700 group-hover:bg-emerald-50">
+                    <tr key={row.hoscode} className="group hover:bg-purple-50/30">
+                      <td className="min-w-24 border-b border-slate-100 bg-white px-3 py-2 font-black text-slate-950 group-hover:bg-purple-50/30">{row.hoscode}</td>
+                      <td className="min-w-56 max-w-72 truncate border-b border-slate-100 bg-white px-3 py-2 font-bold text-slate-700 group-hover:bg-purple-50/30">
                         {row.hosname}
                       </td>
                       <NumberCell value={row.total} strong />
@@ -170,7 +243,7 @@ export default async function RemedPage() {
                       <td className="min-w-56 border-t border-slate-300 bg-slate-100 px-3 py-2 font-black">
                         ทุกหน่วยบริการ
                       </td>
-                      <td className="border-t border-slate-300 bg-emerald-100 px-3 py-2 text-right font-black text-emerald-900">
+                      <td className="border-t border-slate-300 bg-purple-100/60 px-3 py-2 text-right font-black text-purple-950">
                         {numberFormat.format(grandTotal)}
                       </td>
                       {dates.map((date) => (
@@ -195,11 +268,11 @@ export default async function RemedPage() {
 function CompactMetric({ label, value, tone }: { label: string; value: number; tone?: "strong" }) {
   return (
     <div
-      className={`rounded-md border px-3 py-2 text-right ${tone === "strong" ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-slate-50"
+      className={`rounded-md border px-3 py-2 text-right ${tone === "strong" ? "border-purple-200/60 bg-purple-50" : "border-slate-200 bg-slate-50"
         }`}
     >
       <p className="text-[10px] font-black text-slate-500">{label}</p>
-      <p className={`text-lg font-black ${tone === "strong" ? "text-emerald-800" : "text-slate-900"}`}>
+      <p className={`text-lg font-black ${tone === "strong" ? "text-purple-800" : "text-slate-900"}`}>
         {numberFormat.format(value)}
       </p>
     </div>
@@ -227,7 +300,7 @@ function NumberCell({ value, strong = false }: { value: number; strong?: boolean
 
   return (
     <td
-      className={`border-b border-slate-100 px-3 py-2 text-right ${strong ? "bg-emerald-50 font-black text-emerald-900" : "font-bold"
+      className={`border-b border-slate-100 px-3 py-2 text-right ${strong ? "bg-purple-50/50 font-black text-purple-950" : "font-bold"
         } ${isZero ? "text-slate-300" : "text-slate-800"}`}
     >
       {numberFormat.format(value)}
