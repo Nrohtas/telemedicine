@@ -24,9 +24,10 @@ interface DailyDistrictRow {
 interface ExportDailyExcelProps {
     data: DailyDistrictRow[];
     policy?: string;
+    view?: string;
 }
 
-const ExportDailyExcel = ({ data, policy }: ExportDailyExcelProps) => {
+const ExportDailyExcel = ({ data, policy, view }: ExportDailyExcelProps) => {
     const handleExport = () => {
         const exportData = data.map(row => ({
             'รหัสอำเภอ': row.amp_code,
@@ -94,14 +95,19 @@ const ExportDailyExcel = ({ data, policy }: ExportDailyExcelProps) => {
         const wb = XLSX.utils.book_new();
         
         const policyLabel = policy === "pheoc" ? "PHEOC" : "TMM";
-        XLSX.utils.book_append_sheet(wb, ws, `DailySummary_${policyLabel}`);
+        const isPrimary = view === "primary";
+        const sheetName = isPrimary ? `DailySummary_Primary_${policyLabel}` : `DailySummary_${policyLabel}`;
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
         
         // Generate filename with current date and time
         const now = new Date();
         const dateStr = now.toISOString().split('T')[0];
         const timeStr = now.getHours().toString().padStart(2, '0') + 
                        now.getMinutes().toString().padStart(2, '0');
-        XLSX.writeFile(wb, `Telemedicine_Daily_Summary_${policyLabel}_${dateStr}_${timeStr}.xlsx`);
+        const fileName = isPrimary 
+            ? `Telemedicine_Daily_Summary_Primary_${policyLabel}_${dateStr}_${timeStr}.xlsx`
+            : `Telemedicine_Daily_Summary_${policyLabel}_${dateStr}_${timeStr}.xlsx`;
+        XLSX.writeFile(wb, fileName);
     };
 
     return (

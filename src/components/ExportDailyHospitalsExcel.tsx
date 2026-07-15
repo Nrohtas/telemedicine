@@ -28,9 +28,10 @@ interface DailyHospitalRow {
 interface ExportDailyHospitalsExcelProps {
   data: DailyHospitalRow[];
   policy?: string;
+  view?: string;
 }
 
-const ExportDailyHospitalsExcel = ({ data, policy }: ExportDailyHospitalsExcelProps) => {
+const ExportDailyHospitalsExcel = ({ data, policy, view }: ExportDailyHospitalsExcelProps) => {
   const handleExport = () => {
     const exportRows = data.map((row, index) => ({
       "ลำดับ": index + 1,
@@ -102,14 +103,21 @@ const ExportDailyHospitalsExcel = ({ data, policy }: ExportDailyHospitalsExcelPr
     const policyLabel = policy === "pheoc" ? "PHEOC" : "TMM";
     const ws = XLSX.utils.json_to_sheet(exportRows);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, `Daily_Hospitals_${policyLabel}`);
+    
+    const isPrimary = view === "primary";
+    const sheetName = isPrimary ? `Daily_Primary_${policyLabel}` : `Daily_Hospitals_${policyLabel}`;
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
 
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0];
     const timeStr = now.getHours().toString().padStart(2, '0') + 
                    now.getMinutes().toString().padStart(2, '0');
     
-    XLSX.writeFile(wb, `Daily_Telemedicine_Hospitals_All_${policyLabel}_${dateStr}_${timeStr}.xlsx`);
+    const fileName = isPrimary 
+      ? `Daily_Telemedicine_Primary_All_${policyLabel}_${dateStr}_${timeStr}.xlsx`
+      : `Daily_Telemedicine_Hospitals_All_${policyLabel}_${dateStr}_${timeStr}.xlsx`;
+    
+    XLSX.writeFile(wb, fileName);
   };
 
   return (

@@ -27,9 +27,10 @@ interface ExportDailyHospitalProps {
   rows: DailyHospitalRow[];
   districtName: string;
   policy?: string;
+  view?: string;
 }
 
-export default function ExportDailyHospital({ rows, districtName, policy }: ExportDailyHospitalProps) {
+export default function ExportDailyHospital({ rows, districtName, policy, view }: ExportDailyHospitalProps) {
   const handleExportExcel = () => {
     const exportRows = rows.map((row, index) => ({
       "ลำดับ": index + 1,
@@ -103,14 +104,20 @@ export default function ExportDailyHospital({ rows, districtName, policy }: Expo
     const policyLabel = policy === "pheoc" ? "PHEOC" : "TMM";
     const ws = utils.json_to_sheet(exportRows);
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, `Daily_Hospital_${policyLabel}`);
+    
+    const isPrimary = view === "primary";
+    const sheetName = isPrimary ? `Daily_Primary_${policyLabel}` : `Daily_Hospital_${policyLabel}`;
+    utils.book_append_sheet(wb, ws, sheetName);
 
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0];
     const timeStr = now.getHours().toString().padStart(2, '0') + 
                    now.getMinutes().toString().padStart(2, '0');
     
-    writeFileXLSX(wb, `Daily_Telemedicine_อ_${districtName}_${policyLabel}_${dateStr}_${timeStr}.xlsx`);
+    const fileName = isPrimary
+      ? `Daily_Telemedicine_Primary_อ_${districtName}_${policyLabel}_${dateStr}_${timeStr}.xlsx`
+      : `Daily_Telemedicine_อ_${districtName}_${policyLabel}_${dateStr}_${timeStr}.xlsx`;
+    writeFileXLSX(wb, fileName);
   };
 
   return (

@@ -78,7 +78,7 @@ function formatCurrentThaiDate() {
   } as any);
 }
 
-async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: string = "ASC", policy: string = "normal"): Promise<DailyDistrictRow[]> {
+async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: string = "ASC", policy: string = "normal", view: string = "district"): Promise<DailyDistrictRow[]> {
   const allowedSortColumns = [
     "amp_code",
     "amp_name",
@@ -102,6 +102,7 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
 
   const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
   const hisStartDate = policy === "pheoc" ? "2026-03-23" : "2026-01-01";
+  const hostypeFilter = view === "primary" ? "AND h.hostype_new IN (18, 21, 8, 13)" : "";
 
   const query = `
     SELECT
@@ -151,6 +152,7 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
     LEFT JOIN hospital h
       ON h.amp_code = a.amp_code COLLATE utf8mb4_general_ci
       AND h.status = '1'
+      ${hostypeFilter}
     LEFT JOIN (
       SELECT hospcode, CEILING(COALESCE(op_30, 0)) AS target_raw
       FROM target
@@ -213,7 +215,7 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
   }
 }
 
-async function getDailyHospitalRowsAll(sortBy: string = "hospcode", sortOrder: string = "ASC", policy: string = "normal"): Promise<DailyHospitalRow[]> {
+async function getDailyHospitalRowsAll(sortBy: string = "hospcode", sortOrder: string = "ASC", policy: string = "normal", view: string = "hospital"): Promise<DailyHospitalRow[]> {
   const allowedSortColumns = [
     "hospcode",
     "hospname",
@@ -238,6 +240,7 @@ async function getDailyHospitalRowsAll(sortBy: string = "hospcode", sortOrder: s
 
   const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
   const hisStartDate = policy === "pheoc" ? "2026-03-23" : "2026-01-01";
+  const hostypeFilter = view === "primary" ? "18, 21, 8, 13" : "5, 7";
 
   const query = `
     SELECT
@@ -324,7 +327,7 @@ async function getDailyHospitalRowsAll(sortBy: string = "hospcode", sortOrder: s
     LEFT JOIN ${hdcTable} hdc
       ON hdc.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       AND hdc.b_year = '2569'
-    WHERE h.hostype_new IN (5, 7)
+    WHERE h.hostype_new IN (${hostypeFilter})
       AND h.status = '1'
     ORDER BY ${finalSortBy} ${finalSortOrder}
   `;
@@ -388,14 +391,14 @@ export default async function DailyPage({
 }) {
   try {
     const params = await searchParams;
-    const view = params.view === "hospital" ? "hospital" : "district";
+    const view = params.view === "hospital" ? "hospital" : params.view === "primary" ? "primary" : "district";
     const sortBy = params.sort_by ?? (view === "hospital" ? "hospcode" : "amp_code");
     const sortOrder = params.sort_order ?? "ASC";
     const policy = params.policy === "pheoc" ? "pheoc" : "normal";
 
     const rows = view === "hospital"
       ? await getDailyHospitalRowsAll(sortBy, sortOrder, policy)
-      : await getDailyDistrictRows(sortBy, sortOrder, policy);
+      : await getDailyDistrictRows(sortBy, sortOrder, policy, view);
 
     const hdcLastUpdate = await getHdcLatestUpdate(policy);
     const platformLastUpdate = await getPlatformLatestUpdate();
@@ -472,6 +475,19 @@ export default async function DailyPage({
                   </svg>
                   รายโรงพยาบาล
                 </Link>
+                <Link
+                  href={`/daily?view=primary${policy !== "normal" ? `&policy=${policy}` : ""}`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                    view === "primary"
+                      ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  รายปฐมภูมิ
+                </Link>
               </div>
 
               {/* Premium Policy Switcher Tabs */}
@@ -512,9 +528,9 @@ export default async function DailyPage({
                 Onepage
               </Link>
               {view === "hospital" ? (
-                <ExportDailyHospitalsExcel data={rows as DailyHospitalRow[]} policy={policy} />
+                <ExportDailyHospitalsExcel data={rows as DailyHospitalRow[]} policy={policy} view={view} />
               ) : (
-                <ExportDailyExcel data={rows as DailyDistrictRow[]} policy={policy} />
+                <ExportDailyExcel data={rows as DailyDistrictRow[]} policy={policy} view={view} />
               )}
             </div>
           </div>
@@ -739,7 +755,7 @@ export default async function DailyPage({
                         ) : (
                           <td className="whitespace-nowrap px-5 py-2.5 sticky left-0 bg-white group-hover:bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                             <Link
-                              href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}${policy !== "normal" ? `&policy=${policy}` : ""}`}
+                              href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}${policy !== "normal" ? `&policy=${policy}` : ""}${view === "primary" ? "&view=primary" : ""}`}
                               className="flex items-center gap-2 font-black text-slate-900 underline-offset-4 group-hover:text-emerald-700 group-hover:underline decoration-emerald-500/30"
                             >
                               {row.amp_name}

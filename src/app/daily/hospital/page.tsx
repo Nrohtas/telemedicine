@@ -59,7 +59,7 @@ function formatThaiDate(value: string | null) {
   } as any);
 }
 
-async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode", sortOrder: string = "ASC", policy: string = "normal"): Promise<DailyHospitalRow[]> {
+async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode", sortOrder: string = "ASC", policy: string = "normal", view: string = "hospital"): Promise<DailyHospitalRow[]> {
   const allowedSortColumns = [
     "hospcode",
     "hospname",
@@ -83,6 +83,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
 
   const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
   const hisStartDate = policy === "pheoc" ? "2026-03-23" : "2026-01-01";
+  const hostypeFilter = view === "primary" ? "AND h.hostype_new IN (18, 21, 8, 13)" : "";
 
   const query = `
     SELECT
@@ -171,6 +172,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
       AND hdc.b_year = '2569'
     WHERE h.amp_code = ? COLLATE utf8mb4_general_ci
       AND h.status = '1'
+      ${hostypeFilter}
     ORDER BY ${finalSortBy} ${finalSortOrder}
   `;
 
@@ -229,7 +231,7 @@ async function getHdcLatestUpdate(policy: string = "normal"): Promise<string | n
 export default async function DailyHospitalPage({
   searchParams,
 }: {
-  searchParams: Promise<{ amp_code?: string; sort_by?: string; sort_order?: string; policy?: string }>;
+  searchParams: Promise<{ amp_code?: string; sort_by?: string; sort_order?: string; policy?: string; view?: string }>;
 }) {
   try {
     const params = await searchParams;
@@ -237,8 +239,9 @@ export default async function DailyHospitalPage({
     const sortBy = params.sort_by ?? "hospcode";
     const sortOrder = params.sort_order ?? "ASC";
     const policy = params.policy === "pheoc" ? "pheoc" : "normal";
+    const view = params.view === "primary" ? "primary" : "hospital";
 
-    const rows = ampCode ? await getDailyHospitalRows(ampCode, sortBy, sortOrder, policy) : [];
+    const rows = ampCode ? await getDailyHospitalRows(ampCode, sortBy, sortOrder, policy, view) : [];
     const hdcLastUpdate = await getHdcLatestUpdate(policy);
     const platformLastUpdate = await getPlatformLatestUpdate();
     const hisLastUpdate = rows[0]?.latest_date || null;
@@ -265,7 +268,7 @@ export default async function DailyHospitalPage({
 
     const getSortUrl = (column: string) => {
       const nextOrder = sortBy === column && sortOrder === "ASC" ? "DESC" : "ASC";
-      return `/daily/hospital?amp_code=${ampCode}&sort_by=${column}&sort_order=${nextOrder}${policy !== "normal" ? `&policy=${policy}` : ""}`;
+      return `/daily/hospital?amp_code=${ampCode}&sort_by=${column}&sort_order=${nextOrder}${policy !== "normal" ? `&policy=${policy}` : ""}${view !== "hospital" ? `&view=${view}` : ""}`;
     };
 
     const SortIcon = ({ column }: { column: string }) => {
@@ -300,20 +303,22 @@ export default async function DailyHospitalPage({
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   <div>
                     <Link
-                      href={`/daily${policy !== "normal" ? `?policy=${policy}` : ""}`}
+                      href={`/daily?view=${view}${policy !== "normal" ? `&policy=${policy}` : ""}`}
                       className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black text-slate-600 hover:bg-slate-200"
                     >
                       กลับหน้าสรุปอำเภอ
                     </Link>
                     <h1 className="mt-2 text-xl font-black tracking-tight text-slate-950 md:text-2xl">
-                      {districtName === "-" ? "รายหน่วยบริการ" : `รายหน่วยบริการ อ.${districtName}`}
+                      {districtName === "-" 
+                        ? (view === "primary" ? "รายหน่วยบริการปฐมภูมิ" : "รายหน่วยบริการ") 
+                        : (view === "primary" ? `รายหน่วยบริการปฐมภูมิ อ.${districtName}` : `รายหน่วยบริการ อ.${districtName}`)}
                     </h1>
                   </div>
 
                   {/* Premium Switcher Pills on Hospital Page */}
                   <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner mt-1 sm:mt-4">
                     <Link
-                      href={`/daily/hospital?amp_code=${ampCode}&policy=normal${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}`}
+                      href={`/daily/hospital?amp_code=${ampCode}&policy=normal${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "hospital" ? `&view=${view}` : ""}`}
                       className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${policy === "normal"
                           ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
                           : "text-slate-500 hover:text-slate-800"
@@ -322,7 +327,7 @@ export default async function DailyHospitalPage({
                       นโยบาย TMM (1 ม.ค. 2569)
                     </Link>
                     <Link
-                      href={`/daily/hospital?amp_code=${ampCode}&policy=pheoc${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}`}
+                      href={`/daily/hospital?amp_code=${ampCode}&policy=pheoc${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "hospital" ? `&view=${view}` : ""}`}
                       className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${policy === "pheoc"
                           ? "bg-white text-orange-600 shadow-sm border border-slate-200/50"
                           : "text-slate-500 hover:text-slate-800"
@@ -347,7 +352,7 @@ export default async function DailyHospitalPage({
                     </svg>
                     Onepage
                   </Link>
-                  <ExportDailyHospital rows={rows} districtName={districtName} policy={policy} />
+                  <ExportDailyHospital rows={rows} districtName={districtName} policy={policy} view={view} />
                 </div>
               </div>
             </div>
