@@ -207,30 +207,52 @@ export default function Home() {
                   </div>
 
                   {/* Section 2: Goals & Missing Volume (Center - Expanded to 4 cols) */}
-                  <div className="lg:col-span-4 space-y-4 bg-gradient-to-br from-red-50/50 to-orange-50/20 p-4 rounded-2xl border border-red-100/50 flex flex-col justify-center shadow-sm">
-                    <div className="flex flex-col gap-2">
+                  <div className="lg:col-span-4 space-y-2 bg-gradient-to-br from-red-50/50 to-orange-50/20 p-3.5 rounded-2xl border border-red-100/50 flex flex-col justify-center shadow-sm">
+                    <div className="flex flex-col gap-1.5">
                       {(() => {
-                        const displayTarget = Math.round(targetData.target_30);
-                        const missing = Math.max(0, displayTarget - globalStats.total_services);
+                        const displayTarget100 = Math.round(targetData.target);
+                        const displayTarget30 = Math.round(targetData.target_30);
+                        const missing100 = Math.max(0, displayTarget100 - globalStats.total_services);
+                        const missing30 = Math.max(0, displayTarget30 - globalStats.total_services);
                         return (
                           <>
+                            {/* Target 100% Row */}
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-1.5">
-                                <div className="p-1 rounded bg-red-100/50 text-[#FF6B6B]">
-                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                                <div className="p-1 rounded bg-red-100 text-red-600">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <circle cx="12" cy="12" r="6" />
+                                    <circle cx="12" cy="12" r="2" />
                                   </svg>
                                 </div>
-                                <div className="text-[11px] font-black text-[#FF6B6B] uppercase tracking-[0.2em] leading-none text-left">ผลงานขาดอีก</div>
+                                <div className="text-[10px] font-black text-red-600 uppercase tracking-[0.15em] leading-none text-left">เป้าหมาย (100%)</div>
                               </div>
                               <div className="flex items-baseline gap-1">
-                                <span className="text-3xl font-black text-[#FF6B6B] tracking-tight leading-none">{missing.toLocaleString()}</span>
-                                <span className="text-[11px] font-bold text-[#FF6B6B]/70 uppercase tracking-widest leading-none">ครั้ง</span>
+                                <span className="text-xl font-black text-red-700 tracking-tight leading-none">{displayTarget100.toLocaleString()}</span>
+                                <span className="text-[9px] font-bold text-red-600/70 uppercase tracking-widest leading-none">ครั้ง</span>
                               </div>
                             </div>
 
-                            <div className="h-[0.5px] w-full bg-red-200/30" />
+                            {/* Missing 100% Row */}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <div className="p-1 rounded bg-red-100/50 text-[#FF6B6B]">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                                  </svg>
+                                </div>
+                                <div className="text-[10px] font-black text-[#FF6B6B] uppercase tracking-[0.15em] leading-none text-left">ผลงานขาดอีก (100%)</div>
+                              </div>
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-xl font-black text-[#FF6B6B] tracking-tight leading-none">{missing100.toLocaleString()}</span>
+                                <span className="text-[9px] font-bold text-[#FF6B6B]/70 uppercase tracking-widest leading-none">ครั้ง</span>
+                              </div>
+                            </div>
 
+                            <div className="h-[0.5px] w-full bg-red-200/30 my-0.5" />
+
+                            {/* Target 30% Row */}
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-1.5">
                                 <div className="p-1 rounded bg-red-100 text-red-600">
@@ -239,11 +261,27 @@ export default function Home() {
                                     <polyline points="22 4 12 14.01 9 11.01" />
                                   </svg>
                                 </div>
-                                <div className="text-[10px] font-black text-red-600 uppercase tracking-[0.2em] leading-none text-left">เป้าหมาย (30%)</div>
+                                <div className="text-[10px] font-black text-red-600 uppercase tracking-[0.15em] leading-none text-left">เป้าหมาย (30%)</div>
                               </div>
                               <div className="flex items-baseline gap-1">
-                                <span className="text-3xl font-black text-red-700 tracking-tight leading-none">{displayTarget.toLocaleString()}</span>
-                                <span className="text-[10px] font-bold text-red-600/70 uppercase tracking-widest leading-none">ครั้ง</span>
+                                <span className="text-xl font-black text-red-700 tracking-tight leading-none">{displayTarget30.toLocaleString()}</span>
+                                <span className="text-[9px] font-bold text-red-600/70 uppercase tracking-widest leading-none">ครั้ง</span>
+                              </div>
+                            </div>
+
+                            {/* Missing 30% Row */}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <div className="p-1 rounded bg-red-100/50 text-[#FF6B6B]">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                                  </svg>
+                                </div>
+                                <div className="text-[10px] font-black text-[#FF6B6B] uppercase tracking-[0.15em] leading-none text-left">ผลงานขาดอีก (30%)</div>
+                              </div>
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-xl font-black text-[#FF6B6B] tracking-tight leading-none">{missing30.toLocaleString()}</span>
+                                <span className="text-[9px] font-bold text-[#FF6B6B]/70 uppercase tracking-widest leading-none">ครั้ง</span>
                               </div>
                             </div>
                           </>
@@ -254,7 +292,7 @@ export default function Home() {
                     <div className="h-1.5 w-full bg-red-100/20 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-red-500/60 transition-all duration-1000 ease-out"
-                        style={{ width: `${targetData.target_30 > 0 ? Math.min((globalStats.total_services / targetData.target_30) * 100, 100) : 0}%` }}
+                        style={{ width: `${targetData.target > 0 ? Math.min((globalStats.total_services / targetData.target) * 100, 100) : 0}%` }}
                       />
                     </div>
                   </div>
@@ -265,7 +303,7 @@ export default function Home() {
 
                     <div className="relative group cursor-pointer transition-transform hover:scale-105 duration-500">
                       <LiquidProgress
-                        value={targetData.target_30 > 0 ? (globalStats.total_services / targetData.target_30) * 100 : 0}
+                        value={targetData.target > 0 ? (globalStats.total_services / targetData.target) * 100 : 0}
                         size={120}
                         color="#059669" // emerald-600
                         bgColor="#E1EFEA"
@@ -274,7 +312,7 @@ export default function Home() {
                           <span className="text-[10px] font-black text-emerald-900/40 uppercase tracking-tighter leading-none mb-1">ผลงาน</span>
                           <div className="flex items-baseline leading-none">
                             <span className="text-3xl font-black text-emerald-900 tracking-tighter">
-                              {targetData.target_30 > 0 ? (new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format((globalStats.total_services / targetData.target_30) * 100)) : 0}
+                              {targetData.target > 0 ? (new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format((globalStats.total_services / targetData.target) * 100)) : 0}
                             </span>
                             <span className="text-sm font-black text-emerald-900/60">%</span>
                           </div>

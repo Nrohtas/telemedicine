@@ -25,6 +25,7 @@ interface Hospital {
     moph_past_date?: string;
     buddycare_date?: string;
     buddycare_past_date?: string;
+    op: number;
     op_30: number;
 }
 
@@ -128,12 +129,12 @@ function HospitalDirectoryContent() {
         const sortHospitals = (hospitals: Hospital[]) => {
             return [...hospitals].sort((a, b) => {
                 if (selectedSort === 'hospcode') return a.hospcode.localeCompare(b.hospcode);
-                if (selectedSort === 'target') return b.op_30 - a.op_30;
+                if (selectedSort === 'target') return (b.op || 0) - (a.op || 0);
                 if (selectedSort === 'total') return (b.moph + b.buddycare) - (a.moph + a.buddycare);
-                if (selectedSort === 'gap') return (b.op_30 - (b.moph + b.buddycare)) - (a.op_30 - (a.moph + a.buddycare));
+                if (selectedSort === 'gap') return ((b.op || 0) - (b.moph + b.buddycare)) - ((a.op || 0) - (a.moph + a.buddycare));
 
                 // Default: percent
-                const getPercent = (h: any) => h.op_30 > 0 ? ((h.moph + h.buddycare) / h.op_30 * 100) : 0;
+                const getPercent = (h: any) => h.op > 0 ? ((h.moph + h.buddycare) / h.op * 100) : 0;
                 return getPercent(b) - getPercent(a);
             });
         };
@@ -148,12 +149,15 @@ function HospitalDirectoryContent() {
                     "ลำดับ": index++,
                     "รหัส": h.hospcode,
                     "ชื่อหน่วยบริการ": h.hospname,
-                    "เป้าหมาย 30%": h.op_30,
+                    "เป้าหมาย 100%": h.op || 0,
+                    "เป้าหมาย 30%": h.op_30 || 0,
                     "หมอพร้อม": h.moph,
                     "สอน.บัดดี้": h.buddycare,
                     "ยอดรวม": h.moph + h.buddycare,
-                    "เปอร์เซ็นต์": h.op_30 > 0 ? formatPercent((h.moph + h.buddycare) / h.op_30 * 100) : "0%",
-                    "ขาดอีก": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0,
+                    "เปอร์เซ็นต์ (100%)": h.op > 0 ? formatPercent((h.moph + h.buddycare) / h.op * 100) : "0%",
+                    "เปอร์เซ็นต์ (30%)": h.op_30 > 0 ? formatPercent((h.moph + h.buddycare) / h.op_30 * 100) : "0%",
+                    "ขาดอีก (100%)": h.op > 0 ? Math.max(0, h.op - (h.moph + h.buddycare)) : 0,
+                    "ขาดอีก (30%)": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0,
                     "ตำบล": h.tmb_name || '-',
                     "อำเภอ": h.amp_name,
                     "ประเภท": typeLabel
@@ -169,12 +173,15 @@ function HospitalDirectoryContent() {
                         "ลำดับ": index++,
                         "รหัส": h.hospcode,
                         "ชื่อหน่วยบริการ": h.hospname,
-                        "เป้าหมาย 30%": h.op_30,
+                        "เป้าหมาย 100%": h.op || 0,
+                        "เป้าหมาย 30%": h.op_30 || 0,
                         "หมอพร้อม": h.moph,
                         "สอน.บัดดี้": h.buddycare,
                         "รวม": h.moph + h.buddycare,
-                        "เปอร์เซ็นต์": h.op_30 > 0 ? formatPercent((h.moph + h.buddycare) / h.op_30 * 100) : "0%",
-                        "ขาดอีก": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0,
+                        "เปอร์เซ็นต์ (100%)": h.op > 0 ? formatPercent((h.moph + h.buddycare) / h.op * 100) : "0%",
+                        "เปอร์เซ็นต์ (30%)": h.op_30 > 0 ? formatPercent((h.moph + h.buddycare) / h.op_30 * 100) : "0%",
+                        "ขาดอีก (100%)": h.op > 0 ? Math.max(0, h.op - (h.moph + h.buddycare)) : 0,
+                        "ขาดอีก (30%)": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0,
                         "ตำบล": h.tmb_name || '-',
                         "อำเภอ": h.amp_name,
                         "ประเภท": typeLabel
@@ -184,18 +191,22 @@ function HospitalDirectoryContent() {
                 // Add District Summary Row
                 const districtMoph = group.hospitals.reduce((sum, h) => sum + h.moph, 0);
                 const districtBuddy = group.hospitals.reduce((sum, h) => sum + h.buddycare, 0);
-                const districtTarget = group.hospitals.reduce((sum, h) => sum + h.op_30, 0);
+                const districtTarget100 = group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0);
+                const districtTarget30 = group.hospitals.reduce((sum, h) => sum + h.op_30, 0);
 
                 exportRows.push({
                     "ลำดับ": "",
                     "รหัส": "",
                     "ชื่อหน่วยบริการ": `รวมอำเภอ${group.amp_name}`,
-                    "เป้าหมาย 30%": districtTarget,
+                    "เป้าหมาย 100%": districtTarget100,
+                    "เป้าหมาย 30%": districtTarget30,
                     "หมอพร้อม": districtMoph,
                     "สอน.บัดดี้": districtBuddy,
                     "ยอดรวม": districtMoph + districtBuddy,
-                    "เปอร์เซ็นต์": districtTarget > 0 ? formatPercent((districtMoph + districtBuddy) / districtTarget * 100) : "0%",
-                    "ขาดอีก": districtTarget > 0 ? Math.max(0, districtTarget - (districtMoph + districtBuddy)) : 0,
+                    "เปอร์เซ็นต์ (100%)": districtTarget100 > 0 ? formatPercent((districtMoph + districtBuddy) / districtTarget100 * 100) : "0%",
+                    "เปอร์เซ็นต์ (30%)": districtTarget30 > 0 ? formatPercent((districtMoph + districtBuddy) / districtTarget30 * 100) : "0%",
+                    "ขาดอีก (100%)": districtTarget100 > 0 ? Math.max(0, districtTarget100 - (districtMoph + districtBuddy)) : 0,
+                    "ขาดอีก (30%)": districtTarget30 > 0 ? Math.max(0, districtTarget30 - (districtMoph + districtBuddy)) : 0,
                     "ตำบล": "",
                     "อำเภอ": "",
                     "ประเภท": ""
@@ -207,18 +218,22 @@ function HospitalDirectoryContent() {
         if (selectedDistrict === 'ทั้งหมด' || filteredData.length > 1) {
             const grandMoph = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph, 0), 0);
             const grandBuddy = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare, 0), 0);
-            const grandTarget = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0);
+            const grandTarget100 = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0), 0);
+            const grandTarget30 = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0);
 
             exportRows.push({
                 "ลำดับ": "",
                 "รหัส": "",
                 "ชื่อหน่วยบริการ": "รวมทั้งจังหวัด",
-                "เป้าหมาย 30%": grandTarget,
+                "เป้าหมาย 100%": grandTarget100,
+                "เป้าหมาย 30%": grandTarget30,
                 "หมอพร้อม": grandMoph,
                 "สอน.บัดดี้": grandBuddy,
                 "ยอดรวม": grandMoph + grandBuddy,
-                "เปอร์เซ็นต์": grandTarget > 0 ? formatPercent((grandMoph + grandBuddy) / grandTarget * 100) : "0%",
-                "ขาดอีก": grandTarget > 0 ? Math.max(0, grandTarget - (grandMoph + grandBuddy)) : 0,
+                "เปอร์เซ็นต์ (100%)": grandTarget100 > 0 ? formatPercent((grandMoph + grandBuddy) / grandTarget100 * 100) : "0%",
+                "เปอร์เซ็นต์ (30%)": grandTarget30 > 0 ? formatPercent((grandMoph + grandBuddy) / grandTarget30 * 100) : "0%",
+                "ขาดอีก (100%)": grandTarget100 > 0 ? Math.max(0, grandTarget100 - (grandMoph + grandBuddy)) : 0,
+                "ขาดอีก (30%)": grandTarget30 > 0 ? Math.max(0, grandTarget30 - (grandMoph + grandBuddy)) : 0,
                 "ตำบล": "",
                 "อำเภอ": "",
                 "ประเภท": ""
@@ -407,6 +422,7 @@ function HospitalDirectoryContent() {
                                                 <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
                                                     <th className="px-6 py-4 w-24 sticky left-0 z-10 bg-[#FDFBFF]/95 backdrop-blur-sm shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.05)]">รหัส</th>
                                                     <th className="px-6 py-4 whitespace-nowrap">ชื่อหน่วยบริการ</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-red-700 whitespace-nowrap">เป้าหมาย 100%</th>
                                                     <th className="px-6 py-4 w-32 text-right text-red-600 whitespace-nowrap">เป้าหมาย 30%</th>
                                                     <th className="px-6 py-4 w-28 text-right text-[#006837] whitespace-nowrap">
                                                         หมอพร้อม
@@ -419,18 +435,10 @@ function HospitalDirectoryContent() {
                                                     <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">
                                                         ยอดรวม
                                                     </th>
-                                                    <th className="px-6 py-4 w-32 text-right text-emerald-600 whitespace-nowrap">
-                                                        <div className="flex items-center justify-end group">
-                                                            <div className="p-1 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm transition-transform group-hover:scale-110">
-                                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                                                    <line x1="19" y1="5" x2="5" y2="19"></line>
-                                                                    <circle cx="16.5" cy="16.5" r="2.5"></circle>
-                                                                    <circle cx="7.5" cy="7.5" r="2.5"></circle>
-                                                                </svg>
-                                                            </div>
-                                                        </div>
-                                                    </th>
-                                                    <th className="px-6 py-4 w-32 text-right text-[#FF6B6B] whitespace-nowrap">ขาดอีก</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-emerald-700 whitespace-nowrap">% (100%)</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-emerald-600 whitespace-nowrap">% (30%)</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-[#FF6B6B] whitespace-nowrap">ขาดอีก (100%)</th>
+                                                    <th className="px-6 py-4 w-32 text-right text-rose-500 whitespace-nowrap">ขาดอีก (30%)</th>
                                                     <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
                                                     <th className="px-6 py-4 w-32 whitespace-nowrap">อำเภอ</th>
                                                     <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
@@ -441,12 +449,12 @@ function HospitalDirectoryContent() {
                                                     .flatMap(group => group.hospitals)
                                                     .sort((a, b) => {
                                                         if (selectedSort === 'hospcode') return a.hospcode.localeCompare(b.hospcode);
-                                                        if (selectedSort === 'target') return b.op_30 - a.op_30;
+                                                        if (selectedSort === 'target') return (b.op || 0) - (a.op || 0);
                                                         if (selectedSort === 'total') return (b.moph + b.buddycare) - (a.moph + a.buddycare);
-                                                        if (selectedSort === 'gap') return (b.op_30 - (b.moph + b.buddycare)) - (a.op_30 - (a.moph + a.buddycare));
+                                                        if (selectedSort === 'gap') return ((b.op || 0) - (b.moph + b.buddycare)) - ((a.op || 0) - (a.moph + a.buddycare));
 
                                                         // Default: percent
-                                                        const getPercent = (h: any) => h.op_30 > 0 ? ((h.moph + h.buddycare) / h.op_30 * 100) : 0;
+                                                        const getPercent = (h: any) => h.op > 0 ? ((h.moph + h.buddycare) / h.op * 100) : 0;
                                                         return getPercent(b) - getPercent(a);
                                                     })
                                                     .map((hospital) => {
@@ -463,7 +471,10 @@ function HospitalDirectoryContent() {
                                                                 </td>
 
                                                                 <td className="px-6 py-3 text-right">
-                                                                    <span className="text-sm font-bold text-red-600">{hospital.op_30.toLocaleString()}</span>
+                                                                    <span className="text-sm font-bold text-red-700">{(hospital.op || 0).toLocaleString()}</span>
+                                                                </td>
+                                                                <td className="px-6 py-3 text-right">
+                                                                    <span className="text-sm font-bold text-red-600">{(hospital.op_30 || 0).toLocaleString()}</span>
                                                                 </td>
                                                                 <td className="px-6 py-3">
                                                                     {renderComparisonCell(hospital.moph, hospital.moph_past, "text-sm font-bold text-[#006837]")}
@@ -474,13 +485,23 @@ function HospitalDirectoryContent() {
                                                                 <td className="px-6 py-3 bg-indigo-50/30">
                                                                     {renderComparisonCell(hospital.moph + hospital.buddycare, hospital.moph_past + hospital.buddycare_past, "text-sm font-black text-indigo-700")}
                                                                 </td>
-                                                                <td className="px-6 py-3 text-right bg-emerald-50/30">
+                                                                <td className="px-6 py-3 text-right bg-emerald-50/40">
+                                                                    <span className="text-sm font-bold text-emerald-700">
+                                                                        {formatPercent(hospital.op > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op * 100) : 0)}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-6 py-3 text-right bg-emerald-50/20">
                                                                     <span className="text-sm font-bold text-emerald-600">
                                                                         {formatPercent(hospital.op_30 > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op_30 * 100) : 0)}
                                                                     </span>
                                                                 </td>
-                                                                <td className="px-6 py-3 text-right bg-red-50/30">
+                                                                <td className="px-6 py-3 text-right bg-red-50/40">
                                                                     <span className="text-sm font-bold text-[#FF6B6B]">
+                                                                        {(hospital.op > 0 ? Math.max(0, hospital.op - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-6 py-3 text-right bg-red-50/20">
+                                                                    <span className="text-sm font-bold text-rose-500">
                                                                         {(hospital.op_30 > 0 ? Math.max(0, hospital.op_30 - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
                                                                     </span>
                                                                 </td>
@@ -506,12 +527,17 @@ function HospitalDirectoryContent() {
                                                     })}
                                                 {/* Unified Summary Row */}
                                                 <tr className="bg-nm-primary/10 font-bold border-t-2 border-nm-primary/30">
-                                                    <td colSpan={3} className="px-6 py-5 text-nm-primary text-right text-base">
+                                                    <td colSpan={2} className="px-6 py-5 text-nm-primary text-right text-base">
                                                         รวมทั้งจังหวัด
+                                                    </td>
+                                                    <td className="px-6 py-5 text-right font-black text-red-700">
+                                                        <span className="text-xl">
+                                                            {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0), 0).toLocaleString()}
+                                                        </span>
                                                     </td>
                                                     <td className="px-6 py-5 text-right font-black text-red-800">
                                                         <span className="text-xl">
-                                                            {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0).toLocaleString()}
+                                                            {filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op_30 || 0), 0), 0).toLocaleString()}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-5">
@@ -538,7 +564,16 @@ function HospitalDirectoryContent() {
                                                     <td className="px-6 py-5 text-right bg-emerald-50/50">
                                                         <span className="text-xl font-black text-emerald-700">
                                                             {(() => {
-                                                                const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0);
+                                                                const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0), 0);
+                                                                const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
+                                                                return formatPercent(target > 0 ? (current / target * 100) : 0);
+                                                            })()}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-5 text-right bg-emerald-50/30">
+                                                        <span className="text-xl font-black text-emerald-600">
+                                                            {(() => {
+                                                                const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op_30 || 0), 0), 0);
                                                                 const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
                                                                 return formatPercent(target > 0 ? (current / target * 100) : 0);
                                                             })()}
@@ -547,7 +582,16 @@ function HospitalDirectoryContent() {
                                                     <td className="px-6 py-5 text-right bg-red-50/50">
                                                         <span className="text-xl font-black text-red-700">
                                                             {(() => {
-                                                                const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0);
+                                                                const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0), 0);
+                                                                const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
+                                                                return (target > 0 ? Math.max(0, target - current) : 0).toLocaleString();
+                                                            })()}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-5 text-right bg-red-50/30">
+                                                        <span className="text-xl font-black text-rose-600">
+                                                            {(() => {
+                                                                const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op_30 || 0), 0), 0);
                                                                 const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
                                                                 return (target > 0 ? Math.max(0, target - current) : 0).toLocaleString();
                                                             })()}
@@ -591,6 +635,7 @@ function HospitalDirectoryContent() {
                                                     <tr className="bg-nm-primary/5 text-nm-primary text-xs uppercase tracking-wider font-bold border-b border-nm-primary/10">
                                                         <th className="px-6 py-4 w-24 sticky left-0 z-10 bg-[#FDFBFF]/95 backdrop-blur-sm shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.05)]">รหัส</th>
                                                         <th className="px-6 py-4 whitespace-nowrap">หน่วยบริการ</th>
+                                                        <th className="px-6 py-4 w-32 text-right text-red-700 whitespace-nowrap">เป้าหมาย 100%</th>
                                                         <th className="px-6 py-4 w-32 text-right text-red-600 whitespace-nowrap">เป้าหมาย 30%</th>
                                                         <th className="px-6 py-4 w-28 text-right text-[#006837] whitespace-nowrap">
                                                             หมอพร้อม
@@ -603,18 +648,10 @@ function HospitalDirectoryContent() {
                                                         <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">
                                                             ยอดรวม
                                                         </th>
-                                                        <th className="px-6 py-4 w-32 text-right text-emerald-600 whitespace-nowrap">
-                                                            <div className="flex items-center justify-end group">
-                                                                <div className="p-1 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm transition-transform group-hover:scale-110">
-                                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                                                        <line x1="19" y1="5" x2="5" y2="19"></line>
-                                                                        <circle cx="16.5" cy="16.5" r="2.5"></circle>
-                                                                        <circle cx="7.5" cy="7.5" r="2.5"></circle>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                        </th>
-                                                        <th className="px-6 py-4 w-32 text-right text-[#FF6B6B] whitespace-nowrap">ขาดอีก</th>
+                                                        <th className="px-6 py-4 w-32 text-right text-emerald-700 whitespace-nowrap">% (100%)</th>
+                                                        <th className="px-6 py-4 w-32 text-right text-emerald-600 whitespace-nowrap">% (30%)</th>
+                                                        <th className="px-6 py-4 w-32 text-right text-[#FF6B6B] whitespace-nowrap">ขาดอีก (100%)</th>
+                                                        <th className="px-6 py-4 w-32 text-right text-rose-500 whitespace-nowrap">ขาดอีก (30%)</th>
                                                         <th className="px-6 py-4 w-40 whitespace-nowrap">ตำบล</th>
                                                         <th className="px-6 py-4 w-32 whitespace-nowrap">อำเภอ</th>
                                                         <th className="px-6 py-4 w-32 whitespace-nowrap">ประเภท</th>
@@ -624,12 +661,12 @@ function HospitalDirectoryContent() {
                                                     {[...group.hospitals]
                                                         .sort((a, b) => {
                                                             if (selectedSort === 'hospcode') return a.hospcode.localeCompare(b.hospcode);
-                                                            if (selectedSort === 'target') return b.op_30 - a.op_30;
+                                                            if (selectedSort === 'target') return (b.op || 0) - (a.op || 0);
                                                             if (selectedSort === 'total') return (b.moph + b.buddycare) - (a.moph + a.buddycare);
-                                                            if (selectedSort === 'gap') return (b.op_30 - (b.moph + b.buddycare)) - (a.op_30 - (a.moph + a.buddycare));
+                                                            if (selectedSort === 'gap') return ((b.op || 0) - (b.moph + b.buddycare)) - ((a.op || 0) - (a.moph + a.buddycare));
 
                                                             // Default: percent
-                                                            const getPercent = (h: any) => h.op_30 > 0 ? ((h.moph + h.buddycare) / h.op_30 * 100) : 0;
+                                                            const getPercent = (h: any) => h.op > 0 ? ((h.moph + h.buddycare) / h.op * 100) : 0;
                                                             return getPercent(b) - getPercent(a);
                                                         })
                                                         .map((hospital) => {
@@ -645,7 +682,10 @@ function HospitalDirectoryContent() {
                                                                         </span>
                                                                     </td>
                                                                     <td className="px-6 py-3 text-right">
-                                                                        <span className="text-sm font-black text-red-800">{hospital.op_30.toLocaleString()}</span>
+                                                                        <span className="text-sm font-black text-red-700">{(hospital.op || 0).toLocaleString()}</span>
+                                                                    </td>
+                                                                    <td className="px-6 py-3 text-right">
+                                                                        <span className="text-sm font-black text-red-600">{(hospital.op_30 || 0).toLocaleString()}</span>
                                                                     </td>
                                                                     <td className="px-6 py-3">
                                                                         {renderComparisonCell(hospital.moph, hospital.moph_past, "text-sm font-black text-emerald-800")}
@@ -656,13 +696,23 @@ function HospitalDirectoryContent() {
                                                                     <td className="px-6 py-3 bg-indigo-50/30">
                                                                         {renderComparisonCell(hospital.moph + hospital.buddycare, hospital.moph_past + hospital.buddycare_past, "text-sm font-black text-indigo-900")}
                                                                     </td>
-                                                                    <td className="px-6 py-3 text-right bg-emerald-50/30">
+                                                                    <td className="px-6 py-3 text-right bg-emerald-50/40">
                                                                         <span className="text-sm font-black text-emerald-700">
+                                                                            {formatPercent(hospital.op > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op * 100) : 0)}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td className="px-6 py-3 text-right bg-emerald-50/20">
+                                                                        <span className="text-sm font-black text-emerald-600">
                                                                             {formatPercent(hospital.op_30 > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op_30 * 100) : 0)}
                                                                         </span>
                                                                     </td>
-                                                                    <td className="px-6 py-3 text-right bg-red-50/30">
-                                                                        <span className="text-sm font-bold text-red-600">
+                                                                    <td className="px-6 py-3 text-right bg-red-50/40">
+                                                                        <span className="text-sm font-bold text-[#FF6B6B]">
+                                                                            {(hospital.op > 0 ? Math.max(0, hospital.op - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td className="px-6 py-3 text-right bg-red-50/20">
+                                                                        <span className="text-sm font-bold text-rose-500">
                                                                             {(hospital.op_30 > 0 ? Math.max(0, hospital.op_30 - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
                                                                         </span>
                                                                     </td>
@@ -691,9 +741,14 @@ function HospitalDirectoryContent() {
                                                         <td colSpan={2} className="px-6 py-4 text-nm-primary text-right">
                                                             รวมทั้งหมด
                                                         </td>
-                                                        <td className="px-6 py-4 text-right">
-                                                            <span className="text-base font-bold text-red-600">
-                                                                {group.hospitals.reduce((sum, h) => sum + h.op_30, 0).toLocaleString()}
+                                                        <td className="px-6 py-4 text-right font-black text-red-700">
+                                                            <span className="text-base font-bold">
+                                                                {group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0).toLocaleString()}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-right font-black text-red-600">
+                                                            <span className="text-base font-bold">
+                                                                {group.hospitals.reduce((sum, h) => sum + (h.op_30 || 0), 0).toLocaleString()}
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-4">
@@ -717,19 +772,37 @@ function HospitalDirectoryContent() {
                                                                 "text-base font-black text-indigo-700"
                                                             )}
                                                         </td>
-                                                        <td className="px-6 py-4 text-right bg-emerald-50/30">
-                                                            <span className="text-base font-bold text-emerald-600">
+                                                        <td className="px-6 py-4 text-right bg-emerald-50/40">
+                                                            <span className="text-base font-bold text-emerald-700">
                                                                 {(() => {
-                                                                    const target = group.hospitals.reduce((sum, h) => sum + h.op_30, 0);
+                                                                    const target = group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0);
                                                                     const current = group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0);
                                                                     return formatPercent(target > 0 ? (current / target * 100) : 0);
                                                                 })()}
                                                             </span>
                                                         </td>
-                                                        <td className="px-6 py-4 text-right bg-red-50/30">
+                                                        <td className="px-6 py-4 text-right bg-emerald-50/20">
+                                                            <span className="text-base font-bold text-emerald-600">
+                                                                {(() => {
+                                                                    const target = group.hospitals.reduce((sum, h) => sum + (h.op_30 || 0), 0);
+                                                                    const current = group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0);
+                                                                    return formatPercent(target > 0 ? (current / target * 100) : 0);
+                                                                })()}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-right bg-red-50/40">
                                                             <span className="text-base font-bold text-[#FF6B6B]">
                                                                 {(() => {
-                                                                    const target = group.hospitals.reduce((sum, h) => sum + h.op_30, 0);
+                                                                    const target = group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0);
+                                                                    const current = group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0);
+                                                                    return (target > 0 ? Math.max(0, target - current) : 0).toLocaleString();
+                                                                })()}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-right bg-red-50/20">
+                                                            <span className="text-base font-bold text-rose-500">
+                                                                {(() => {
+                                                                    const target = group.hospitals.reduce((sum, h) => sum + (h.op_30 || 0), 0);
                                                                     const current = group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0);
                                                                     return (target > 0 ? Math.max(0, target - current) : 0).toLocaleString();
                                                                 })()}

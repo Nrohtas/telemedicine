@@ -12,6 +12,7 @@ interface DistrictStat {
     sornbuddy_count: number;
     total_result: number;
     total_result_past: number;
+    target: number;
     target_30: number;
 }
 
@@ -89,15 +90,17 @@ export default function DistrictTable({ type, source }: DistrictTableProps = {})
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {(() => {
                     const sortedStats = [...stats].sort((a, b) => {
-                        const rateA = a.target_30 > 0 ? (a.total_result / a.target_30) : 0;
-                        const rateB = b.target_30 > 0 ? (b.total_result / b.target_30) : 0;
+                        const rateA = a.target > 0 ? (a.total_result / a.target) : 0;
+                        const rateB = b.target > 0 ? (b.total_result / b.target) : 0;
                         if (rateB !== rateA) return rateB - rateA;
                         return (b.total_result || 0) - (a.total_result || 0); // fallback to total result
                     });
                     return sortedStats.map((stat) => {
                         const rank = sortedStats.findIndex(s => s.amp_code === stat.amp_code) + 1;
                         const diff = (stat.total_result || 0) - (stat.total_result_past || 0);
-                        const completionRate = stat.target_30 > 0 ? (stat.total_result / stat.target_30) * 100 : 0;
+                        const completionRate = stat.target > 0 ? (stat.total_result / stat.target) * 100 : 0;
+                        const missing100 = Math.max(0, Math.round(stat.target || 0) - stat.total_result);
+                        const missing30 = Math.max(0, Math.round(stat.target_30 || 0) - stat.total_result);
 
                         return (
                             <Link key={stat.amp_code} href={`/hospital?amp_code=${stat.amp_code}${type ? `&type=${encodeURIComponent(type)}` : ''}`} className="block">
@@ -190,7 +193,7 @@ export default function DistrictTable({ type, source }: DistrictTableProps = {})
                                             )}
 
                                             {/* Latest Stats (Right) */}
-                                            <div className="flex-1 bg-white p-3 flex flex-col items-end gap-1 text-right">
+                                            <div className="flex-1 bg-[#F8FAFC] p-3 flex flex-col items-end gap-1 text-right">
                                                 <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest">ผลงานล่าสุด</span>
                                                 <div className="flex items-baseline gap-1">
                                                     <span className="text-xl font-black text-indigo-700 tracking-tighter">{(stat.total_result || 0).toLocaleString()}</span>
@@ -199,61 +202,60 @@ export default function DistrictTable({ type, source }: DistrictTableProps = {})
                                             </div>
                                         </div>
                                     </div>
-                                    {/* Spacing gap between rows - reduced as requested */}
-                                    <div className="mt-2 space-y-6 relative z-10">
-                                        {/* Main Highlight Row: Missing, Target, Percent - 3-column Grid */}
-                                        <div className="grid grid-cols-3 gap-2">
-                                            {/* Missing Box */}
-                                            <div className="bg-gradient-to-br from-amber-50 to-white p-3 rounded-2xl border border-amber-100 shadow-sm flex flex-col items-center justify-center text-center">
-                                                <div className="flex items-center gap-1 mb-1">
-                                                    <div className="p-0.5 rounded bg-amber-100/50 text-amber-600">
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                                                        </svg>
+
+                                    {/* Target & Missing Stats Highlight Row */}
+                                    <div className="mt-2 space-y-4 relative z-10">
+                                        <div className="grid grid-cols-12 gap-2 items-center">
+                                            {/* Target & Missing Details Box (8 Cols) */}
+                                            <div className="col-span-8 bg-gradient-to-br from-rose-50/60 to-amber-50/30 p-2.5 rounded-2xl border border-rose-100/60 shadow-sm space-y-1.5">
+                                                {/* 100% Target & Missing Row */}
+                                                <div className="flex items-center justify-between text-[10px]">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="font-black text-rose-600">เป้า 100%:</span>
+                                                        <span className="font-black text-rose-700">{Math.round(stat.target || 0).toLocaleString()}</span>
                                                     </div>
-                                                    <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest">ขาดอีก</span>
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="font-black text-amber-600">ขาด:</span>
+                                                        <span className="font-black text-amber-700">{missing100.toLocaleString()}</span>
+                                                    </div>
                                                 </div>
-                                                <span className="text-xl font-black text-amber-700 leading-none">{Math.max(0, Math.round(stat.target_30) - stat.total_result).toLocaleString()}</span>
-                                                <span className="text-[8px] font-bold text-amber-400 uppercase mt-1">ครั้ง</span>
+
+                                                <div className="h-[0.5px] w-full bg-rose-200/40" />
+
+                                                {/* 30% Target & Missing Row */}
+                                                <div className="flex items-center justify-between text-[10px]">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="font-black text-rose-600/80">เป้า 30%:</span>
+                                                        <span className="font-black text-rose-700/80">{Math.round(stat.target_30 || 0).toLocaleString()}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="font-black text-amber-600/80">ขาด:</span>
+                                                        <span className="font-black text-amber-700/80">{missing30.toLocaleString()}</span>
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            {/* Target Box */}
-                                            <div className="bg-gradient-to-br from-rose-50 to-white p-3 rounded-2xl border border-rose-100 shadow-sm flex flex-col items-center justify-center text-center">
-                                                <div className="flex items-center gap-1 mb-1">
-                                                    <div className="p-0.5 rounded bg-rose-100 text-rose-600">
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                                                            <polyline points="22 4 12 14.01 9 11.01" />
-                                                        </svg>
-                                                    </div>
-                                                    <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest">เป้าหมาย</span>
-                                                </div>
-                                                <span className="text-xl font-black text-rose-700 leading-none">{Math.round(stat.target_30).toLocaleString()}</span>
-                                                <span className="text-[8px] font-bold text-rose-400 uppercase mt-1">ครั้ง</span>
-                                            </div>
-
-                                            {/* Completion Circle (No outer border/bg, larger size) */}
-                                            <div className="flex flex-col items-center justify-center overflow-hidden h-full">
+                                            {/* Completion Circle (4 Cols) */}
+                                            <div className="col-span-4 flex flex-col items-center justify-center overflow-hidden h-full">
                                                 <CircularProgress
                                                     value={completionRate}
-                                                    size={80}
-                                                    strokeWidth={7}
+                                                    size={72}
+                                                    strokeWidth={6}
                                                     color="#059669"
                                                     bgColor="#E1EFEA"
                                                 >
                                                     <div className="flex flex-col items-center">
-                                                        <span className="text-[8px] font-black text-emerald-600/60 uppercase tracking-tighter leading-none mb-0.5">ผลงาน</span>
+                                                        <span className="text-[7px] font-black text-emerald-600/60 uppercase tracking-tighter leading-none mb-0.5">ผลงาน</span>
                                                         <div className="flex items-baseline leading-none">
-                                                            <span className="text-lg font-black text-emerald-700 tracking-tighter">
+                                                            <span className="text-base font-black text-emerald-700 tracking-tighter">
                                                                 {new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(completionRate)}
                                                             </span>
-                                                            <span className="text-[8px] font-black text-emerald-700/60">%</span>
+                                                            <span className="text-[7px] font-black text-emerald-700/60">%</span>
                                                         </div>
                                                     </div>
                                                 </CircularProgress>
                                             </div>
                                         </div>
-
                                     </div>
                                 </SoftCard>
                             </Link>

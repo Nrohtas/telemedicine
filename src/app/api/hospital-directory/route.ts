@@ -28,6 +28,7 @@ export async function GET(request: Request) {
                 t.moph_past_date,
                 t.buddycare_date,
                 t.buddycare_past_date,
+                CEILING(COALESCE(tg.op, 0)) as op,
                 CEILING(COALESCE(tg.op_30, 0)) as op_30
             FROM hospital h
             LEFT JOIN (

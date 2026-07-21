@@ -154,7 +154,7 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
       AND h.status = '1'
       ${hostypeFilter}
     LEFT JOIN (
-      SELECT hospcode, CEILING(COALESCE(op_30, 0)) AS target_raw
+      SELECT hospcode, CEILING(COALESCE(op, 0)) AS target_raw
       FROM target
       WHERE b_year = '2568'
     ) tgt ON tgt.hospcode = h.hospcode COLLATE utf8mb4_general_ci
@@ -297,7 +297,7 @@ async function getDailyHospitalRowsAll(sortBy: string = "hospcode", sortOrder: s
         GROUP BY hostype_new, hostype_name
     ) ht ON h.hostype_new = ht.hostype_new COLLATE utf8mb4_general_ci
     LEFT JOIN (
-      SELECT hospcode, CEILING(COALESCE(op_30, 0)) AS target
+      SELECT hospcode, CEILING(COALESCE(op, 0)) AS target
       FROM target
       WHERE b_year = '2568'
     ) tgt ON tgt.hospcode = h.hospcode COLLATE utf8mb4_general_ci
