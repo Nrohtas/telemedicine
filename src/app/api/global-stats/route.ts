@@ -17,6 +17,8 @@ export async function GET(request: Request) {
                 MAX(t.result_past_date) as prev_update_date,
                 SUM(COALESCE(t.moph, 0)) as total_moph,
                 SUM(COALESCE(t.buddycare, 0)) as total_buddycare,
+                SUM(COALESCE(t.hdc, 0)) as total_hdc,
+                SUM(COALESCE(t.healthconnex, 0)) as total_healthconnex,
                 (
                     SELECT COUNT(*) 
                     FROM hospital h2 
@@ -44,6 +46,8 @@ export async function GET(request: Request) {
             prev_update_date: data.prev_update_date,
             total_moph: parseInt(data.total_moph) || 0,
             total_buddycare: parseInt(data.total_buddycare) || 0,
+            total_hdc: parseInt(data.total_hdc) || 0,
+            total_healthconnex: parseInt(data.total_healthconnex) || 0,
             total_hospitals: parseInt(data.total_hospitals) || 0,
         });
     } catch (error: any) {

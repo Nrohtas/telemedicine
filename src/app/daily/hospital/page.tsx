@@ -209,7 +209,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
 
 async function getPlatformLatestUpdate(): Promise<string | null> {
   try {
-    const [rows]: any = await pool.query("SELECT DATE_FORMAT(MAX(file_time), '%Y-%m-%d %H:%i:%s') as last_update FROM fileupload WHERE file_platform = 'moph_buddycare'");
+    const [rows]: any = await pool.query("SELECT DATE_FORMAT(MAX(file_time), '%Y-%m-%d %H:%i:%s') as last_update FROM fileupload WHERE file_platform = 'platform'");
     return rows[0]?.last_update || null;
   } catch (err) {
     console.error('Error fetching Platform latest update:', err);
@@ -420,24 +420,16 @@ export default async function DailyHospitalPage({
                         </Link>
                       </th>
                       <th className="border-l-2 border-indigo-300 bg-indigo-50 px-3 py-3 text-indigo-700 sticky top-0 z-20" colSpan={3}>
-                        <div className="flex flex-col items-center gap-1">
-                          <span className="text-[13px] font-black uppercase">ผลงาน PLATFORM</span>
-                          <div className="text-[9px] font-bold opacity-80 scale-90 origin-center">
+                        <div className="flex flex-col items-center justify-center gap-1">
+                          <span className="text-[13px] font-black uppercase tracking-wider">ผลงาน PLATFORM</span>
+                          <div className="text-[9px] font-bold opacity-80">
                             <a
                               href="https://datastudio.google.com/u/0/reporting/33f2a1d7-2f28-43b1-85ea-6cf3e8d579ac/page/p_q5mrcvqeyd"
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="hover:underline flex items-center gap-1"
+                              className="hover:underline max-w-[200px] whitespace-normal block text-center leading-tight text-indigo-700/80"
                             >
-                              <div className="p-0.5 rounded-md bg-emerald-50 shadow-sm ring-1 ring-emerald-100/50">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <circle cx="50" cy="22" r="14" fill="#006837" />
-                                  <path d="M25 40H75V75C75 80 71 84 66 84H34C29 84 25 80 25 75V40Z" stroke="#F6D76E" strokeWidth="10" />
-                                  <rect x="40" y="52" width="20" height="7" fill="#A5A7AA" />
-                                  <rect x="46.5" y="46" width="7" height="19" fill="#A5A7AA" />
-                                </svg>
-                              </div>
-                              <span>หมอพร้อม Station + สอน.บัดดี้</span>
+                              หมอพร้อม + สอน.บัดดี้ + HDC + Connex
                             </a>
                           </div>
                         </div>

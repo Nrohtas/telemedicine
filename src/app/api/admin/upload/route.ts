@@ -2,6 +2,41 @@ import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import * as XLSX from 'xlsx';
 
+const cleanExcelDate = (val: any, defaultDate: string | null): string | null => {
+    if (val === undefined || val === null || val === '') return defaultDate;
+    
+    if (typeof val === 'number') {
+        const dateObj = new Date((val - 25569) * 86400 * 1000);
+        if (!isNaN(dateObj.getTime())) {
+            return dateObj.toISOString().split('T')[0];
+        }
+    }
+    
+    if (val instanceof Date && !isNaN(val.getTime())) {
+        return val.toISOString().split('T')[0];
+    }
+    
+    const dateStr = String(val).trim();
+    const dmyPattern = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/;
+    const dmyMatch = dateStr.match(dmyPattern);
+    if (dmyMatch) {
+        let year = parseInt(dmyMatch[3]);
+        if (year > 2400) year -= 543;
+        const day = dmyMatch[1].padStart(2, '0');
+        const month = dmyMatch[2].padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    try {
+        const dateObj = new Date(dateStr);
+        if (!isNaN(dateObj.getTime())) {
+            return dateObj.toISOString().split('T')[0];
+        }
+    } catch (e) {}
+
+    return defaultDate;
+};
+
 export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
@@ -237,6 +272,7 @@ export async function POST(request: NextRequest) {
                 const byearKey = findKeyInRow(row, ['ปีงบประมาณ', 'b_year']);
                 const platformKey = findKeyInRow(row, ['แพลตฟอร์ม', 'platform']);
                 const countKey = findKeyInRow(row, ['จำนวนนัด Telemed', 'จำนวน', 'count']);
+                const dateKey = findKeyInRow(row, ['วันอัปเดต', 'วันที่', 'date_update', 'update_date', 'd_update', 'date']);
 
                 const rawHospcode = String(row[hospcodeKey || ''] || '');
                 if (!rawHospcode || rawHospcode === 'undefined' || rawHospcode.includes('รวม')) return;
@@ -245,46 +281,127 @@ export async function POST(request: NextRequest) {
                 const b_year = String(row[byearKey || ''] || '');
                 const platform = String(row[platformKey || ''] || '').trim().toLowerCase();
                 const count = parseInt(row[countKey || ''] || '0') || 0;
+                const rowDate = cleanExcelDate(dateKey ? row[dateKey] : null, date);
 
                 const id = `${hospcode}_${b_year}`;
 
                 if (!aggregatedData[id]) {
-                    aggregatedData[id] = { id, hospcode, b_year, moph: 0, buddycare: 0 };
+                    aggregatedData[id] = { id, hospcode, b_year, moph: 0, buddycare: 0, hdc: 0, healthconnex: 0, rowDate: rowDate };
+                } else if (rowDate && (!aggregatedData[id].rowDate || rowDate > aggregatedData[id].rowDate)) {
+                    aggregatedData[id].rowDate = rowDate;
                 }
 
                 if (platform.includes('หมอพร้อม') || platform.includes('moph')) {
                     aggregatedData[id].moph += count;
                 } else if (platform.includes('บัดดี้') || platform.includes('buddy')) {
                     aggregatedData[id].buddycare += count;
+                } else if (platform.includes('hdc') || platform.includes('เอชดีซี')) {
+                    aggregatedData[id].hdc += count;
+                } else if (platform.includes('health') || platform.includes('connex') || platform.includes('healthconnex') || platform.includes('เฮลท์') || platform.includes('คอนเน็กซ์')) {
+                    aggregatedData[id].healthconnex += count;
                 }
             });
 
             const compareQuery = `
-                INSERT INTO telemed (id, hospcode, b_year, moph, buddycare, result, moph_date, buddycare_date, result_date)
+                INSERT INTO telemed (
+                    id, hospcode, b_year, 
+                    moph, buddycare, hdc, healthconnex, result, 
+                    moph_date, buddycare_date, hdc_date, healthconnex_date, result_date
+                )
                 VALUES ?
                 ON DUPLICATE KEY UPDATE
-                    moph_compare = CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) - moph ELSE 0 END,
-                    buddycare_compare = CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) - buddycare ELSE 0 END,
-                    result_compare = (CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) ELSE moph END + CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) ELSE buddycare END) - result,
-                    percentage = CASE WHEN result > 0 THEN ((VALUES(result) - result) / result) * 100 ELSE 0 END,
-                    moph_past = moph,
-                    moph_past_date = moph_date,
-                    buddycare_past = buddycare,
-                    buddycare_past_date = buddycare_date,
-                    result_past = result,
-                    result_past_date = result_date,
+                    moph_compare = CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) - COALESCE(moph, 0) ELSE 0 END,
+                    buddycare_compare = CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) - COALESCE(buddycare, 0) ELSE 0 END,
+                    result_compare = CASE WHEN (
+                        VALUES(moph) > 0 OR 
+                        VALUES(buddycare) > 0 OR 
+                        VALUES(hdc) > 0 OR 
+                        VALUES(healthconnex) > 0
+                    ) THEN (
+                        CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) ELSE COALESCE(moph, 0) END + 
+                        CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) ELSE COALESCE(buddycare, 0) END +
+                        CASE WHEN VALUES(hdc) > 0 THEN VALUES(hdc) ELSE COALESCE(hdc, 0) END +
+                        CASE WHEN VALUES(healthconnex) > 0 THEN VALUES(healthconnex) ELSE COALESCE(healthconnex, 0) END
+                    ) - COALESCE(result, 0) ELSE 0 END,
+                    percentage = CASE WHEN (
+                        VALUES(moph) > 0 OR 
+                        VALUES(buddycare) > 0 OR 
+                        VALUES(hdc) > 0 OR 
+                        VALUES(healthconnex) > 0
+                    ) AND COALESCE(result, 0) > 0 THEN (
+                        ((
+                            CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) ELSE COALESCE(moph, 0) END + 
+                            CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) ELSE COALESCE(buddycare, 0) END +
+                            CASE WHEN VALUES(hdc) > 0 THEN VALUES(hdc) ELSE COALESCE(hdc, 0) END +
+                            CASE WHEN VALUES(healthconnex) > 0 THEN VALUES(healthconnex) ELSE COALESCE(healthconnex, 0) END
+                        ) - COALESCE(result, 0)) / COALESCE(result, 0)
+                    ) * 100 ELSE percentage END,
+                    moph_past = CASE WHEN VALUES(moph) > 0 THEN COALESCE(moph, 0) ELSE moph_past END,
+                    moph_past_date = CASE WHEN VALUES(moph) > 0 THEN moph_date ELSE moph_past_date END,
+                    buddycare_past = CASE WHEN VALUES(buddycare) > 0 THEN COALESCE(buddycare, 0) ELSE buddycare_past END,
+                    buddycare_past_date = CASE WHEN VALUES(buddycare) > 0 THEN buddycare_date ELSE buddycare_past_date END,
+                    hdc_past = CASE WHEN VALUES(hdc) > 0 THEN COALESCE(hdc, 0) ELSE hdc_past END,
+                    hdc_past_date = CASE WHEN VALUES(hdc) > 0 THEN hdc_date ELSE hdc_past_date END,
+                    healthconnex_past = CASE WHEN VALUES(healthconnex) > 0 THEN COALESCE(healthconnex, 0) ELSE healthconnex_past END,
+                    healthconnex_past_date = CASE WHEN VALUES(healthconnex) > 0 THEN healthconnex_date ELSE healthconnex_past_date END,
+                    result_past = CASE WHEN (
+                        VALUES(moph) > 0 OR 
+                        VALUES(buddycare) > 0 OR 
+                        VALUES(hdc) > 0 OR 
+                        VALUES(healthconnex) > 0
+                    ) THEN COALESCE(result, 0) ELSE result_past END,
+                    result_past_date = CASE WHEN (
+                        VALUES(moph) > 0 OR 
+                        VALUES(buddycare) > 0 OR 
+                        VALUES(hdc) > 0 OR 
+                        VALUES(healthconnex) > 0
+                    ) THEN result_date ELSE result_past_date END,
                     b_year = VALUES(b_year),
                     moph = CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) ELSE moph END,
                     buddycare = CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) ELSE buddycare END,
-                    result = (CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) ELSE moph END) + (CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) ELSE buddycare END),
+                    hdc = CASE WHEN VALUES(hdc) > 0 THEN VALUES(hdc) ELSE hdc END,
+                    healthconnex = CASE WHEN VALUES(healthconnex) > 0 THEN VALUES(healthconnex) ELSE healthconnex END,
+                    result = CASE WHEN (
+                        VALUES(moph) > 0 OR 
+                        VALUES(buddycare) > 0 OR 
+                        VALUES(hdc) > 0 OR 
+                        VALUES(healthconnex) > 0
+                    ) THEN (
+                        CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) ELSE COALESCE(moph, 0) END + 
+                        CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) ELSE COALESCE(buddycare, 0) END +
+                        CASE WHEN VALUES(hdc) > 0 THEN VALUES(hdc) ELSE COALESCE(hdc, 0) END +
+                        CASE WHEN VALUES(healthconnex) > 0 THEN VALUES(healthconnex) ELSE COALESCE(healthconnex, 0) END
+                    ) ELSE result END,
                     moph_date = CASE WHEN VALUES(moph) > 0 THEN VALUES(moph_date) ELSE moph_date END,
                     buddycare_date = CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare_date) ELSE buddycare_date END,
-                    result_date = VALUES(result_date)
+                    hdc_date = CASE WHEN VALUES(hdc) > 0 THEN VALUES(hdc_date) ELSE hdc_date END,
+                    healthconnex_date = CASE WHEN VALUES(healthconnex) > 0 THEN VALUES(healthconnex_date) ELSE healthconnex_date END,
+                    result_date = CASE WHEN (
+                        VALUES(moph) > 0 OR 
+                        VALUES(buddycare) > 0 OR 
+                        VALUES(hdc) > 0 OR 
+                        VALUES(healthconnex) > 0
+                    ) THEN VALUES(result_date) ELSE result_date END
             `;
 
             const compareValues = Object.values(aggregatedData).map((item: any) => {
-                const result = item.moph + item.buddycare;
-                return [item.id, item.hospcode, item.b_year, item.moph, item.buddycare, result, date, date, date];
+                const result = item.moph + item.buddycare + item.hdc + item.healthconnex;
+                const rowDate = item.rowDate || date;
+                return [
+                    item.id, 
+                    item.hospcode, 
+                    item.b_year, 
+                    item.moph, 
+                    item.buddycare, 
+                    item.hdc,
+                    item.healthconnex,
+                    result, 
+                    rowDate, 
+                    rowDate, 
+                    rowDate, 
+                    rowDate, 
+                    rowDate
+                ];
             });
 
             [results] = await pool.query(compareQuery, [compareValues]);
@@ -306,7 +423,7 @@ export async function POST(request: NextRequest) {
             const logType = excelBYear ? String(excelBYear).trim() : ((type === 'HDC' || type === 'HDC_PHEOC') ? targetBYear : 'Telemed');
 
             // Determine file_platform based on type
-            const file_platform = type === 'HDC' ? 'hdc' : (type === 'HDC_PHEOC' ? 'hdc_pheoc' : 'moph_buddycare');
+            const file_platform = type === 'HDC' ? 'hdc' : (type === 'HDC_PHEOC' ? 'hdc_pheoc' : 'platform');
 
             const logQuery = `
                 INSERT INTO fileupload 

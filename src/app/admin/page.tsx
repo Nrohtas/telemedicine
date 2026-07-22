@@ -310,7 +310,7 @@ export default function AdminPage() {
                     <UploadCard 
                         type="Telemedicine"
                         title="Upload File"
-                        subtitle="หมอพร้อม Station + สอน.บัดดี้"
+                        subtitle="PLATFORM"
                         onUploadSuccess={fetchHistory}
                         icons={
                             <>
@@ -387,11 +387,11 @@ export default function AdminPage() {
                         <div className="space-y-6">
                              <div className="flex items-center gap-3 mb-2">
                                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                                <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">หมอพร้อม + สอน.บัดดี้</h4>
+                                <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">PLATFORM</h4>
                             </div>
                             <div className="space-y-4">
-                                {history.filter(item => item.file_platform === 'moph_buddycare').length > 0 ? (
-                                    history.filter(item => item.file_platform === 'moph_buddycare').slice(0, 5).map((item, idx) => (
+                                {history.filter(item => item.file_platform === 'platform').length > 0 ? (
+                                    history.filter(item => item.file_platform === 'platform').slice(0, 5).map((item, idx) => (
                                         <HistoryItem key={item.file_id} item={item} idx={idx} />
                                     ))
                                 ) : (

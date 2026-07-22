@@ -10,9 +10,9 @@ export async function GET() {
                 h.amp_name,
                 ht.hostype_label,
                 ht.affiliation,
-                (COALESCE(t.moph, 0) + COALESCE(t.buddycare, 0)) as current_total,
-                (COALESCE(t.moph_past, 0) + COALESCE(t.buddycare_past, 0)) as past_total,
-                ((COALESCE(t.moph, 0) + COALESCE(t.buddycare, 0)) - (COALESCE(t.moph_past, 0) + COALESCE(t.buddycare_past, 0))) as increase,
+                COALESCE(t.result, 0) as current_total,
+                COALESCE(t.result_past, 0) as past_total,
+                (COALESCE(t.result, 0) - COALESCE(t.result_past, 0)) as increase,
                 COALESCE(tg.op_30, 0) as target
             FROM hospital h
             LEFT JOIN (

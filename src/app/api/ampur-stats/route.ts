@@ -14,6 +14,8 @@ export async function GET(request: Request) {
                 a.amp_name,
                 SUM(COALESCE(t.moph, 0)) as mohpromt_count,
                 SUM(COALESCE(t.buddycare, 0)) as sornbuddy_count,
+                SUM(COALESCE(t.hdc, 0)) as hdc_count,
+                SUM(COALESCE(t.healthconnex, 0)) as healthconnex_count,
                 SUM(COALESCE(t.result, 0)) as total_result,
                 SUM(COALESCE(t.result_past, 0)) as total_result_past,
                 (
@@ -47,6 +49,8 @@ export async function GET(request: Request) {
             amp_name: row.amp_name,
             mohpromt_count: parseInt(row.mohpromt_count) || 0,
             sornbuddy_count: parseInt(row.sornbuddy_count) || 0,
+            hdc_count: parseInt(row.hdc_count) || 0,
+            healthconnex_count: parseInt(row.healthconnex_count) || 0,
             total_result: parseInt(row.total_result) || 0,
             total_result_past: parseInt(row.total_result_past) || 0,
             target: parseFloat(row.target) || 0,

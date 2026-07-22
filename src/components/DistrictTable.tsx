@@ -10,6 +10,8 @@ interface DistrictStat {
     amp_name: string;
     mohpromt_count: number;
     sornbuddy_count: number;
+    hdc_count: number;
+    healthconnex_count: number;
     total_result: number;
     total_result_past: number;
     target: number;
@@ -82,7 +84,7 @@ export default function DistrictTable({ type, source }: DistrictTableProps = {})
 
     // Find max value for relative progress bars
     const maxVal = Array.isArray(stats) && stats.length > 0
-        ? Math.max(...stats.map(s => Math.max(s.mohpromt_count || 0, s.sornbuddy_count || 0)), 1)
+        ? Math.max(...stats.map(s => Math.max(s.mohpromt_count || 0, s.sornbuddy_count || 0, s.hdc_count || 0, s.amp_code === '6501' ? s.healthconnex_count || 0 : 0)), 1)
         : 1;
 
     return (
@@ -154,6 +156,32 @@ export default function DistrictTable({ type, source }: DistrictTableProps = {})
                                                             </div>
                                                             <span className="text-[7px] font-black uppercase tracking-tighter opacity-70">สอน.บัดดี้</span>
                                                         </div>
+
+                                                        {/* HDC Badge */}
+                                                        <div className="bg-purple-50/50 text-[#7C3AED] px-2 py-1.5 rounded-xl border border-purple-100/50 flex flex-col items-center gap-0.5 shadow-sm min-w-[54px]">
+                                                            <div className="flex items-center gap-1">
+                                                                <svg width="12" height="12" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <text x="50" y="55" dominantBaseline="middle" textAnchor="middle" fill="#7C3AED" fontWeight="900" fontSize="42" fontFamily="Inter, sans-serif">H</text>
+                                                                    <path d="M20 75H80" stroke="#F6D76E" strokeWidth="12" strokeLinecap="round" />
+                                                                </svg>
+                                                                <span className="text-[12px] font-black leading-none">{(stat.hdc_count || 0).toLocaleString()}</span>
+                                                            </div>
+                                                            <span className="text-[7px] font-black uppercase tracking-tighter opacity-70">HDC</span>
+                                                        </div>
+
+                                                        {/* Health Connex Badge */}
+                                                        {stat.amp_code === '6501' && (
+                                                            <div className="bg-rose-50/50 text-[#FF6B6B] px-2 py-1.5 rounded-xl border border-rose-100/50 flex flex-col items-center gap-0.5 shadow-sm min-w-[54px]">
+                                                                <div className="flex items-center gap-1">
+                                                                    <svg width="12" height="12" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <text x="50" y="55" dominantBaseline="middle" textAnchor="middle" fill="#FF6B6B" fontWeight="900" fontSize="42" fontFamily="Inter, sans-serif">H</text>
+                                                                        <path d="M15 50H85M50 15V85" stroke="#F6D76E" strokeWidth="12" strokeLinecap="round" />
+                                                                    </svg>
+                                                                    <span className="text-[12px] font-black leading-none">{(stat.healthconnex_count || 0).toLocaleString()}</span>
+                                                                </div>
+                                                                <span className="text-[7px] font-black uppercase tracking-tighter opacity-70">Connex</span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     {/* Ratio Bar synced to width */}
                                                     <div className="w-full space-y-1">
@@ -166,6 +194,16 @@ export default function DistrictTable({ type, source }: DistrictTableProps = {})
                                                                 className="h-full bg-[#00ADEF] transition-all duration-1000 ease-out"
                                                                 style={{ width: `${stat.total_result > 0 ? ((stat.sornbuddy_count || 0) / stat.total_result) * 100 : 0}%` }}
                                                             ></div>
+                                                            <div
+                                                                className="h-full bg-[#7C3AED] transition-all duration-1000 ease-out"
+                                                                style={{ width: `${stat.total_result > 0 ? ((stat.hdc_count || 0) / stat.total_result) * 100 : 0}%` }}
+                                                            ></div>
+                                                            {stat.amp_code === '6501' && (
+                                                                <div
+                                                                    className="h-full bg-[#FF6B6B] transition-all duration-1000 ease-out"
+                                                                    style={{ width: `${stat.total_result > 0 ? ((stat.healthconnex_count || 0) / stat.total_result) * 100 : 0}%` }}
+                                                                ></div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>

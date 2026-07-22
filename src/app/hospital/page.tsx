@@ -19,12 +19,24 @@ interface Hospital {
     hostype_level: string;
     moph: number;
     buddycare: number;
+    hdc: number;
+    healthconnex: number;
+    result: number;
     moph_past: number;
     buddycare_past: number;
+    hdc_past: number;
+    healthconnex_past: number;
+    result_past: number;
     moph_date?: string;
     moph_past_date?: string;
     buddycare_date?: string;
     buddycare_past_date?: string;
+    hdc_date?: string;
+    hdc_past_date?: string;
+    healthconnex_date?: string;
+    healthconnex_past_date?: string;
+    result_date?: string;
+    result_past_date?: string;
     op: number;
     op_30: number;
 }
@@ -130,11 +142,11 @@ function HospitalDirectoryContent() {
             return [...hospitals].sort((a, b) => {
                 if (selectedSort === 'hospcode') return a.hospcode.localeCompare(b.hospcode);
                 if (selectedSort === 'target') return (b.op || 0) - (a.op || 0);
-                if (selectedSort === 'total') return (b.moph + b.buddycare) - (a.moph + a.buddycare);
-                if (selectedSort === 'gap') return ((b.op || 0) - (b.moph + b.buddycare)) - ((a.op || 0) - (a.moph + a.buddycare));
+                if (selectedSort === 'total') return (b.result || 0) - (a.result || 0);
+                if (selectedSort === 'gap') return ((b.op || 0) - (b.result || 0)) - ((a.op || 0) - (a.result || 0));
 
                 // Default: percent
-                const getPercent = (h: any) => h.op > 0 ? ((h.moph + h.buddycare) / h.op * 100) : 0;
+                const getPercent = (h: any) => h.op > 0 ? ((h.result || 0) / h.op * 100) : 0;
                 return getPercent(b) - getPercent(a);
             });
         };
@@ -153,11 +165,13 @@ function HospitalDirectoryContent() {
                     "เป้าหมาย 30%": h.op_30 || 0,
                     "หมอพร้อม": h.moph,
                     "สอน.บัดดี้": h.buddycare,
-                    "ยอดรวม": h.moph + h.buddycare,
-                    "เปอร์เซ็นต์ (100%)": h.op > 0 ? formatPercent((h.moph + h.buddycare) / h.op * 100) : "0%",
-                    "เปอร์เซ็นต์ (30%)": h.op_30 > 0 ? formatPercent((h.moph + h.buddycare) / h.op_30 * 100) : "0%",
-                    "ขาดอีก (100%)": h.op > 0 ? Math.max(0, h.op - (h.moph + h.buddycare)) : 0,
-                    "ขาดอีก (30%)": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0,
+                    "HDC": h.hdc || 0,
+                    "Health Connex": h.healthconnex || 0,
+                    "ยอดรวม": h.result || 0,
+                    "เปอร์เซ็นต์ (100%)": h.op > 0 ? formatPercent((h.result || 0) / h.op * 100) : "0%",
+                    "เปอร์เซ็นต์ (30%)": h.op_30 > 0 ? formatPercent((h.result || 0) / h.op_30 * 100) : "0%",
+                    "ขาดอีก (100%)": h.op > 0 ? Math.max(0, h.op - (h.result || 0)) : 0,
+                    "ขาดอีก (30%)": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.result || 0)) : 0,
                     "ตำบล": h.tmb_name || '-',
                     "อำเภอ": h.amp_name,
                     "ประเภท": typeLabel
@@ -177,11 +191,13 @@ function HospitalDirectoryContent() {
                         "เป้าหมาย 30%": h.op_30 || 0,
                         "หมอพร้อม": h.moph,
                         "สอน.บัดดี้": h.buddycare,
-                        "รวม": h.moph + h.buddycare,
-                        "เปอร์เซ็นต์ (100%)": h.op > 0 ? formatPercent((h.moph + h.buddycare) / h.op * 100) : "0%",
-                        "เปอร์เซ็นต์ (30%)": h.op_30 > 0 ? formatPercent((h.moph + h.buddycare) / h.op_30 * 100) : "0%",
-                        "ขาดอีก (100%)": h.op > 0 ? Math.max(0, h.op - (h.moph + h.buddycare)) : 0,
-                        "ขาดอีก (30%)": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.moph + h.buddycare)) : 0,
+                        "HDC": h.hdc || 0,
+                        "Health Connex": h.healthconnex || 0,
+                        "ยอดรวม": h.result || 0,
+                        "เปอร์เซ็นต์ (100%)": h.op > 0 ? formatPercent((h.result || 0) / h.op * 100) : "0%",
+                        "เปอร์เซ็นต์ (30%)": h.op_30 > 0 ? formatPercent((h.result || 0) / h.op_30 * 100) : "0%",
+                        "ขาดอีก (100%)": h.op > 0 ? Math.max(0, h.op - (h.result || 0)) : 0,
+                        "ขาดอีก (30%)": h.op_30 > 0 ? Math.max(0, h.op_30 - (h.result || 0)) : 0,
                         "ตำบล": h.tmb_name || '-',
                         "อำเภอ": h.amp_name,
                         "ประเภท": typeLabel
@@ -191,6 +207,9 @@ function HospitalDirectoryContent() {
                 // Add District Summary Row
                 const districtMoph = group.hospitals.reduce((sum, h) => sum + h.moph, 0);
                 const districtBuddy = group.hospitals.reduce((sum, h) => sum + h.buddycare, 0);
+                const districtHdc = group.hospitals.reduce((sum, h) => sum + (h.hdc || 0), 0);
+                const districtHealthConnex = group.hospitals.reduce((sum, h) => sum + (h.healthconnex || 0), 0);
+                const districtResult = group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0);
                 const districtTarget100 = group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0);
                 const districtTarget30 = group.hospitals.reduce((sum, h) => sum + h.op_30, 0);
 
@@ -202,11 +221,13 @@ function HospitalDirectoryContent() {
                     "เป้าหมาย 30%": districtTarget30,
                     "หมอพร้อม": districtMoph,
                     "สอน.บัดดี้": districtBuddy,
-                    "ยอดรวม": districtMoph + districtBuddy,
-                    "เปอร์เซ็นต์ (100%)": districtTarget100 > 0 ? formatPercent((districtMoph + districtBuddy) / districtTarget100 * 100) : "0%",
-                    "เปอร์เซ็นต์ (30%)": districtTarget30 > 0 ? formatPercent((districtMoph + districtBuddy) / districtTarget30 * 100) : "0%",
-                    "ขาดอีก (100%)": districtTarget100 > 0 ? Math.max(0, districtTarget100 - (districtMoph + districtBuddy)) : 0,
-                    "ขาดอีก (30%)": districtTarget30 > 0 ? Math.max(0, districtTarget30 - (districtMoph + districtBuddy)) : 0,
+                    "HDC": districtHdc,
+                    "Health Connex": districtHealthConnex,
+                    "ยอดรวม": districtResult,
+                    "เปอร์เซ็นต์ (100%)": districtTarget100 > 0 ? formatPercent(districtResult / districtTarget100 * 100) : "0%",
+                    "เปอร์เซ็นต์ (30%)": districtTarget30 > 0 ? formatPercent(districtResult / districtTarget30 * 100) : "0%",
+                    "ขาดอีก (100%)": districtTarget100 > 0 ? Math.max(0, districtTarget100 - districtResult) : 0,
+                    "ขาดอีก (30%)": districtTarget30 > 0 ? Math.max(0, districtTarget30 - districtResult) : 0,
                     "ตำบล": "",
                     "อำเภอ": "",
                     "ประเภท": ""
@@ -218,6 +239,9 @@ function HospitalDirectoryContent() {
         if (selectedDistrict === 'ทั้งหมด' || filteredData.length > 1) {
             const grandMoph = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph, 0), 0);
             const grandBuddy = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.buddycare, 0), 0);
+            const grandHdc = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.hdc || 0), 0), 0);
+            const grandHealthConnex = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.healthconnex || 0), 0), 0);
+            const grandResult = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0), 0);
             const grandTarget100 = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0), 0);
             const grandTarget30 = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.op_30, 0), 0);
 
@@ -229,11 +253,13 @@ function HospitalDirectoryContent() {
                 "เป้าหมาย 30%": grandTarget30,
                 "หมอพร้อม": grandMoph,
                 "สอน.บัดดี้": grandBuddy,
-                "ยอดรวม": grandMoph + grandBuddy,
-                "เปอร์เซ็นต์ (100%)": grandTarget100 > 0 ? formatPercent((grandMoph + grandBuddy) / grandTarget100 * 100) : "0%",
-                "เปอร์เซ็นต์ (30%)": grandTarget30 > 0 ? formatPercent((grandMoph + grandBuddy) / grandTarget30 * 100) : "0%",
-                "ขาดอีก (100%)": grandTarget100 > 0 ? Math.max(0, grandTarget100 - (grandMoph + grandBuddy)) : 0,
-                "ขาดอีก (30%)": grandTarget30 > 0 ? Math.max(0, grandTarget30 - (grandMoph + grandBuddy)) : 0,
+                "HDC": grandHdc,
+                "Health Connex": grandHealthConnex,
+                "ยอดรวม": grandResult,
+                "เปอร์เซ็นต์ (100%)": grandTarget100 > 0 ? formatPercent(grandResult / grandTarget100 * 100) : "0%",
+                "เปอร์เซ็นต์ (30%)": grandTarget30 > 0 ? formatPercent(grandResult / grandTarget30 * 100) : "0%",
+                "ขาดอีก (100%)": grandTarget100 > 0 ? Math.max(0, grandTarget100 - grandResult) : 0,
+                "ขาดอีก (30%)": grandTarget30 > 0 ? Math.max(0, grandTarget30 - grandResult) : 0,
                 "ตำบล": "",
                 "อำเภอ": "",
                 "ประเภท": ""
@@ -254,12 +280,17 @@ function HospitalDirectoryContent() {
             { wch: 8 },  // ลำดับ
             { wch: 10 }, // รหัส
             { wch: 40 }, // ชื่อหน่วยบริการ
+            { wch: 15 }, // เป้าหมาย 100%
             { wch: 15 }, // เป้าหมาย 30%
-            { wch: 15 }, // หมอพร้อม
-            { wch: 15 }, // สอน.บัดดี้
-            { wch: 10 }, // รวม
-            { wch: 12 }, // เปอร์เซ็นต์
-            { wch: 15 }, // ขาดอีก
+            { wch: 12 }, // หมอพร้อม
+            { wch: 12 }, // สอน.บัดดี้
+            { wch: 12 }, // HDC
+            { wch: 15 }, // Health Connex
+            { wch: 12 }, // ยอดรวม
+            { wch: 16 }, // เปอร์เซ็นต์ (100%)
+            { wch: 16 }, // เปอร์เซ็นต์ (30%)
+            { wch: 15 }, // ขาดอีก (100%)
+            { wch: 15 }, // ขาดอีก (30%)
             { wch: 15 }, // ตำบล
             { wch: 15 }, // อำเภอ
             { wch: 15 }, // ประเภท
@@ -341,6 +372,10 @@ function HospitalDirectoryContent() {
     const mophPastDate = data.flatMap(g => g.hospitals).find(h => h.moph_past_date)?.moph_past_date;
     const buddyDate = data.flatMap(g => g.hospitals).find(h => h.buddycare_date)?.buddycare_date;
     const buddyPastDate = data.flatMap(g => g.hospitals).find(h => h.buddycare_past_date)?.buddycare_past_date;
+    const hdcDate = data.flatMap(g => g.hospitals).find(h => h.hdc_date)?.hdc_date;
+    const hdcPastDate = data.flatMap(g => g.hospitals).find(h => h.hdc_past_date)?.hdc_past_date;
+    const healthconnexDate = data.flatMap(g => g.hospitals).find(h => h.healthconnex_date)?.healthconnex_date;
+    const healthconnexPastDate = data.flatMap(g => g.hospitals).find(h => h.healthconnex_past_date)?.healthconnex_past_date;
 
     const renderHeaderDate = (current?: string, past?: string) => {
         if (!current && !past) return null;
@@ -432,6 +467,14 @@ function HospitalDirectoryContent() {
                                                         สอน.บัดดี้
                                                         {renderHeaderDate(buddyDate, buddyPastDate)}
                                                     </th>
+                                                    <th className="px-6 py-4 w-28 text-right text-[#7C3AED] whitespace-nowrap">
+                                                        HDC
+                                                        {renderHeaderDate(hdcDate, hdcPastDate)}
+                                                    </th>
+                                                    <th className="px-6 py-4 w-28 text-right text-[#FF6B6B] whitespace-nowrap">
+                                                        Health Connex
+                                                        {renderHeaderDate(healthconnexDate, healthconnexPastDate)}
+                                                    </th>
                                                     <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">
                                                         ยอดรวม
                                                     </th>
@@ -450,11 +493,11 @@ function HospitalDirectoryContent() {
                                                     .sort((a, b) => {
                                                         if (selectedSort === 'hospcode') return a.hospcode.localeCompare(b.hospcode);
                                                         if (selectedSort === 'target') return (b.op || 0) - (a.op || 0);
-                                                        if (selectedSort === 'total') return (b.moph + b.buddycare) - (a.moph + a.buddycare);
-                                                        if (selectedSort === 'gap') return ((b.op || 0) - (b.moph + b.buddycare)) - ((a.op || 0) - (a.moph + a.buddycare));
+                                                        if (selectedSort === 'total') return (b.result || 0) - (a.result || 0);
+                                                        if (selectedSort === 'gap') return ((b.op || 0) - (b.result || 0)) - ((a.op || 0) - (a.result || 0));
 
                                                         // Default: percent
-                                                        const getPercent = (h: any) => h.op > 0 ? ((h.moph + h.buddycare) / h.op * 100) : 0;
+                                                        const getPercent = (h: any) => h.op > 0 ? ((h.result || 0) / h.op * 100) : 0;
                                                         return getPercent(b) - getPercent(a);
                                                     })
                                                     .map((hospital) => {
@@ -482,27 +525,33 @@ function HospitalDirectoryContent() {
                                                                 <td className="px-6 py-3">
                                                                     {renderComparisonCell(hospital.buddycare, hospital.buddycare_past, "text-sm font-bold text-[#00ADEF]")}
                                                                 </td>
+                                                                <td className="px-6 py-3">
+                                                                    {renderComparisonCell(hospital.hdc || 0, hospital.hdc_past || 0, "text-sm font-bold text-[#7C3AED]")}
+                                                                </td>
+                                                                <td className="px-6 py-3">
+                                                                    {renderComparisonCell(hospital.healthconnex || 0, hospital.healthconnex_past || 0, "text-sm font-bold text-[#FF6B6B]")}
+                                                                </td>
                                                                 <td className="px-6 py-3 bg-indigo-50/30">
-                                                                    {renderComparisonCell(hospital.moph + hospital.buddycare, hospital.moph_past + hospital.buddycare_past, "text-sm font-black text-indigo-700")}
+                                                                    {renderComparisonCell(hospital.result || 0, hospital.result_past || 0, "text-sm font-black text-indigo-700")}
                                                                 </td>
                                                                 <td className="px-6 py-3 text-right bg-emerald-50/40">
                                                                     <span className="text-sm font-bold text-emerald-700">
-                                                                        {formatPercent(hospital.op > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op * 100) : 0)}
+                                                                        {formatPercent(hospital.op > 0 ? ((hospital.result || 0) / hospital.op * 100) : 0)}
                                                                     </span>
                                                                 </td>
                                                                 <td className="px-6 py-3 text-right bg-emerald-50/20">
                                                                     <span className="text-sm font-bold text-emerald-600">
-                                                                        {formatPercent(hospital.op_30 > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op_30 * 100) : 0)}
+                                                                        {formatPercent(hospital.op_30 > 0 ? ((hospital.result || 0) / hospital.op_30 * 100) : 0)}
                                                                     </span>
                                                                 </td>
                                                                 <td className="px-6 py-3 text-right bg-red-50/40">
                                                                     <span className="text-sm font-bold text-[#FF6B6B]">
-                                                                        {(hospital.op > 0 ? Math.max(0, hospital.op - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
+                                                                        {(hospital.op > 0 ? Math.max(0, hospital.op - (hospital.result || 0)) : 0).toLocaleString()}
                                                                     </span>
                                                                 </td>
                                                                 <td className="px-6 py-3 text-right bg-red-50/20">
                                                                     <span className="text-sm font-bold text-rose-500">
-                                                                        {(hospital.op_30 > 0 ? Math.max(0, hospital.op_30 - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
+                                                                        {(hospital.op_30 > 0 ? Math.max(0, hospital.op_30 - (hospital.result || 0)) : 0).toLocaleString()}
                                                                     </span>
                                                                 </td>
                                                                 <td className="px-6 py-3 text-sm opacity-70 whitespace-nowrap">
@@ -556,8 +605,8 @@ function HospitalDirectoryContent() {
                                                     </td>
                                                     <td className="px-6 py-5 bg-indigo-50/50">
                                                         {renderComparisonCell(
-                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0),
-                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph_past + h.buddycare_past, 0), 0),
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0), 0),
+                                                            filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.result_past || 0), 0), 0),
                                                             "text-xl font-black text-indigo-900"
                                                         )}
                                                     </td>
@@ -565,7 +614,7 @@ function HospitalDirectoryContent() {
                                                         <span className="text-xl font-black text-emerald-700">
                                                             {(() => {
                                                                 const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0), 0);
-                                                                const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
+                                                                const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0), 0);
                                                                 return formatPercent(target > 0 ? (current / target * 100) : 0);
                                                             })()}
                                                         </span>
@@ -574,7 +623,7 @@ function HospitalDirectoryContent() {
                                                         <span className="text-xl font-black text-emerald-600">
                                                             {(() => {
                                                                 const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op_30 || 0), 0), 0);
-                                                                const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
+                                                                const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0), 0);
                                                                 return formatPercent(target > 0 ? (current / target * 100) : 0);
                                                             })()}
                                                         </span>
@@ -583,7 +632,7 @@ function HospitalDirectoryContent() {
                                                         <span className="text-xl font-black text-red-700">
                                                             {(() => {
                                                                 const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0), 0);
-                                                                const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
+                                                                const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0), 0);
                                                                 return (target > 0 ? Math.max(0, target - current) : 0).toLocaleString();
                                                             })()}
                                                         </span>
@@ -592,7 +641,7 @@ function HospitalDirectoryContent() {
                                                         <span className="text-xl font-black text-rose-600">
                                                             {(() => {
                                                                 const target = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.op_30 || 0), 0), 0);
-                                                                const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0), 0);
+                                                                const current = filteredData.reduce((total, group) => total + group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0), 0);
                                                                 return (target > 0 ? Math.max(0, target - current) : 0).toLocaleString();
                                                             })()}
                                                         </span>
@@ -614,7 +663,7 @@ function HospitalDirectoryContent() {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
                                         </div>
-                                        <h3 className="text-lg font-bold text-nm-primary opacity-80">อำเภอ{group.amp_name}</h3>
+                                                        <h3 className="text-lg font-bold text-nm-primary opacity-80">อำเภอ{group.amp_name}</h3>
                                         <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
                                         {groupIndex === 0 && <LastUpdate className="mb-0 flex-shrink-0" />}
                                         <button
@@ -645,6 +694,14 @@ function HospitalDirectoryContent() {
                                                             สอน.บัดดี้
                                                             {renderHeaderDate(buddyDate, buddyPastDate)}
                                                         </th>
+                                                        <th className="px-6 py-4 w-28 text-right text-[#7C3AED] whitespace-nowrap">
+                                                            HDC
+                                                            {renderHeaderDate(hdcDate, hdcPastDate)}
+                                                        </th>
+                                                        <th className="px-6 py-4 w-28 text-right text-[#FF6B6B] whitespace-nowrap">
+                                                            Health Connex
+                                                            {renderHeaderDate(healthconnexDate, healthconnexPastDate)}
+                                                        </th>
                                                         <th className="px-6 py-4 w-32 text-right text-indigo-700 whitespace-nowrap">
                                                             ยอดรวม
                                                         </th>
@@ -662,11 +719,11 @@ function HospitalDirectoryContent() {
                                                         .sort((a, b) => {
                                                             if (selectedSort === 'hospcode') return a.hospcode.localeCompare(b.hospcode);
                                                             if (selectedSort === 'target') return (b.op || 0) - (a.op || 0);
-                                                            if (selectedSort === 'total') return (b.moph + b.buddycare) - (a.moph + a.buddycare);
-                                                            if (selectedSort === 'gap') return ((b.op || 0) - (b.moph + b.buddycare)) - ((a.op || 0) - (a.moph + a.buddycare));
+                                                            if (selectedSort === 'total') return (b.result || 0) - (a.result || 0);
+                                                            if (selectedSort === 'gap') return ((b.op || 0) - (b.result || 0)) - ((a.op || 0) - (a.result || 0));
 
                                                             // Default: percent
-                                                            const getPercent = (h: any) => h.op > 0 ? ((h.moph + h.buddycare) / h.op * 100) : 0;
+                                                            const getPercent = (h: any) => h.op > 0 ? ((h.result || 0) / h.op * 100) : 0;
                                                             return getPercent(b) - getPercent(a);
                                                         })
                                                         .map((hospital) => {
@@ -693,27 +750,33 @@ function HospitalDirectoryContent() {
                                                                     <td className="px-6 py-3">
                                                                         {renderComparisonCell(hospital.buddycare, hospital.buddycare_past, "text-sm font-black text-blue-800")}
                                                                     </td>
+                                                                    <td className="px-6 py-3">
+                                                                        {renderComparisonCell(hospital.hdc || 0, hospital.hdc_past || 0, "text-sm font-black text-purple-800")}
+                                                                    </td>
+                                                                    <td className="px-6 py-3">
+                                                                        {renderComparisonCell(hospital.healthconnex || 0, hospital.healthconnex_past || 0, "text-sm font-black text-rose-800")}
+                                                                    </td>
                                                                     <td className="px-6 py-3 bg-indigo-50/30">
-                                                                        {renderComparisonCell(hospital.moph + hospital.buddycare, hospital.moph_past + hospital.buddycare_past, "text-sm font-black text-indigo-900")}
+                                                                        {renderComparisonCell(hospital.result || 0, hospital.result_past || 0, "text-sm font-black text-indigo-900")}
                                                                     </td>
                                                                     <td className="px-6 py-3 text-right bg-emerald-50/40">
                                                                         <span className="text-sm font-black text-emerald-700">
-                                                                            {formatPercent(hospital.op > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op * 100) : 0)}
+                                                                            {formatPercent(hospital.op > 0 ? ((hospital.result || 0) / hospital.op * 100) : 0)}
                                                                         </span>
                                                                     </td>
                                                                     <td className="px-6 py-3 text-right bg-emerald-50/20">
                                                                         <span className="text-sm font-black text-emerald-600">
-                                                                            {formatPercent(hospital.op_30 > 0 ? ((hospital.moph + hospital.buddycare) / hospital.op_30 * 100) : 0)}
+                                                                            {formatPercent(hospital.op_30 > 0 ? ((hospital.result || 0) / hospital.op_30 * 100) : 0)}
                                                                         </span>
                                                                     </td>
                                                                     <td className="px-6 py-3 text-right bg-red-50/40">
                                                                         <span className="text-sm font-bold text-[#FF6B6B]">
-                                                                            {(hospital.op > 0 ? Math.max(0, hospital.op - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
+                                                                            {(hospital.op > 0 ? Math.max(0, hospital.op - (hospital.result || 0)) : 0).toLocaleString()}
                                                                         </span>
                                                                     </td>
                                                                     <td className="px-6 py-3 text-right bg-red-50/20">
                                                                         <span className="text-sm font-bold text-rose-500">
-                                                                            {(hospital.op_30 > 0 ? Math.max(0, hospital.op_30 - (hospital.moph + hospital.buddycare)) : 0).toLocaleString()}
+                                                                            {(hospital.op_30 > 0 ? Math.max(0, hospital.op_30 - (hospital.result || 0)) : 0).toLocaleString()}
                                                                         </span>
                                                                     </td>
                                                                     <td className="px-6 py-3 text-sm font-black text-slate-700 whitespace-nowrap">
@@ -767,8 +830,8 @@ function HospitalDirectoryContent() {
                                                         </td>
                                                         <td className="px-6 py-4 bg-indigo-50/30">
                                                             {renderComparisonCell(
-                                                                group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0),
-                                                                group.hospitals.reduce((sum, h) => sum + h.moph_past + h.buddycare_past, 0),
+                                                                group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0),
+                                                                group.hospitals.reduce((sum, h) => sum + (h.result_past || 0), 0),
                                                                 "text-base font-black text-indigo-700"
                                                             )}
                                                         </td>
@@ -776,7 +839,7 @@ function HospitalDirectoryContent() {
                                                             <span className="text-base font-bold text-emerald-700">
                                                                 {(() => {
                                                                     const target = group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0);
-                                                                    const current = group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0);
+                                                                    const current = group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0);
                                                                     return formatPercent(target > 0 ? (current / target * 100) : 0);
                                                                 })()}
                                                             </span>
@@ -785,7 +848,7 @@ function HospitalDirectoryContent() {
                                                             <span className="text-base font-bold text-emerald-600">
                                                                 {(() => {
                                                                     const target = group.hospitals.reduce((sum, h) => sum + (h.op_30 || 0), 0);
-                                                                    const current = group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0);
+                                                                    const current = group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0);
                                                                     return formatPercent(target > 0 ? (current / target * 100) : 0);
                                                                 })()}
                                                             </span>
@@ -794,7 +857,7 @@ function HospitalDirectoryContent() {
                                                             <span className="text-base font-bold text-[#FF6B6B]">
                                                                 {(() => {
                                                                     const target = group.hospitals.reduce((sum, h) => sum + (h.op || 0), 0);
-                                                                    const current = group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0);
+                                                                    const current = group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0);
                                                                     return (target > 0 ? Math.max(0, target - current) : 0).toLocaleString();
                                                                 })()}
                                                             </span>
@@ -803,7 +866,7 @@ function HospitalDirectoryContent() {
                                                             <span className="text-base font-bold text-rose-500">
                                                                 {(() => {
                                                                     const target = group.hospitals.reduce((sum, h) => sum + (h.op_30 || 0), 0);
-                                                                    const current = group.hospitals.reduce((sum, h) => sum + h.moph + h.buddycare, 0);
+                                                                    const current = group.hospitals.reduce((sum, h) => sum + (h.result || 0), 0);
                                                                     return (target > 0 ? Math.max(0, target - current) : 0).toLocaleString();
                                                                 })()}
                                                             </span>

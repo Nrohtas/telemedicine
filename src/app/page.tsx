@@ -20,6 +20,8 @@ export default function Home() {
     total_hospitals: 0,
     total_moph: 0,
     total_buddycare: 0,
+    total_hdc: 0,
+    total_healthconnex: 0,
     last_update_date: null,
     prev_update_date: null,
   });
@@ -110,6 +112,32 @@ export default function Home() {
         </svg>
       )
     },
+    {
+      label: "HDC",
+      value: globalStats.total_hdc.toLocaleString(),
+      unit: "ครั้ง",
+      trend: "+0%",
+      color: "text-[#7C3AED]",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="50" y="55" dominantBaseline="middle" textAnchor="middle" fill="#7C3AED" fontWeight="900" fontSize="36" fontFamily="Inter, sans-serif">H</text>
+          <path d="M20 75H80" stroke="#F6D76E" strokeWidth="8" strokeLinecap="round" />
+        </svg>
+      )
+    },
+    {
+      label: "Health Connex",
+      value: globalStats.total_healthconnex.toLocaleString(),
+      unit: "ครั้ง",
+      trend: "+0%",
+      color: "text-[#FF6B6B]",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="50" y="55" dominantBaseline="middle" textAnchor="middle" fill="#FF6B6B" fontWeight="900" fontSize="36" fontFamily="Inter, sans-serif">H</text>
+          <path d="M15 50H85M50 15V85" stroke="#F6D76E" strokeWidth="8" strokeLinecap="round" />
+        </svg>
+      )
+    }
   ];
 
   return (
@@ -330,11 +358,11 @@ export default function Home() {
 
           {/* Secondary Column: Unified Platform Distribution */}
           <div className="lg:col-span-4 flex flex-col">
-            <SoftCard className="p-4 h-full group transition-all duration-300 shadow-xl border-t-4 border-slate-700 bg-white/95 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+            <SoftCard className="p-4 h-full group transition-all duration-300 shadow-xl border-t-4 border-slate-700 bg-white/95 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between min-h-[300px]">
               {/* Decorative Background */}
               <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px]" />
 
-              <div className="relative z-10 w-full mb-3">
+              <div className="relative z-10 w-full mb-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-lg bg-slate-100 text-slate-800">
@@ -344,84 +372,123 @@ export default function Home() {
                         <line x1="6" y1="20" x2="6" y2="14" />
                       </svg>
                     </div>
-                    <h3 className="text-[11px] font-black text-slate-800 uppercase tracking-widest leading-none">Platform</h3>
+                    <h3 className="text-[11px] font-black text-slate-800 uppercase tracking-widest leading-none">PLATFORM</h3>
                   </div>
                   <div className="px-2 py-1 bg-slate-50 border border-slate-100 rounded-lg">
-                    <span className="text-[10px] font-black text-slate-400">รวม : {(globalStats.total_moph + globalStats.total_buddycare).toLocaleString()}</span>
+                    <span className="text-[10px] font-black text-slate-400">รวม : {globalStats.total_services.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Main Scale Comparison Row */}
-              <div className="relative flex flex-col gap-4 py-1">
-                {/* MOPH Section */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2.5 rounded-2xl bg-emerald-50 text-[#006837] shadow-inner ring-1 ring-emerald-100/50 flex-shrink-0">
-                      <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* The Horizontal Stacked Bar */}
+              <div className="relative py-2 w-full">
+                <div className="h-4 w-full bg-slate-100 rounded-xl overflow-hidden flex shadow-inner border border-slate-200/50">
+                  {/* MOPH */}
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-700 to-[#006837] transition-all duration-1000 ease-out relative group/bar"
+                    style={{ width: `${globalStats.total_services > 0 ? (globalStats.total_moph / globalStats.total_services * 100) : 0}%` }}
+                  >
+                    <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/bar:opacity-100 transition-opacity" />
+                  </div>
+                  {/* SORN */}
+                  <div
+                    className="h-full bg-gradient-to-r from-[#00ADEF] to-sky-600 transition-all duration-1000 ease-out relative group/bar"
+                    style={{ width: `${globalStats.total_services > 0 ? (globalStats.total_buddycare / globalStats.total_services * 100) : 0}%` }}
+                  >
+                    <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/bar:opacity-100 transition-opacity" />
+                  </div>
+                  {/* HDC */}
+                  <div
+                    className="h-full bg-gradient-to-r from-purple-500 to-[#7C3AED] transition-all duration-1000 ease-out relative group/bar"
+                    style={{ width: `${globalStats.total_services > 0 ? (globalStats.total_hdc / globalStats.total_services * 100) : 0}%` }}
+                  >
+                    <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/bar:opacity-100 transition-opacity" />
+                  </div>
+                  {/* Health Connex */}
+                  <div
+                    className="h-full bg-gradient-to-r from-rose-400 to-[#FF6B6B] transition-all duration-1000 ease-out relative group/bar"
+                    style={{ width: `${globalStats.total_services > 0 ? (globalStats.total_healthconnex / globalStats.total_services * 100) : 0}%` }}
+                  >
+                    <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/bar:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Grid 2x2 of Platforms */}
+              <div className="grid grid-cols-2 gap-3 mt-1">
+                {/* 1. MOPH */}
+                <div className="p-2.5 bg-slate-50 border border-slate-100/80 rounded-2xl flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="p-1 bg-emerald-50 rounded-lg text-[#006837] flex-shrink-0">
+                      <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="50" cy="22" r="14" fill="#006837" />
                         <path d="M25 40H75V75C75 80 71 84 66 84H34C29 84 25 80 25 75V40Z" stroke="#F6D76E" strokeWidth="10" />
-                        <rect x="40" y="52" width="20" height="7" fill="#A5A7AA" />
-                        <rect x="46.5" y="46" width="7" height="19" fill="#A5A7AA" />
                       </svg>
                     </div>
-                    <div className="flex flex-col justify-center">
-                      <span className="text-[11px] font-black text-emerald-900 uppercase tracking-tight mb-1">หมอพร้อม STATION</span>
-                      <div className="flex items-baseline gap-1 leading-none">
-                        <span className="text-xl font-black text-[#006837] tracking-tighter">{(globalStats.total_moph).toLocaleString()}</span>
-                        <span className="text-[8px] font-bold text-[#006837]/40 uppercase">ครั้ง</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end leading-none">
-                    <span className="text-xl font-black text-[#006837] tracking-tighter">
-                      {globalStats.total_moph + globalStats.total_buddycare > 0 ? (new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format((globalStats.total_moph / (globalStats.total_moph + globalStats.total_buddycare)) * 100)) : 0}%
+                    <span className="text-[11px] font-black text-[#006837] tracking-tighter">
+                      {globalStats.total_services > 0 ? (new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 1 }).format((globalStats.total_moph / globalStats.total_services) * 100)) : 0}%
                     </span>
                   </div>
-                </div>
-
-                {/* The Horizontal Scale (Stacked Bar) */}
-                <div className="relative py-2">
-                  <div className="h-4 w-full bg-slate-100 rounded-xl overflow-hidden flex shadow-inner border border-slate-200/50">
-                    <div
-                      className="h-full bg-gradient-to-r from-emerald-700 to-[#006837] transition-all duration-1000 ease-out relative group/bar"
-                      style={{ width: `${globalStats.total_moph + globalStats.total_buddycare > 0 ? (globalStats.total_moph / (globalStats.total_moph + globalStats.total_buddycare) * 100) : 0}%` }}
-                    >
-                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/bar:opacity-100 transition-opacity" />
-                    </div>
-                    <div
-                      className="h-full bg-gradient-to-r from-[#00ADEF] to-sky-600 transition-all duration-1000 ease-out relative group/bar"
-                      style={{ width: `${globalStats.total_moph + globalStats.total_buddycare > 0 ? (globalStats.total_buddycare / (globalStats.total_moph + globalStats.total_buddycare) * 100) : 0}%` }}
-                    >
-                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/bar:opacity-100 transition-opacity" />
-                    </div>
+                  <div>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1 truncate">หมอพร้อม STATION</p>
+                    <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_moph).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
                   </div>
                 </div>
 
-                {/* SORN Section */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2.5 rounded-2xl bg-sky-50 text-[#00ADEF] shadow-inner ring-1 ring-sky-100/50 flex-shrink-0">
-                      <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* 2. SORN */}
+                <div className="p-2.5 bg-slate-50 border border-slate-100/80 rounded-2xl flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="p-1 bg-sky-50 rounded-lg text-[#00ADEF] flex-shrink-0">
+                      <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 45L50 15L90 45" stroke="#00ADEF" strokeWidth="12" strokeLinecap="round" />
-                        <rect x="40" y="32" width="20" height="7" fill="#A5A7AA" />
-                        <rect x="46.5" y="26" width="7" height="19" fill="#A5A7AA" />
-                        <path d="M25 55C25 55 25 85 50 85C75 85 75 60 75 60" stroke="#F6D76E" strokeWidth="10" fill="none" strokeLinecap="round" />
                         <circle cx="75" cy="62" r="8" fill="#0060A9" />
                       </svg>
                     </div>
-                    <div className="flex flex-col justify-center">
-                      <span className="text-[11px] font-black text-sky-900 uppercase tracking-tight mb-1">สอน.บัดดี้</span>
-                      <div className="flex items-baseline gap-1 leading-none">
-                        <span className="text-xl font-black text-[#00ADEF] tracking-tighter">{(globalStats.total_buddycare).toLocaleString()}</span>
-                        <span className="text-[8px] font-bold text-[#00ADEF]/40 uppercase">ครั้ง</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end leading-none">
-                    <span className="text-xl font-black text-[#00ADEF] tracking-tighter">
-                      {globalStats.total_moph + globalStats.total_buddycare > 0 ? (new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format((globalStats.total_buddycare / (globalStats.total_moph + globalStats.total_buddycare)) * 100)) : 0}%
+                    <span className="text-[11px] font-black text-[#00ADEF] tracking-tighter">
+                      {globalStats.total_services > 0 ? (new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 1 }).format((globalStats.total_buddycare / globalStats.total_services) * 100)) : 0}%
                     </span>
+                  </div>
+                  <div>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1 truncate">สอน.บัดดี้</p>
+                    <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_buddycare).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
+                  </div>
+                </div>
+
+                {/* 3. HDC */}
+                <div className="p-2.5 bg-slate-50 border border-slate-100/80 rounded-2xl flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="p-1 bg-purple-50 rounded-lg text-[#7C3AED] flex-shrink-0">
+                      <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <text x="50" y="55" dominantBaseline="middle" textAnchor="middle" fill="#7C3AED" fontWeight="900" fontSize="42" fontFamily="Inter, sans-serif">H</text>
+                        <path d="M20 75H80" stroke="#F6D76E" strokeWidth="12" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                    <span className="text-[11px] font-black text-[#7C3AED] tracking-tighter">
+                      {globalStats.total_services > 0 ? (new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 1 }).format((globalStats.total_hdc / globalStats.total_services) * 100)) : 0}%
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1 truncate">HDC</p>
+                    <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_hdc).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
+                  </div>
+                </div>
+
+                {/* 4. Health Connex */}
+                <div className="p-2.5 bg-slate-50 border border-slate-100/80 rounded-2xl flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="p-1 bg-rose-50 rounded-lg text-[#FF6B6B] flex-shrink-0">
+                      <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <text x="50" y="55" dominantBaseline="middle" textAnchor="middle" fill="#FF6B6B" fontWeight="900" fontSize="42" fontFamily="Inter, sans-serif">H</text>
+                        <path d="M15 50H85M50 15V85" stroke="#F6D76E" strokeWidth="12" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                    <span className="text-[11px] font-black text-[#FF6B6B] tracking-tighter">
+                      {globalStats.total_services > 0 ? (new Intl.NumberFormat("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 1 }).format((globalStats.total_healthconnex / globalStats.total_services) * 100)) : 0}%
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1 truncate">Health Connex</p>
+                    <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_healthconnex).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
                   </div>
                 </div>
               </div>
