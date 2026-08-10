@@ -22,19 +22,19 @@ export async function GET(request: Request) {
                 ht.hostype as hostype_level,
                 COALESCE(t.moph, 0) as moph,
                 COALESCE(t.buddycare, 0) as buddycare,
-                COALESCE(t.hdc, 0) as hdc,
+                COALESCE(hdc_t.telemedicine, 0) as hdc,
                 COALESCE(t.healthconnex, 0) as healthconnex,
-                COALESCE(t.result, 0) as result,
+                (COALESCE(t.moph, 0) + COALESCE(t.buddycare, 0) + COALESCE(hdc_t.telemedicine, 0) + COALESCE(t.healthconnex, 0)) as result,
                 COALESCE(t.moph_past, 0) as moph_past,
                 COALESCE(t.buddycare_past, 0) as buddycare_past,
                 COALESCE(t.hdc_past, 0) as hdc_past,
                 COALESCE(t.healthconnex_past, 0) as healthconnex_past,
-                COALESCE(t.result_past, 0) as result_past,
+                (COALESCE(t.moph_past, 0) + COALESCE(t.buddycare_past, 0) + COALESCE(t.hdc_past, 0) + COALESCE(t.healthconnex_past, 0)) as result_past,
                 t.moph_date,
                 t.moph_past_date,
                 t.buddycare_date,
                 t.buddycare_past_date,
-                t.hdc_date,
+                hdc_t.hdc_update as hdc_date,
                 t.hdc_past_date,
                 t.healthconnex_date,
                 t.healthconnex_past_date,
@@ -49,11 +49,12 @@ export async function GET(request: Request) {
                 GROUP BY hostype_new, hostype_name, hostype_list
             ) ht ON h.hostype_new = ht.hostype_new
             LEFT JOIN telemed t ON h.hospcode = t.hospcode AND t.b_year = ?
+            LEFT JOIN telemed_opd_hdc hdc_t ON h.hospcode = hdc_t.hospcode COLLATE utf8mb4_general_ci AND hdc_t.b_year = ?
             LEFT JOIN target tg ON h.hospcode = tg.hospcode AND tg.b_year = ?
             WHERE h.status = '1' 
         `;
         const targetYear = (parseInt(year) - 1).toString();
-        const params: any[] = [year, targetYear];
+        const params: any[] = [year, year, targetYear];
 
         if (affiliation && affiliation !== 'ทั้งหมด') {
             query += " AND ht.hostype_name = ?";

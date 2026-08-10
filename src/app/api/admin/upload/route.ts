@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import * as XLSX from 'xlsx';
+import { verifyJWT } from '@/lib/auth';
 
 const cleanExcelDate = (val: any, defaultDate: string | null): string | null => {
     if (val === undefined || val === null || val === '') return defaultDate;
@@ -39,6 +40,27 @@ const cleanExcelDate = (val: any, defaultDate: string | null): string | null => 
 
 export async function POST(request: NextRequest) {
     try {
+        // Authenticate request
+        let token = request.cookies.get('token')?.value;
+
+        if (!token) {
+            const authHeader = request.headers.get('Authorization');
+            if (authHeader?.startsWith('Bearer ')) {
+                token = authHeader.split(' ')[1];
+            }
+        }
+
+        if (!token) {
+            return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
+        }
+
+        const payload = await verifyJWT(token);
+        if (!payload) {
+            return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
+        }
+
+        const username = payload.username || 'system';
+
         const formData = await request.formData();
         const file = formData.get('file') as File;
         const type = formData.get('type') as string || 'Telemedicine';
@@ -410,13 +432,6 @@ export async function POST(request: NextRequest) {
 
         // Log to fileupload table
         try {
-            const token = request.cookies.get('token')?.value;
-            const payload = token ? await (async () => {
-                const { verifyJWT } = await import('@/lib/auth');
-                return await verifyJWT(token);
-            })() : null;
-            const username = payload?.username || 'system';
-            
             // Determine fiscal year for logging
             const targetBYear = date ? (new Date(date).getFullYear() + 543).toString() : '2569';
             const excelBYear = rawData[0]['ปีงบประมาณ'] || rawData[0]['b_year'];
