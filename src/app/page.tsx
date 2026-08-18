@@ -19,9 +19,13 @@ export default function Home() {
     total_result_past: 0,
     total_hospitals: 0,
     total_moph: 0,
+    total_moph_past: 0,
     total_buddycare: 0,
+    total_buddycare_past: 0,
     total_hdc: 0,
+    total_hdc_past: 0,
     total_healthconnex: 0,
+    total_healthconnex_past: 0,
     last_update_date: null,
     prev_update_date: null,
   });
@@ -431,7 +435,19 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1 truncate">หมอพร้อม STATION</p>
-                    <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_moph).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
+                    <div className="flex items-baseline justify-between gap-1 flex-wrap">
+                      <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_moph).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
+                      {(globalStats.total_moph - (globalStats.total_moph_past || 0)) !== 0 && (
+                        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md flex items-center leading-none ${
+                          (globalStats.total_moph - (globalStats.total_moph_past || 0)) > 0
+                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60'
+                            : 'bg-rose-50 text-rose-600 border border-rose-200/60'
+                        }`} title={`ครั้งก่อน: ${(globalStats.total_moph_past || 0).toLocaleString()}`}>
+                          {(globalStats.total_moph - (globalStats.total_moph_past || 0)) > 0 ? '+' : ''}
+                          {(globalStats.total_moph - (globalStats.total_moph_past || 0)).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -450,7 +466,19 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1 truncate">สอน.บัดดี้</p>
-                    <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_buddycare).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
+                    <div className="flex items-baseline justify-between gap-1 flex-wrap">
+                      <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_buddycare).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
+                      {(globalStats.total_buddycare - (globalStats.total_buddycare_past || 0)) !== 0 && (
+                        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md flex items-center leading-none ${
+                          (globalStats.total_buddycare - (globalStats.total_buddycare_past || 0)) > 0
+                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60'
+                            : 'bg-rose-50 text-rose-600 border border-rose-200/60'
+                        }`} title={`ครั้งก่อน: ${(globalStats.total_buddycare_past || 0).toLocaleString()}`}>
+                          {(globalStats.total_buddycare - (globalStats.total_buddycare_past || 0)) > 0 ? '+' : ''}
+                          {(globalStats.total_buddycare - (globalStats.total_buddycare_past || 0)).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -469,7 +497,19 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1 truncate">HDC</p>
-                    <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_hdc).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
+                    <div className="flex items-baseline justify-between gap-1 flex-wrap">
+                      <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_hdc).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
+                      {(globalStats.total_hdc - (globalStats.total_hdc_past || 0)) !== 0 && (
+                        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md flex items-center leading-none ${
+                          (globalStats.total_hdc - (globalStats.total_hdc_past || 0)) > 0
+                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60'
+                            : 'bg-rose-50 text-rose-600 border border-rose-200/60'
+                        }`} title={`ครั้งก่อน: ${(globalStats.total_hdc_past || 0).toLocaleString()}`}>
+                          {(globalStats.total_hdc - (globalStats.total_hdc_past || 0)) > 0 ? '+' : ''}
+                          {(globalStats.total_hdc - (globalStats.total_hdc_past || 0)).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -488,7 +528,19 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1 truncate">Health Connex</p>
-                    <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_healthconnex).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
+                    <div className="flex items-baseline justify-between gap-1 flex-wrap">
+                      <p className="text-sm font-black text-slate-800 leading-none">{(globalStats.total_healthconnex).toLocaleString()} <span className="text-[8px] font-bold text-slate-400">ครั้ง</span></p>
+                      {(globalStats.total_healthconnex - (globalStats.total_healthconnex_past || 0)) !== 0 && (
+                        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md flex items-center leading-none ${
+                          (globalStats.total_healthconnex - (globalStats.total_healthconnex_past || 0)) > 0
+                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60'
+                            : 'bg-rose-50 text-rose-600 border border-rose-200/60'
+                        }`} title={`ครั้งก่อน: ${(globalStats.total_healthconnex_past || 0).toLocaleString()}`}>
+                          {(globalStats.total_healthconnex - (globalStats.total_healthconnex_past || 0)) > 0 ? '+' : ''}
+                          {(globalStats.total_healthconnex - (globalStats.total_healthconnex_past || 0)).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
