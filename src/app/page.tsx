@@ -14,6 +14,7 @@ import TopImprovers from "@/components/TopImprovers";
 
 export default function Home() {
   const [selectedDistrict, setSelectedDistrict] = useState("เลือกอำเภอ");
+  const [selectedYear, setSelectedYear] = useState("2569");
   const [globalStats, setGlobalStats] = useState({
     total_services: 0,
     total_result_past: 0,
@@ -43,7 +44,7 @@ export default function Home() {
   React.useEffect(() => {
     const fetchGlobalStats = async () => {
       try {
-        const response = await fetch('/telemedicine/api/global-stats', { cache: 'no-store' });
+        const response = await fetch(`/telemedicine/api/global-stats?year=${selectedYear}`, { cache: 'no-store' });
         const data = await response.json();
         if (!data.error) {
           setGlobalStats(data);
@@ -55,11 +56,8 @@ export default function Home() {
 
     const fetchTargetData = async () => {
       try {
-        console.log('Fetching target data...');
-        const response = await fetch('/telemedicine/api/target', { cache: 'no-store' });
-        console.log('Target response status:', response.status);
+        const response = await fetch(`/telemedicine/api/target?year=${selectedYear}`, { cache: 'no-store' });
         const data = await response.json();
-        console.log('Target data received:', data);
         if (!data.error) {
           setTargetData(data);
         } else {
@@ -72,7 +70,7 @@ export default function Home() {
 
     fetchGlobalStats();
     fetchTargetData();
-  }, []);
+  }, [selectedYear]);
   const formatDateThai = (dateStr: string | null) => {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
@@ -155,8 +153,42 @@ export default function Home() {
 
       <div className="px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
         {/* Stats Section Header */}
-        <div className="lg:col-span-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0 mb-[-8px] sm:mb-[-16px]">
-          <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">ภาพรวมจังหวัด</h3>
+        <div className="lg:col-span-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-[-8px] sm:mb-[-16px]">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">ภาพรวมจังหวัด</h3>
+            {/* Fiscal Year Switcher Tabs */}
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+              <button
+                type="button"
+                onClick={() => setSelectedYear("2570")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                  selectedYear === "2570"
+                    ? "bg-white text-purple-700 shadow-sm border border-slate-200/50"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${selectedYear === "2570" ? "bg-purple-500 animate-pulse" : "bg-slate-300"}`} />
+                ปีงบ 2570
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedYear("2569")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                  selectedYear === "2569"
+                    ? "bg-white text-indigo-700 shadow-sm border border-slate-200/50"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${selectedYear === "2569" ? "bg-indigo-500" : "bg-slate-300"}`} />
+                ปีงบ 2569
+              </button>
+            </div>
+            {selectedYear === "2570" && (
+              <span className="text-[11px] font-semibold text-purple-600 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-100">
+                * เป้าหมายปี 2570 อ้างอิงเป้าเดิม (รอประกาศทางการ)
+              </span>
+            )}
+          </div>
           <LastUpdate />
         </div>
 
@@ -614,12 +646,12 @@ export default function Home() {
 
         {/* District Stats Section */}
         <div className="lg:col-span-12">
-          <DistrictTable />
+          <DistrictTable year={selectedYear} />
         </div>
 
         {/* Top Improvers Section (Added) */}
         <div className="lg:col-span-12 mt-8">
-          <TopImprovers />
+          <TopImprovers year={selectedYear} />
         </div>
       </div>
       <Footer />

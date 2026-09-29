@@ -38,6 +38,16 @@ const cleanExcelDate = (val: any, defaultDate: string | null): string | null => 
     return defaultDate;
 };
 
+const getThaiFiscalYear = (dateStr?: string | null): string => {
+    if (!dateStr) return '2570';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '2570';
+    const yearCE = d.getFullYear();
+    const month = d.getMonth() + 1; // 1-12
+    const fiscalYear = month >= 10 ? yearCE + 544 : yearCE + 543;
+    return fiscalYear.toString();
+};
+
 export async function POST(request: NextRequest) {
     try {
         // Authenticate request
@@ -133,7 +143,7 @@ export async function POST(request: NextRequest) {
         if (type === 'HDC' || type === 'HDC_PHEOC') {
             const hdcTable = type === 'HDC' ? 'telemed_opd_hdc' : 'telemed_opd_hdc_pheoc';
             // Processing for HDC (telemed_opd_hdc or telemed_opd_hdc_pheoc table)
-            const targetBYear = date ? (new Date(date).getFullYear() + 543).toString() : '2569';
+            const targetBYear = getThaiFiscalYear(date);
 
             const hdcValues = rawData.map((row, index) => {
                 // Helper to find key by partial match (case-insensitive)
@@ -300,10 +310,10 @@ export async function POST(request: NextRequest) {
                 if (!rawHospcode || rawHospcode === 'undefined' || rawHospcode.includes('รวม')) return;
 
                 const hospcode = rawHospcode.padStart(5, '0');
-                const b_year = String(row[byearKey || ''] || '');
+                const rowDate = cleanExcelDate(dateKey ? row[dateKey] : null, date);
+                const b_year = String(row[byearKey || ''] || '').trim() || getThaiFiscalYear(rowDate || date);
                 const platform = String(row[platformKey || ''] || '').trim().toLowerCase();
                 const count = parseInt(row[countKey || ''] || '0') || 0;
-                const rowDate = cleanExcelDate(dateKey ? row[dateKey] : null, date);
 
                 const id = `${hospcode}_${b_year}`;
 
@@ -433,7 +443,7 @@ export async function POST(request: NextRequest) {
         // Log to fileupload table
         try {
             // Determine fiscal year for logging
-            const targetBYear = date ? (new Date(date).getFullYear() + 543).toString() : '2569';
+            const targetBYear = getThaiFiscalYear(date);
             const excelBYear = rawData[0]['ปีงบประมาณ'] || rawData[0]['b_year'];
             const logType = excelBYear ? String(excelBYear).trim() : ((type === 'HDC' || type === 'HDC_PHEOC') ? targetBYear : 'Telemed');
 

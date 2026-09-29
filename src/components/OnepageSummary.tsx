@@ -19,7 +19,7 @@ const formatPercent = (val: number) => {
 };
 
 export default function OnepageSummary({ data }: { data: any }) {
-  const { pie, totals, hTotals, subhTotals, formattedDate, districtData, hospitalData, top10Data, policy, startDateThai } = data;
+  const { pie, totals, hTotals, subhTotals, formattedDate, districtData, hospitalData, top10Data, policy, startDateThai, fiscalYear = "2569" } = data;
   const dashboardRef = useRef<HTMLDivElement>(null);
 
   const handleExport = useCallback(() => {
@@ -129,9 +129,18 @@ export default function OnepageSummary({ data }: { data: any }) {
             <img src="/telemedicine/logo-moph.png" alt="MOPH" className="w-full h-full object-contain drop-shadow-sm" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-indigo-950 tracking-tighter leading-none">
-              ผลงาน Telemedicine <span className="text-emerald-600">จังหวัดพิษณุโลก</span>
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl md:text-3xl font-black text-indigo-950 tracking-tighter leading-none">
+                ผลงาน Telemedicine <span className="text-emerald-600">จังหวัดพิษณุโลก</span>
+              </h1>
+              <span className={`px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider border shadow-sm ${
+                fiscalYear === '2570'
+                  ? 'bg-purple-100 text-purple-800 border-purple-200'
+                  : 'bg-indigo-100 text-indigo-800 border-indigo-200'
+              }`}>
+                ปีงบ {fiscalYear}
+              </span>
+            </div>
             <div className="flex items-center gap-2 mt-2">
               <p className="text-[13px] font-black text-purple-900 uppercase tracking-tight">
                 สำนักงานสาธารณสุขจังหวัดพิษณุโลก
@@ -151,7 +160,27 @@ export default function OnepageSummary({ data }: { data: any }) {
             </div>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row items-center gap-4">
+        <div className="flex flex-col md:flex-row items-center gap-3">
+          {/* Year Switcher in Onepage */}
+          <div className="flex items-center bg-white/90 p-1 rounded-xl border border-slate-200 shadow-sm">
+            <a
+              href={`/daily/onepage?year=2570${policy === 'pheoc' ? '&policy=pheoc' : ''}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${
+                fiscalYear === '2570' ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              ปีงบ 2570
+            </a>
+            <a
+              href={`/daily/onepage?year=2569${policy === 'pheoc' ? '&policy=pheoc' : ''}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${
+                fiscalYear === '2569' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              ปีงบ 2569
+            </a>
+          </div>
+
           <button
             id="export-button"
             onClick={handleExport}

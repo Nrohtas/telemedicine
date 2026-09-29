@@ -17,34 +17,34 @@ DB_PORT = int(os.getenv("DB_PORT", 3306))
 
 API_URL = "https://opendata.moph.go.th/api/report_data"
 
-def main():
-    print(f"[{datetime.now()}] Starting sync for telemed_hdc...")
+def sync_year(target_year: str):
+    print(f"[{datetime.now()}] Starting sync for telemed_hdc for fiscal year {target_year}...")
     
     # 1. Fetch Data
     try:
         # We use POST as tested in scratch scripts
         payload = {
             "tableName": "s_telemed_hosp",
-            "year": "2569",
+            "year": target_year,
             "province": "65"
         }
-        print(f"Fetching data from {API_URL} for year 2569, province 65...")
+        print(f"Fetching data from {API_URL} for year {target_year}, province 65...")
         response = requests.post(API_URL, json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
     except Exception as e:
-        print(f"Error fetching API: {e}")
+        print(f"Error fetching API for year {target_year}: {e}")
         if 'response' in locals() and response is not None:
             print(f"Response content: {response.text[:200]}")
-        sys.exit(1)
+        return
 
     # Validate data structure
     records = data if isinstance(data, list) else data.get("data", [])
     
     if not records:
-        print("No data received from API or data is empty.")
+        print(f"No data received from API or data is empty for year {target_year}.")
         log_to_db(0, 0, 0)
-        sys.exit(0)
+        return
 
     # 2. Filter Data
     # The API might already filter by province, but we double-check for safety
@@ -53,16 +53,16 @@ def main():
         areacode = str(row.get("areacode", ""))
         b_year = str(row.get("b_year", ""))
         # Province 65 starts with "65" in areacode
-        if areacode.startswith("65") and b_year == "2569":
+        if areacode.startswith("65") and b_year == target_year:
             filtered_data.append(row)
 
     total_count = len(records)
     matched_count = len(filtered_data)
-    print(f"Total fetched: {total_count}. Matched (P65, Y2569): {matched_count}.")
+    print(f"Total fetched: {total_count}. Matched (P65, Y{target_year}): {matched_count}.")
 
     if matched_count == 0:
         log_to_db(total_count, 0, 0)
-        print("No matched data to insert.")
+        print(f"No matched data to insert for year {target_year}.")
         return
 
     # 3. Insert into Database
@@ -180,6 +180,11 @@ def log_to_db(h_count, h_y, h_n):
             cursor.close()
         if 'conn' in locals():
             conn.close()
+
+def main():
+    years = sys.argv[1:] if len(sys.argv) > 1 else ["2569", "2570"]
+    for y in years:
+        sync_year(str(y))
 
 if __name__ == "__main__":
     main()

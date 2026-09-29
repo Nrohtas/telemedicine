@@ -59,7 +59,7 @@ function formatThaiDate(value: string | null) {
   } as any);
 }
 
-async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode", sortOrder: string = "ASC", policy: string = "normal", view: string = "hospital"): Promise<DailyHospitalRow[]> {
+async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode", sortOrder: string = "ASC", policy: string = "normal", view: string = "hospital", fiscalYear: string = "2569"): Promise<DailyHospitalRow[]> {
   const allowedSortColumns = [
     "hospcode",
     "hospname",
@@ -82,7 +82,12 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
   const finalSortOrder = sortOrder.toUpperCase() === "DESC" ? "DESC" : "ASC";
 
   const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
-  const hisStartDate = policy === "pheoc" ? "2026-03-23" : "2026-01-01";
+  const hisStartDate = fiscalYear === "2569"
+    ? (policy === "pheoc" ? "2026-03-23" : "2026-01-01")
+    : "2026-10-01";
+  const hisEndDateCondition = fiscalYear === "2569"
+    ? "AND visit_date <= '2026-09-30'"
+    : "AND visit_date <= CURDATE()";
   const hostypeFilter = view === "primary" ? "AND h.hostype_new IN (18, 21, 8, 13)" : "";
 
   const query = `
@@ -142,12 +147,12 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
     LEFT JOIN (
       SELECT hospcode, CEILING(COALESCE(op, 0)) AS target
       FROM target
-      WHERE b_year = '2568'
+      WHERE b_year = '${fiscalYear}'
     ) tgt ON tgt.hospcode = h.hospcode COLLATE utf8mb4_general_ci
     LEFT JOIN (
       SELECT hospcode, result
       FROM telemed
-      WHERE b_year = '2569'
+      WHERE b_year = '${fiscalYear}'
     ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
     LEFT JOIN (
       SELECT MAX(visit_date) AS latest_date
@@ -164,12 +169,12 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
         COALESCE(SUM(visit_type_3), 0) AS visit_type_3,
         COALESCE(SUM(visit_type_5), 0) AS visit_type_5
       FROM visit_type_daily
-      WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
+      WHERE visit_date >= '${hisStartDate}' ${hisEndDateCondition}
       GROUP BY hoscode
     ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
     LEFT JOIN ${hdcTable} hdc
       ON hdc.hospcode = h.hospcode COLLATE utf8mb4_general_ci
-      AND hdc.b_year = '2569'
+      AND hdc.b_year = '${fiscalYear}'
     WHERE h.amp_code = ? COLLATE utf8mb4_general_ci
       AND h.status = '1'
       ${hostypeFilter}
@@ -231,17 +236,18 @@ async function getHdcLatestUpdate(policy: string = "normal"): Promise<string | n
 export default async function DailyHospitalPage({
   searchParams,
 }: {
-  searchParams: Promise<{ amp_code?: string; sort_by?: string; sort_order?: string; policy?: string; view?: string }>;
+  searchParams: Promise<{ amp_code?: string; sort_by?: string; sort_order?: string; policy?: string; view?: string; year?: string }>;
 }) {
   try {
     const params = await searchParams;
     const ampCode = params.amp_code ?? "";
+    const fiscalYear = params.year === "2570" ? "2570" : "2569";
     const sortBy = params.sort_by ?? "hospcode";
     const sortOrder = params.sort_order ?? "ASC";
     const policy = params.policy === "pheoc" ? "pheoc" : "normal";
     const view = params.view === "primary" ? "primary" : "hospital";
 
-    const rows = ampCode ? await getDailyHospitalRows(ampCode, sortBy, sortOrder, policy, view) : [];
+    const rows = ampCode ? await getDailyHospitalRows(ampCode, sortBy, sortOrder, policy, view, fiscalYear) : [];
     const hdcLastUpdate = await getHdcLatestUpdate(policy);
     const platformLastUpdate = await getPlatformLatestUpdate();
     const hisLastUpdate = rows[0]?.latest_date || null;
@@ -263,12 +269,15 @@ export default async function DailyHospitalPage({
     const totalPercent = totals.total > 0 ? (totals.visit_type_5 / totals.total) * 100 : 0;
     const hdcTotalPercent = totals.hdc_opd > 0 ? (totals.hdc_result / totals.hdc_opd) * 100 : 0;
 
-    const startDateThai = policy === "pheoc" ? "23 มีนาคม 2569" : "1 มกราคม 2569";
-    const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ข้อมูลระหว่าง ${startDateThai} - ${rows.length > 0 ? formatThaiDate(rows[0].latest_date || new Date().toISOString()) : "-"}`;
+    const startDateThai = fiscalYear === "2569"
+      ? (policy === "pheoc" ? "23 มีนาคม 2569" : "1 มกราคม 2569")
+      : "1 ตุลาคม 2569";
+    const endDateThai = fiscalYear === "2569" ? "30 กันยายน 2569" : (rows.length > 0 ? formatThaiDate(rows[0].latest_date || new Date().toISOString()) : "-");
+    const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ปีงบประมาณ ${fiscalYear} (ข้อมูลระหว่าง ${startDateThai} - ${endDateThai})`;
 
     const getSortUrl = (column: string) => {
       const nextOrder = sortBy === column && sortOrder === "ASC" ? "DESC" : "ASC";
-      return `/daily/hospital?amp_code=${ampCode}&sort_by=${column}&sort_order=${nextOrder}${policy !== "normal" ? `&policy=${policy}` : ""}${view !== "hospital" ? `&view=${view}` : ""}`;
+      return `/daily/hospital?amp_code=${ampCode}&sort_by=${column}&sort_order=${nextOrder}${policy !== "normal" ? `&policy=${policy}` : ""}${view !== "hospital" ? `&view=${view}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`;
     };
 
     const SortIcon = ({ column }: { column: string }) => {
@@ -300,10 +309,10 @@ export default async function DailyHospitalPage({
           <div className="w-full space-y-3">
             <div className="rounded-2xl border border-emerald-100 bg-white/90 p-3 shadow-lg shadow-emerald-900/5 md:p-4">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
                   <div>
                     <Link
-                      href={`/daily?view=${view}${policy !== "normal" ? `&policy=${policy}` : ""}`}
+                      href={`/daily?view=${view}${policy !== "normal" ? `&policy=${policy}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
                       className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black text-slate-600 hover:bg-slate-200"
                     >
                       กลับหน้าสรุปอำเภอ
@@ -315,25 +324,51 @@ export default async function DailyHospitalPage({
                     </h1>
                   </div>
 
+                  {/* Fiscal Year Switcher Tabs on Hospital Page */}
+                  <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner mt-1 sm:mt-4">
+                    <Link
+                      href={`/daily/hospital?amp_code=${ampCode}&year=2570${policy !== "normal" ? `&policy=${policy}` : ""}${view !== "hospital" ? `&view=${view}` : ""}`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all flex items-center gap-1.5 ${
+                        fiscalYear === "2570"
+                          ? "bg-white text-purple-700 shadow-sm border border-slate-200/50"
+                          : "text-slate-500 hover:text-slate-800"
+                      }`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${fiscalYear === "2570" ? "bg-purple-500 animate-pulse" : "bg-slate-300"}`} />
+                      ปีงบ 2570
+                    </Link>
+                    <Link
+                      href={`/daily/hospital?amp_code=${ampCode}&year=2569${policy !== "normal" ? `&policy=${policy}` : ""}${view !== "hospital" ? `&view=${view}` : ""}`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all flex items-center gap-1.5 ${
+                        fiscalYear === "2569"
+                          ? "bg-white text-indigo-700 shadow-sm border border-slate-200/50"
+                          : "text-slate-500 hover:text-slate-800"
+                      }`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${fiscalYear === "2569" ? "bg-indigo-500" : "bg-slate-300"}`} />
+                      ปีงบ 2569
+                    </Link>
+                  </div>
+
                   {/* Premium Switcher Pills on Hospital Page */}
                   <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner mt-1 sm:mt-4">
                     <Link
-                      href={`/daily/hospital?amp_code=${ampCode}&policy=normal${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "hospital" ? `&view=${view}` : ""}`}
+                      href={`/daily/hospital?amp_code=${ampCode}&policy=normal${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "hospital" ? `&view=${view}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
                       className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${policy === "normal"
                           ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
                           : "text-slate-500 hover:text-slate-800"
                         }`}
                     >
-                      นโยบาย TMM (1 ม.ค. 2569)
+                      นโยบาย TMM
                     </Link>
                     <Link
-                      href={`/daily/hospital?amp_code=${ampCode}&policy=pheoc${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "hospital" ? `&view=${view}` : ""}`}
+                      href={`/daily/hospital?amp_code=${ampCode}&policy=pheoc${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "hospital" ? `&view=${view}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
                       className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${policy === "pheoc"
                           ? "bg-white text-orange-600 shadow-sm border border-slate-200/50"
                           : "text-slate-500 hover:text-slate-800"
                         }`}
                     >
-                      นโยบาย PHEOC (23 มี.ค. 2569)
+                      นโยบาย PHEOC
                     </Link>
                   </div>
                 </div>

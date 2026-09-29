@@ -30,9 +30,10 @@ const formatPercent = (val: number) => {
 
 interface TopPerformanceProps {
     policy?: string;
+    year?: string;
 }
 
-const TopPerformance = ({ policy = "normal" }: TopPerformanceProps = {}) => {
+const TopPerformance = ({ policy = "normal", year = "2569" }: TopPerformanceProps = {}) => {
 
     const [data, setData] = useState<{
         hospitals: PerformanceItem[],
@@ -56,7 +57,7 @@ const TopPerformance = ({ policy = "normal" }: TopPerformanceProps = {}) => {
         setMounted(true);
         const fetchPerformance = async () => {
             try {
-                const res = await fetch(`/telemedicine/api/daily/top-performance?policy=${policy}`, { cache: 'no-store' });
+                const res = await fetch(`/telemedicine/api/daily/top-performance?policy=${policy}&year=${year}`, { cache: 'no-store' });
                 if (!res.ok) {
                     console.error('Fetch error:', res.status, res.statusText);
                     throw new Error(`Fetch failed: ${res.status}`);
@@ -76,7 +77,7 @@ const TopPerformance = ({ policy = "normal" }: TopPerformanceProps = {}) => {
         };
 
         fetchPerformance();
-    }, [policy]);
+    }, [policy, year]);
 
     // Prevent hydration mismatch by only rendering after mount
     if (!mounted) return <div className="min-h-[200px]" />;

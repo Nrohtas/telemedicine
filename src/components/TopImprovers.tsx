@@ -18,9 +18,10 @@ interface Improver {
 
 interface TopImproversProps {
     source?: string;
+    year?: string;
 }
 
-const TopImprovers = ({ source }: TopImproversProps = {}) => {
+const TopImprovers = ({ source, year = '2569' }: TopImproversProps = {}) => {
 
     const [data, setData] = useState<{ hospitals: Improver[], primaryCare: Improver[] }>({ hospitals: [], primaryCare: [] });
     const [isLoading, setIsLoading] = useState(true);
@@ -37,7 +38,11 @@ const TopImprovers = ({ source }: TopImproversProps = {}) => {
         setMounted(true);
         const fetchImprovers = async () => {
             try {
-                const url = source ? `/telemedicine/api/top-improvers?source=${encodeURIComponent(source)}` : '/telemedicine/api/top-improvers';
+                const params = new URLSearchParams();
+                if (source) params.append('source', source);
+                if (year) params.append('year', year);
+                const queryString = params.toString();
+                const url = `/telemedicine/api/top-improvers${queryString ? `?${queryString}` : ''}`;
                 const res = await fetch(url, { cache: 'no-store' });
 
                 if (!res.ok) throw new Error('Fetch failed');
@@ -53,7 +58,7 @@ const TopImprovers = ({ source }: TopImproversProps = {}) => {
         };
 
         fetchImprovers();
-    }, []);
+    }, [source, year]);
 
     // Prevent hydration mismatch by only rendering after mount
     if (!mounted) return <div className="min-h-[200px]" />;

@@ -5,6 +5,7 @@ export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const type = searchParams.get('type');
+        const year = searchParams.get('year') || '2569';
 
         // Query to get districts and count hospitals as a base
         // Using telemedicine database explicitly based on previous exploration
@@ -22,26 +23,31 @@ export async function GET(request: Request) {
                     SELECT SUM(COALESCE(tg.op, 0)) FROM target tg 
                     INNER JOIN hospital h2 ON tg.hospcode = h2.hospcode 
                     ${type ? 'INNER JOIN hostype ht2 ON h2.hostype = ht2.hostype_new' : ''}
-                    WHERE h2.amp_code = a.amp_code AND tg.b_year = '2568' AND h2.status = '1'
+                    WHERE h2.amp_code = a.amp_code AND tg.b_year = ? AND h2.status = '1'
                     ${type ? 'AND ht2.hostype_list = ?' : ''}
                 ) as target,
                 (
                     SELECT SUM(COALESCE(tg.op_30, 0)) FROM target tg 
                     INNER JOIN hospital h2 ON tg.hospcode = h2.hospcode 
                     ${type ? 'INNER JOIN hostype ht2 ON h2.hostype = ht2.hostype_new' : ''}
-                    WHERE h2.amp_code = a.amp_code AND tg.b_year = '2568' AND h2.status = '1'
+                    WHERE h2.amp_code = a.amp_code AND tg.b_year = ? AND h2.status = '1'
                     ${type ? 'AND ht2.hostype_list = ?' : ''}
                 ) as target_30
             FROM ampur a
             LEFT JOIN hospital h ON a.amp_code = h.amp_code AND h.status = '1'
             ${type ? 'LEFT JOIN hostype ht ON h.hostype = ht.hostype_new' : ''}
-            LEFT JOIN telemed t ON h.hospcode = t.hospcode
+            LEFT JOIN telemed t ON h.hospcode = t.hospcode AND t.b_year = ?
             ${type ? 'WHERE ht.hostype_list = ?' : ''}
             GROUP BY a.amp_code, a.amp_name
             ORDER BY a.amp_code ASC
         `;
 
-        const params = type ? [type, type, type] : [];
+        const params: any[] = [];
+        if (type) {
+            params.push(year, type, year, type, year, type);
+        } else {
+            params.push(year, year, year);
+        }
         const [rows]: any = await pool.query(query, params);
 
         const stats = rows.map((row: any) => ({

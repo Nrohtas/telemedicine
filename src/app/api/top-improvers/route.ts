@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const year = searchParams.get('year') || '2569';
+
         const getQuery = (types: number[]) => `
             SELECT 
                 h.hospcode, 
@@ -20,21 +23,21 @@ export async function GET() {
                 FROM hostype
                 GROUP BY hostype_new
             ) ht ON h.hostype_new = ht.hostype_new
-            JOIN telemed t ON h.hospcode = t.hospcode
+            JOIN telemed t ON h.hospcode = t.hospcode AND t.b_year = ?
             LEFT JOIN (
                 SELECT hospcode, CEILING(COALESCE(op_30, 0)) as op_30
                 FROM target
-                WHERE b_year = '2568'
+                WHERE b_year = ?
             ) tg ON h.hospcode = tg.hospcode
-            WHERE h.status = '1' AND t.b_year = '2569'
+            WHERE h.status = '1'
             AND h.hostype_new IN (${types.join(',')})
             GROUP BY h.hospcode, ht.hostype_label, ht.affiliation, tg.op_30
             ORDER BY increase DESC, current_total DESC
             LIMIT 10
         `;
 
-        const [hospitals] = await pool.query(getQuery([5, 7, 11, 12]));
-        const [primaryCare] = await pool.query(getQuery([8, 13, 18, 21]));
+        const [hospitals] = await pool.query(getQuery([5, 7, 11, 12]), [year, year]);
+        const [primaryCare] = await pool.query(getQuery([8, 13, 18, 21]), [year, year]);
 
         return NextResponse.json({
             hospitals,

@@ -6,12 +6,18 @@ export const dynamic = "force-dynamic";
 export default async function OnepagePage({
   searchParams,
 }: {
-  searchParams: Promise<{ policy?: string }>;
+  searchParams: Promise<{ policy?: string; year?: string }>;
 }) {
   const params = await searchParams;
+  const fiscalYear = params.year === '2570' ? '2570' : '2569';
   const policy = params.policy === 'pheoc' ? 'pheoc' : 'normal';
   const hdcTable = policy === 'pheoc' ? 'telemed_opd_hdc_pheoc' : 'telemed_opd_hdc';
-  const hisStartDate = policy === 'pheoc' ? '2026-03-23' : '2026-01-01';
+  const hisStartDate = fiscalYear === '2569'
+    ? (policy === 'pheoc' ? '2026-03-23' : '2026-01-01')
+    : '2026-10-01';
+  const hisEndDateCondition = fiscalYear === '2569'
+    ? "AND vtd.visit_date <= '2026-09-30'"
+    : "AND vtd.visit_date <= CURDATE()";
 
   // Query 1: Overall totals
   const overallQuery = `
@@ -19,11 +25,11 @@ export default async function OnepagePage({
       COALESCE(SUM(vtd.visit_type_2), 0) AS visit_type_2,
       COALESCE(SUM(vtd.visit_type_3), 0) AS visit_type_3,
       COALESCE(SUM(vtd.visit_type_5), 0) AS visit_type_5,
-      (SELECT COALESCE(SUM(opd), 0) FROM ${hdcTable} WHERE b_year = '2569') AS hdc_opd,
-      (SELECT COALESCE(SUM(telemedicine), 0) FROM ${hdcTable} WHERE b_year = '2569') AS hdc_tele,
+      (SELECT COALESCE(SUM(opd), 0) FROM ${hdcTable} WHERE b_year = '${fiscalYear}') AS hdc_opd,
+      (SELECT COALESCE(SUM(telemedicine), 0) FROM ${hdcTable} WHERE b_year = '${fiscalYear}') AS hdc_tele,
       (SELECT MAX(d_update) FROM visit_type_daily) AS last_update
     FROM visit_type_daily vtd
-    WHERE vtd.visit_date BETWEEN '${hisStartDate}' AND CURDATE()
+    WHERE vtd.visit_date >= '${hisStartDate}' ${hisEndDateCondition}
   `;
     try {
     const [overallRows]: any = await pool.query(overallQuery);
@@ -52,14 +58,14 @@ export default async function OnepagePage({
       LEFT JOIN hospital h ON h.amp_code = a.amp_code COLLATE utf8mb4_general_ci AND h.status = '1'
       LEFT JOIN (
         SELECT hoscode, COALESCE(SUM(visit_type_5), 0) AS visit_type_5
-        FROM visit_type_daily
-        WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
+        FROM visit_type_daily vtd
+        WHERE vtd.visit_date >= '${hisStartDate}' ${hisEndDateCondition}
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
         SELECT hospcode, telemedicine AS result, opd
         FROM ${hdcTable}
-        WHERE b_year = '2569'
+        WHERE b_year = '${fiscalYear}'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       GROUP BY a.amp_code, a.amp_name
       ORDER BY hdc_visit_type_5 DESC
@@ -91,14 +97,14 @@ export default async function OnepagePage({
                COALESCE(SUM(visit_type_2), 0) AS visit_type_2,
                COALESCE(SUM(visit_type_3), 0) AS visit_type_3,
                COALESCE(SUM(visit_type_5), 0) AS visit_type_5
-        FROM visit_type_daily
-        WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
+        FROM visit_type_daily vtd
+        WHERE vtd.visit_date >= '${hisStartDate}' ${hisEndDateCondition}
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
         SELECT hospcode, telemedicine AS result, opd
         FROM ${hdcTable}
-        WHERE b_year = '2569'
+        WHERE b_year = '${fiscalYear}'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       WHERE h.status = '1' 
         AND h.hostype_new IN (5, 7)
@@ -159,14 +165,14 @@ export default async function OnepagePage({
                COALESCE(SUM(visit_type_2), 0) AS visit_type_2,
                COALESCE(SUM(visit_type_3), 0) AS visit_type_3,
                COALESCE(SUM(visit_type_5), 0) AS visit_type_5
-        FROM visit_type_daily
-        WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
+        FROM visit_type_daily vtd
+        WHERE vtd.visit_date >= '${hisStartDate}' ${hisEndDateCondition}
         GROUP BY hoscode
       ) vtd ON vtd.hoscode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
         SELECT hospcode, telemedicine AS result, opd
         FROM ${hdcTable}
-        WHERE b_year = '2569'
+        WHERE b_year = '${fiscalYear}'
       ) p ON p.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       WHERE h.status = '1' 
         AND ht.hostype_new IN (8, 18, 21)
@@ -201,8 +207,11 @@ export default async function OnepagePage({
       hdc: Number(r.dashboard_result) || 0,
       hdc_opd: Number(r.hdc_opd) || 0,
     }));
-    const startDateThai = policy === "pheoc" ? "23 มี.ค. 69" : "1 ม.ค. 69";
+    const startDateThai = fiscalYear === '2569'
+      ? (policy === "pheoc" ? "23 มี.ค. 69" : "1 ม.ค. 69")
+      : "1 ต.ค. 69";
     const data = {
+      fiscalYear,
       pie: [
         { name: 'ตามนัด (2)', value: type2, fill: '#6366F1' }, // Indigo
         { name: 'ส่งต่อ (3)', value: type3, fill: '#F87171' }, // Rose/Red

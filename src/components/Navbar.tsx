@@ -237,6 +237,20 @@ const Navbar = ({
                                 <span>Daily HDC</span>
                             </SoftButton>
                         </Link>
+                        {/* Menu Should - Disabled
+                        <Link href="/should" className="hover:opacity-80 transition-opacity">
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/should'}
+                                className="flex items-center justify-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>Should</span>
+                            </SoftButton>
+                        </Link>
+                        */}
                         <Link href="/remed" className="hover:opacity-80 transition-opacity">
                             <SoftButton
                                 variant="nav"
@@ -335,6 +349,20 @@ const Navbar = ({
                                 <span className="text-xs font-black uppercase tracking-widest">Daily HDC</span>
                             </SoftButton>
                         </Link>
+                        {/* Menu Should - Disabled
+                        <Link href="/should" onClick={() => setIsMenuOpen(false)}>
+                            <SoftButton
+                                variant="nav"
+                                active={pathname === '/should'}
+                                className="flex items-center justify-center gap-3 w-full py-3"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="text-xs font-black uppercase tracking-widest">Should</span>
+                            </SoftButton>
+                        </Link>
+                        */}
                         <Link href="/remed" onClick={() => setIsMenuOpen(false)}>
                             <SoftButton
                                 variant="nav"

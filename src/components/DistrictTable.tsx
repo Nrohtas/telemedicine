@@ -21,10 +21,11 @@ interface DistrictStat {
 interface DistrictTableProps {
     type?: string;
     source?: string;
+    year?: string;
 }
 
 
-export default function DistrictTable({ type, source }: DistrictTableProps = {}) {
+export default function DistrictTable({ type, source, year = '2569' }: DistrictTableProps = {}) {
     const [stats, setStats] = useState<DistrictStat[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -35,6 +36,7 @@ export default function DistrictTable({ type, source }: DistrictTableProps = {})
         const params = new URLSearchParams();
         if (type) params.append('type', type);
         if (source) params.append('source', source);
+        if (year) params.append('year', year);
         
         const queryString = params.toString();
         if (queryString) url += `?${queryString}`;
@@ -57,7 +59,7 @@ export default function DistrictTable({ type, source }: DistrictTableProps = {})
                 setError('เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล');
                 setLoading(false);
             });
-    }, [type, source]);
+    }, [type, source, year]);
 
 
     if (loading) {

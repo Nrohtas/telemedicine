@@ -5,8 +5,14 @@ export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
         const policy = searchParams.get('policy') === 'pheoc' ? 'pheoc' : 'normal';
+        const year = searchParams.get('year') || '2569';
         const hdcTable = policy === 'pheoc' ? 'telemed_opd_hdc_pheoc' : 'telemed_opd_hdc';
-        const hisStartDate = policy === 'pheoc' ? '2026-03-23' : '2026-01-01';
+        const hisStartDate = year === '2569'
+            ? (policy === 'pheoc' ? '2026-03-23' : '2026-01-01')
+            : '2026-10-01';
+        const hisEndDateCondition = year === '2569'
+            ? "AND visit_date <= '2026-09-30'"
+            : "AND visit_date <= CURDATE()";
 
         const getQuery = (types: number[], orderBy: string = 'current_total DESC, performance_percent DESC') => `
             SELECT 
@@ -43,7 +49,7 @@ export async function GET(request: NextRequest) {
                     SUM(visit_type_3) as visit_type_3,
                     SUM(visit_type_5) as visit_type_5
                 FROM visit_type_daily
-                WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
+                WHERE visit_date >= '${hisStartDate}' ${hisEndDateCondition}
                 GROUP BY hoscode
             ) vtd ON h.hospcode = vtd.hoscode COLLATE utf8mb4_general_ci
             LEFT JOIN (
@@ -52,10 +58,10 @@ export async function GET(request: NextRequest) {
                     SUM(opd) as hdc_opd,
                     SUM(telemedicine) as hdc_result
                 FROM ${hdcTable}
-                WHERE b_year = '2569'
+                WHERE b_year = '${year}'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
-            LEFT JOIN target tg ON h.hospcode = tg.hospcode COLLATE utf8mb4_general_ci AND tg.b_year = '2568'
+            LEFT JOIN target tg ON h.hospcode = tg.hospcode COLLATE utf8mb4_general_ci AND tg.b_year = '${year}'
             WHERE h.status = '1'
             AND h.hostype_new IN (${types.join(',')})
             AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข' COLLATE utf8mb4_general_ci
@@ -80,7 +86,7 @@ export async function GET(request: NextRequest) {
                     SUM(opd) as hdc_opd,
                     SUM(telemedicine) as hdc_result
                 FROM ${hdcTable}
-                WHERE b_year = '2569'
+                WHERE b_year = '${year}'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
             LEFT JOIN (
@@ -90,7 +96,7 @@ export async function GET(request: NextRequest) {
                     SUM(visit_type_3) as visit_type_3,
                     SUM(visit_type_5) as visit_type_5
                 FROM visit_type_daily
-                WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
+                WHERE visit_date >= '${hisStartDate}' ${hisEndDateCondition}
                 GROUP BY hoscode
             ) vtd ON h.hospcode = vtd.hoscode COLLATE utf8mb4_general_ci
             WHERE h.status = '1'
@@ -121,7 +127,7 @@ export async function GET(request: NextRequest) {
                     SUM(opd) as hdc_opd,
                     SUM(telemedicine) as hdc_result
                 FROM ${hdcTable}
-                WHERE b_year = '2569'
+                WHERE b_year = '${year}'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
             LEFT JOIN (
@@ -131,7 +137,7 @@ export async function GET(request: NextRequest) {
                     SUM(visit_type_3) as visit_type_3,
                     SUM(visit_type_5) as visit_type_5
                 FROM visit_type_daily
-                WHERE visit_date BETWEEN '${hisStartDate}' AND CURDATE()
+                WHERE visit_date >= '${hisStartDate}' ${hisEndDateCondition}
                 GROUP BY hoscode
             ) vtd ON h.hospcode = vtd.hoscode COLLATE utf8mb4_general_ci
             WHERE h.status = '1'

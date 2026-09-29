@@ -8,7 +8,7 @@ export async function GET(request: Request) {
         const amp_code = searchParams.get('amp_code');
         const hospcode = searchParams.get('hospcode');
         const type = searchParams.get('type');
-        const year = searchParams.get('year') || '2569'; // Default to latest fiscal year
+        const year = searchParams.get('year') || '2569'; // Default to fiscal year 2569
 
         let query = `
             SELECT 
