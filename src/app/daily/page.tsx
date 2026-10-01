@@ -6,6 +6,7 @@ import Link from "next/link";
 import TopPerformance from "@/components/TopPerformance";
 import ExportDailyExcel from "@/components/ExportDailyExcel";
 import ExportDailyHospitalsExcel from "@/components/ExportDailyHospitalsExcel";
+import { getTargetYear } from "@/lib/targetYear";
 
 export const dynamic = "force-dynamic";
 
@@ -109,6 +110,8 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
     : "AND visit_date <= CURDATE()";
   const hostypeFilter = view === "primary" ? "AND h.hostype_new IN (18, 21, 8, 13)" : "";
 
+  const targetYear = await getTargetYear(fiscalYear);
+
   const query = `
     SELECT
       a.amp_code,
@@ -161,7 +164,7 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
     LEFT JOIN (
       SELECT hospcode, CEILING(COALESCE(op, 0)) AS target_raw
       FROM target
-      WHERE b_year = '${fiscalYear}'
+      WHERE b_year = '${targetYear}'
     ) tgt ON tgt.hospcode = h.hospcode COLLATE utf8mb4_general_ci
     LEFT JOIN (
       SELECT hospcode, result
@@ -252,6 +255,8 @@ async function getDailyHospitalRowsAll(sortBy: string = "hospcode", sortOrder: s
     : "AND visit_date <= CURDATE()";
   const hostypeFilter = view === "primary" ? "18, 21, 8, 13" : "5, 7";
 
+  const targetYear = await getTargetYear(fiscalYear);
+
   const query = `
     SELECT
       h.hospcode,
@@ -309,7 +314,7 @@ async function getDailyHospitalRowsAll(sortBy: string = "hospcode", sortOrder: s
     LEFT JOIN (
       SELECT hospcode, CEILING(COALESCE(op, 0)) AS target
       FROM target
-      WHERE b_year = '${fiscalYear}'
+      WHERE b_year = '${targetYear}'
     ) tgt ON tgt.hospcode = h.hospcode COLLATE utf8mb4_general_ci
     LEFT JOIN (
       SELECT hospcode, result

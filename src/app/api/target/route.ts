@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { getTargetYear } from '@/lib/targetYear';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +10,7 @@ export async function GET(request: Request) {
         const type = searchParams.get('type');
 
         const year = searchParams.get('year') || '2569';
+        const targetYear = await getTargetYear(year);
 
         const query = `
             SELECT 
@@ -27,7 +29,7 @@ export async function GET(request: Request) {
             WHERE tg.b_year = ? AND h.status = '1'
             ${type ? 'AND ht.hostype_list = ?' : ''}
         `;
-        const params = type ? [year, type, year, type] : [year, year];
+        const params = type ? [year, type, targetYear, type] : [year, targetYear];
         const [rows]: any = await pool.query(query, params);
         console.log('Target API rows:', rows);
         

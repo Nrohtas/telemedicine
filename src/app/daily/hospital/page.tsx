@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import pool from "@/lib/db";
 import ExportDailyHospital from "./ExportDailyHospital";
 import LastUpdate from "@/components/LastUpdate";
+import { getTargetYear } from "@/lib/targetYear";
 
 export const dynamic = "force-dynamic";
 
@@ -89,6 +90,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
     ? "AND visit_date <= '2026-09-30'"
     : "AND visit_date <= CURDATE()";
   const hostypeFilter = view === "primary" ? "AND h.hostype_new IN (18, 21, 8, 13)" : "";
+  const targetYear = await getTargetYear(fiscalYear);
 
   const query = `
     SELECT
@@ -147,7 +149,7 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
     LEFT JOIN (
       SELECT hospcode, CEILING(COALESCE(op, 0)) AS target
       FROM target
-      WHERE b_year = '${fiscalYear}'
+      WHERE b_year = '${targetYear}'
     ) tgt ON tgt.hospcode = h.hospcode COLLATE utf8mb4_general_ci
     LEFT JOIN (
       SELECT hospcode, result

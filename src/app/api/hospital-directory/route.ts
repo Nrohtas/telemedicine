@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { getTargetYear } from '@/lib/targetYear';
 
 export async function GET(request: Request) {
     try {
@@ -9,6 +10,7 @@ export async function GET(request: Request) {
         const hospcode = searchParams.get('hospcode');
         const type = searchParams.get('type');
         const year = searchParams.get('year') || '2569'; // Default to fiscal year 2569
+        const targetYear = await getTargetYear(year);
 
         let query = `
             SELECT 
@@ -53,7 +55,6 @@ export async function GET(request: Request) {
             LEFT JOIN target tg ON h.hospcode = tg.hospcode AND tg.b_year = ?
             WHERE h.status = '1' 
         `;
-        const targetYear = (parseInt(year) - 1).toString();
         const params: any[] = [year, year, targetYear];
 
         if (affiliation && affiliation !== 'ทั้งหมด') {

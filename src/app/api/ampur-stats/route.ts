@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { getTargetYear } from '@/lib/targetYear';
 
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const type = searchParams.get('type');
         const year = searchParams.get('year') || '2569';
+        const targetYear = await getTargetYear(year);
 
         // Query to get districts and count hospitals as a base
         // Using telemedicine database explicitly based on previous exploration
@@ -44,9 +46,9 @@ export async function GET(request: Request) {
 
         const params: any[] = [];
         if (type) {
-            params.push(year, type, year, type, year, type);
+            params.push(targetYear, type, targetYear, type, year, type);
         } else {
-            params.push(year, year, year);
+            params.push(targetYear, targetYear, year);
         }
         const [rows]: any = await pool.query(query, params);
 

@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { getTargetYear } from '@/lib/targetYear';
 
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const year = searchParams.get('year') || '2569';
+        const targetYear = await getTargetYear(year);
 
         const getQuery = (types: number[]) => `
             SELECT 
@@ -36,8 +38,8 @@ export async function GET(request: Request) {
             LIMIT 10
         `;
 
-        const [hospitals] = await pool.query(getQuery([5, 7, 11, 12]), [year, year]);
-        const [primaryCare] = await pool.query(getQuery([8, 13, 18, 21]), [year, year]);
+        const [hospitals] = await pool.query(getQuery([5, 7, 11, 12]), [year, targetYear]);
+        const [primaryCare] = await pool.query(getQuery([8, 13, 18, 21]), [year, targetYear]);
 
         return NextResponse.json({
             hospitals,

@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import pool from "@/lib/db";
 import Link from "next/link";
 import SoftCard from "@/components/ui/SoftCard";
+import { getTargetYear } from "@/lib/targetYear";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,7 @@ interface DistrictEligible {
 
 async function getEligibleData(fiscalYear: string = "2569") {
   try {
+    const targetYear = await getTargetYear(fiscalYear);
     const query = `
       SELECT 
         a.amp_code,
@@ -39,7 +41,7 @@ async function getEligibleData(fiscalYear: string = "2569") {
           CEILING(COALESCE(op, 0)) AS target_100,
           CEILING(COALESCE(op_30, 0)) AS target_30
         FROM target
-        WHERE b_year = '${fiscalYear}'
+        WHERE b_year = '${targetYear}'
       ) tgt ON tgt.hospcode = h.hospcode COLLATE utf8mb4_general_ci
       LEFT JOIN (
         SELECT hospcode, result
