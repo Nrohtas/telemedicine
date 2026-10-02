@@ -82,13 +82,13 @@ async function getDailyHospitalRows(ampCode: string, sortBy: string = "hospcode"
   const finalSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "hospcode";
   const finalSortOrder = sortOrder.toUpperCase() === "DESC" ? "DESC" : "ASC";
 
-  const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
+  const hdcTable = (fiscalYear === "2570" || policy !== "pheoc") ? "telemed_opd_hdc" : "telemed_opd_hdc_pheoc";
   const hisStartDate = fiscalYear === "2569"
     ? (policy === "pheoc" ? "2026-03-23" : "2026-01-01")
     : "2026-10-01";
   const hisEndDateCondition = fiscalYear === "2569"
     ? "AND visit_date <= '2026-09-30'"
-    : "AND visit_date <= CURDATE()";
+    : "AND visit_date <= '2027-09-30'";
   const hostypeFilter = view === "primary" ? "AND h.hostype_new IN (18, 21, 8, 13)" : "";
   const targetYear = await getTargetYear(fiscalYear);
 
@@ -246,7 +246,7 @@ export default async function DailyHospitalPage({
     const fiscalYear = params.year === "2570" ? "2570" : "2569";
     const sortBy = params.sort_by ?? "hospcode";
     const sortOrder = params.sort_order ?? "ASC";
-    const policy = params.policy === "pheoc" ? "pheoc" : "normal";
+    const policy = fiscalYear === "2570" ? "normal" : (params.policy === "pheoc" ? "pheoc" : "normal");
     const view = params.view === "primary" ? "primary" : "hospital";
 
     const rows = ampCode ? await getDailyHospitalRows(ampCode, sortBy, sortOrder, policy, view, fiscalYear) : [];
@@ -274,7 +274,7 @@ export default async function DailyHospitalPage({
     const startDateThai = fiscalYear === "2569"
       ? (policy === "pheoc" ? "23 มีนาคม 2569" : "1 มกราคม 2569")
       : "1 ตุลาคม 2569";
-    const endDateThai = fiscalYear === "2569" ? "30 กันยายน 2569" : (rows.length > 0 ? formatThaiDate(rows[0].latest_date || new Date().toISOString()) : "-");
+    const endDateThai = fiscalYear === "2569" ? "30 กันยายน 2569" : "30 กันยายน 2570";
     const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ปีงบประมาณ ${fiscalYear} (ข้อมูลระหว่าง ${startDateThai} - ${endDateThai})`;
 
     const getSortUrl = (column: string) => {
@@ -329,7 +329,7 @@ export default async function DailyHospitalPage({
                   {/* Fiscal Year Switcher Tabs on Hospital Page */}
                   <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner mt-1 sm:mt-4">
                     <Link
-                      href={`/daily/hospital?amp_code=${ampCode}&year=2570${policy !== "normal" ? `&policy=${policy}` : ""}${view !== "hospital" ? `&view=${view}` : ""}`}
+                      href={`/daily/hospital?amp_code=${ampCode}&year=2570${view !== "hospital" ? `&view=${view}` : ""}`}
                       className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all flex items-center gap-1.5 ${
                         fiscalYear === "2570"
                           ? "bg-white text-purple-700 shadow-sm border border-slate-200/50"
@@ -352,27 +352,69 @@ export default async function DailyHospitalPage({
                     </Link>
                   </div>
 
-                  {/* Premium Switcher Pills on Hospital Page */}
+                  {/* View Switcher Tabs on Hospital Page */}
                   <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner mt-1 sm:mt-4">
                     <Link
-                      href={`/daily/hospital?amp_code=${ampCode}&policy=normal${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "hospital" ? `&view=${view}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${policy === "normal"
-                          ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
-                          : "text-slate-500 hover:text-slate-800"
-                        }`}
+                      href={`/daily?view=district${policy !== "normal" ? `&policy=${policy}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
+                      className="px-3 py-1.5 rounded-lg text-[10px] font-black transition-all flex items-center gap-1.5 text-slate-500 hover:text-slate-800"
                     >
-                      นโยบาย TMM
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      รายอำเภอ
                     </Link>
                     <Link
-                      href={`/daily/hospital?amp_code=${ampCode}&policy=pheoc${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "hospital" ? `&view=${view}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${policy === "pheoc"
-                          ? "bg-white text-orange-600 shadow-sm border border-slate-200/50"
+                      href={`/daily/hospital?amp_code=${ampCode}&view=hospital${policy !== "normal" ? `&policy=${policy}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all flex items-center gap-1.5 ${
+                        view === "hospital"
+                          ? "bg-white text-teal-700 shadow-sm border border-slate-200/50"
                           : "text-slate-500 hover:text-slate-800"
-                        }`}
+                      }`}
                     >
-                      นโยบาย PHEOC
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                      รายโรงพยาบาล
+                    </Link>
+                    <Link
+                      href={`/daily/hospital?amp_code=${ampCode}&view=primary${policy !== "normal" ? `&policy=${policy}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all flex items-center gap-1.5 ${
+                        view === "primary"
+                          ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
+                          : "text-slate-500 hover:text-slate-800"
+                      }`}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      รายหน่วยบริการ
                     </Link>
                   </div>
+
+                  {/* Premium Switcher Pills on Hospital Page - เฉพาะปีงบ 2569 */}
+                  {fiscalYear === "2569" && (
+                    <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner mt-1 sm:mt-4">
+                      <Link
+                        href={`/daily/hospital?amp_code=${ampCode}&policy=normal${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "hospital" ? `&view=${view}` : ""}`}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${policy === "normal"
+                            ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
+                            : "text-slate-500 hover:text-slate-800"
+                          }`}
+                      >
+                        นโยบาย TMM
+                      </Link>
+                      <Link
+                        href={`/daily/hospital?amp_code=${ampCode}&policy=pheoc${sortBy !== "hospcode" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "hospital" ? `&view=${view}` : ""}`}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${policy === "pheoc"
+                            ? "bg-white text-orange-600 shadow-sm border border-slate-200/50"
+                            : "text-slate-500 hover:text-slate-800"
+                          }`}
+                      >
+                        นโยบาย PHEOC
+                      </Link>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">

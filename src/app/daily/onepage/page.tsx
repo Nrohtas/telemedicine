@@ -10,14 +10,14 @@ export default async function OnepagePage({
 }) {
   const params = await searchParams;
   const fiscalYear = params.year === '2570' ? '2570' : '2569';
-  const policy = params.policy === 'pheoc' ? 'pheoc' : 'normal';
-  const hdcTable = policy === 'pheoc' ? 'telemed_opd_hdc_pheoc' : 'telemed_opd_hdc';
+  const policy = fiscalYear === '2570' ? 'normal' : (params.policy === 'pheoc' ? 'pheoc' : 'normal');
+  const hdcTable = (fiscalYear === '2570' || policy !== 'pheoc') ? 'telemed_opd_hdc' : 'telemed_opd_hdc_pheoc';
   const hisStartDate = fiscalYear === '2569'
     ? (policy === 'pheoc' ? '2026-03-23' : '2026-01-01')
     : '2026-10-01';
   const hisEndDateCondition = fiscalYear === '2569'
     ? "AND vtd.visit_date <= '2026-09-30'"
-    : "AND vtd.visit_date <= CURDATE()";
+    : "AND vtd.visit_date <= '2027-09-30'";
 
   // Query 1: Overall totals
   const overallQuery = `

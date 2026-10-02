@@ -149,7 +149,7 @@ export default function OnepageSummary({ data }: { data: any }) {
               <p className="text-[13px] font-black text-indigo-600 uppercase tracking-tight">
                 กลุ่มงานสุขภาพดิจิทัล
               </p>
-              {policy === 'pheoc' && (
+              {policy === 'pheoc' && fiscalYear !== '2570' && (
                 <>
                   <div className="w-[1px] h-3 bg-slate-300 mx-1" />
                   <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-orange-200">
@@ -164,7 +164,7 @@ export default function OnepageSummary({ data }: { data: any }) {
           {/* Year Switcher in Onepage */}
           <div className="flex items-center bg-white/90 p-1 rounded-xl border border-slate-200 shadow-sm">
             <a
-              href={`/daily/onepage?year=2570${policy === 'pheoc' ? '&policy=pheoc' : ''}`}
+              href="/daily/onepage?year=2570"
               className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${
                 fiscalYear === '2570' ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
               }`}

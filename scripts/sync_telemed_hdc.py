@@ -100,6 +100,7 @@ def sync_year(target_year: str):
             INSERT INTO telemed_opd_hdc (id, hospcode, b_year, opd, telemedicine, percent, hdc_update, d_update)
             VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
             ON DUPLICATE KEY UPDATE 
+                id = VALUES(id),
                 opd = VALUES(opd),
                 telemedicine = VALUES(telemedicine),
                 percent = VALUES(percent),

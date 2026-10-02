@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { getTargetYear } from '@/lib/targetYear';
 
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
-        const policy = searchParams.get('policy') === 'pheoc' ? 'pheoc' : 'normal';
+        const rawPolicy = searchParams.get('policy') === 'pheoc' ? 'pheoc' : 'normal';
         const year = searchParams.get('year') || '2569';
-        const hdcTable = policy === 'pheoc' ? 'telemed_opd_hdc_pheoc' : 'telemed_opd_hdc';
+        const policy = year === '2570' ? 'normal' : rawPolicy;
+        const targetYear = await getTargetYear(year);
+        const hdcTable = (year === '2570' || policy !== 'pheoc') ? 'telemed_opd_hdc' : 'telemed_opd_hdc_pheoc';
         const hisStartDate = year === '2569'
             ? (policy === 'pheoc' ? '2026-03-23' : '2026-01-01')
             : '2026-10-01';
         const hisEndDateCondition = year === '2569'
             ? "AND visit_date <= '2026-09-30'"
-            : "AND visit_date <= CURDATE()";
+            : "AND visit_date <= '2027-09-30'";
 
         const getQuery = (types: number[], orderBy: string = 'current_total DESC, performance_percent DESC') => `
             SELECT 
@@ -61,7 +64,7 @@ export async function GET(request: NextRequest) {
                 WHERE b_year = '${year}'
                 GROUP BY hospcode
             ) hdc ON h.hospcode = hdc.hospcode COLLATE utf8mb4_general_ci
-            LEFT JOIN target tg ON h.hospcode = tg.hospcode COLLATE utf8mb4_general_ci AND tg.b_year = '${year}'
+            LEFT JOIN target tg ON h.hospcode = tg.hospcode COLLATE utf8mb4_general_ci AND tg.b_year = '${targetYear}'
             WHERE h.status = '1'
             AND h.hostype_new IN (${types.join(',')})
             AND h.dep_name = 'สำนักงานปลัดกระทรวงสาธารณสุข' COLLATE utf8mb4_general_ci

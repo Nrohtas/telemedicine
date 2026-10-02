@@ -265,6 +265,7 @@ export async function POST(request: NextRequest) {
                 INSERT INTO ${hdcTable} (id, hospcode, b_year, opd, telemedicine, percent, hdc_update, d_update)
                 VALUES ?
                 ON DUPLICATE KEY UPDATE
+                    id = VALUES(id),
                     opd = VALUES(opd),
                     telemedicine = VALUES(telemedicine),
                     percent = VALUES(percent),

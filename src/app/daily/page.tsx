@@ -101,13 +101,13 @@ async function getDailyDistrictRows(sortBy: string = "amp_code", sortOrder: stri
   const finalSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "amp_code";
   const finalSortOrder = sortOrder.toUpperCase() === "DESC" ? "DESC" : "ASC";
 
-  const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
+  const hdcTable = (fiscalYear === "2570" || policy !== "pheoc") ? "telemed_opd_hdc" : "telemed_opd_hdc_pheoc";
   const hisStartDate = fiscalYear === "2569"
     ? (policy === "pheoc" ? "2026-03-23" : "2026-01-01")
     : "2026-10-01";
   const hisEndDateCondition = fiscalYear === "2569"
     ? "AND visit_date <= '2026-09-30'"
-    : "AND visit_date <= CURDATE()";
+    : "AND visit_date <= '2027-09-30'";
   const hostypeFilter = view === "primary" ? "AND h.hostype_new IN (18, 21, 8, 13)" : "";
 
   const targetYear = await getTargetYear(fiscalYear);
@@ -246,13 +246,13 @@ async function getDailyHospitalRowsAll(sortBy: string = "hospcode", sortOrder: s
   const finalSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "hospcode";
   const finalSortOrder = sortOrder.toUpperCase() === "DESC" ? "DESC" : "ASC";
 
-  const hdcTable = policy === "pheoc" ? "telemed_opd_hdc_pheoc" : "telemed_opd_hdc";
+  const hdcTable = (fiscalYear === "2570" || policy !== "pheoc") ? "telemed_opd_hdc" : "telemed_opd_hdc_pheoc";
   const hisStartDate = fiscalYear === "2569"
     ? (policy === "pheoc" ? "2026-03-23" : "2026-01-01")
     : "2026-10-01";
   const hisEndDateCondition = fiscalYear === "2569"
     ? "AND visit_date <= '2026-09-30'"
-    : "AND visit_date <= CURDATE()";
+    : "AND visit_date <= '2027-09-30'";
   const hostypeFilter = view === "primary" ? "18, 21, 8, 13" : "5, 7";
 
   const targetYear = await getTargetYear(fiscalYear);
@@ -408,11 +408,12 @@ export default async function DailyPage({
     const params = await searchParams;
     const fiscalYear = params.year === "2570" ? "2570" : "2569";
     const view = params.view === "hospital" ? "hospital" : params.view === "primary" ? "primary" : "district";
-    const sortBy = params.sort_by ?? (view === "hospital" ? "hospcode" : "amp_code");
+    const isHospitalView = view === "hospital" || view === "primary";
+    const sortBy = params.sort_by ?? (isHospitalView ? "hospcode" : "amp_code");
     const sortOrder = params.sort_order ?? "ASC";
-    const policy = params.policy === "pheoc" ? "pheoc" : "normal";
+    const policy = fiscalYear === "2570" ? "normal" : (params.policy === "pheoc" ? "pheoc" : "normal");
 
-    const rows = view === "hospital"
+    const rows = isHospitalView
       ? await getDailyHospitalRowsAll(sortBy, sortOrder, policy, view, fiscalYear)
       : await getDailyDistrictRows(sortBy, sortOrder, policy, view, fiscalYear);
 
@@ -439,7 +440,7 @@ export default async function DailyPage({
     const startDateThai = fiscalYear === "2569"
       ? (policy === "pheoc" ? "23 มีนาคม 2569" : "1 มกราคม 2569")
       : "1 ตุลาคม 2569";
-    const endDateThai = fiscalYear === "2569" ? "30 กันยายน 2569" : formatCurrentThaiDate();
+    const endDateThai = fiscalYear === "2569" ? "30 กันยายน 2569" : "30 กันยายน 2570";
     const reportPeriodLabel = `ผลงานให้บริการแพทย์ทางไกล ปีงบประมาณ ${fiscalYear} (ข้อมูลระหว่าง ${startDateThai} - ${endDateThai})`;
 
     const getSortUrl = (column: string) => {
@@ -468,7 +469,7 @@ export default async function DailyPage({
               {/* Fiscal Year Switcher Tabs */}
               <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
                 <Link
-                  href={`/daily?year=2570${policy !== "normal" ? `&policy=${policy}` : ""}${view !== "district" ? `&view=${view}` : ""}`}
+                  href={`/daily?year=2570${view !== "district" ? `&view=${view}` : ""}`}
                   className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
                     fiscalYear === "2570"
                       ? "bg-white text-purple-700 shadow-sm border border-slate-200/50"
@@ -531,31 +532,33 @@ export default async function DailyPage({
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
-                  รายปฐมภูมิ
+                  รายหน่วยบริการ
                 </Link>
               </div>
 
-              {/* Premium Policy Switcher Tabs */}
-              <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
-                <Link
-                  href={`/daily?policy=normal${sortBy !== "amp_code" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "district" ? `&view=${view}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${policy === "normal"
-                      ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
-                      : "text-slate-500 hover:text-slate-800"
-                    }`}
-                >
-                  นโยบาย TMM
-                </Link>
-                <Link
-                  href={`/daily?policy=pheoc${sortBy !== "amp_code" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "district" ? `&view=${view}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${policy === "pheoc"
-                      ? "bg-white text-orange-600 shadow-sm border border-slate-200/50"
-                      : "text-slate-500 hover:text-slate-800"
-                    }`}
-                >
-                  นโยบาย PHEOC
-                </Link>
-              </div>
+              {/* Premium Policy Switcher Tabs - เฉพาะปีงบ 2569 */}
+              {fiscalYear === "2569" && (
+                <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+                  <Link
+                    href={`/daily?policy=normal${sortBy !== "amp_code" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "district" ? `&view=${view}` : ""}`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${policy === "normal"
+                        ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
+                        : "text-slate-500 hover:text-slate-800"
+                      }`}
+                  >
+                    นโยบาย TMM
+                  </Link>
+                  <Link
+                    href={`/daily?policy=pheoc${sortBy !== "amp_code" ? `&sort_by=${sortBy}` : ""}${sortOrder !== "ASC" ? `&sort_order=${sortOrder}` : ""}${view !== "district" ? `&view=${view}` : ""}`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${policy === "pheoc"
+                        ? "bg-white text-orange-600 shadow-sm border border-slate-200/50"
+                        : "text-slate-500 hover:text-slate-800"
+                      }`}
+                  >
+                    นโยบาย PHEOC
+                  </Link>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-3">
@@ -572,7 +575,7 @@ export default async function DailyPage({
                 </svg>
                 Onepage
               </Link>
-              {view === "hospital" ? (
+              {isHospitalView ? (
                 <ExportDailyHospitalsExcel data={rows as DailyHospitalRow[]} policy={policy} view={view} />
               ) : (
                 <ExportDailyExcel data={rows as DailyDistrictRow[]} policy={policy} view={view} />
@@ -637,7 +640,7 @@ export default async function DailyPage({
               <table className="w-full min-w-[1200px] divide-y divide-slate-100">
                 <thead className="bg-slate-50">
                   <tr className="border-b border-slate-200 text-center text-[13px] font-black text-slate-600">
-                    {view === "hospital" ? (
+                    {isHospitalView ? (
                       <>
                         <th className="px-5 py-3 text-left sticky left-0 top-0 bg-slate-50 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" rowSpan={2}>
                           <Link href={getSortUrl("hospcode")} scroll={false} className="hover:text-emerald-600">
@@ -765,8 +768,8 @@ export default async function DailyPage({
                     const diff_hdc_platform = row.hdc_result - row.platform_result;
                     const diff_hdc_his = row.hdc_result - row.visit_type_5;
                     return (
-                      <tr key={view === "hospital" ? row.hospcode : row.amp_code} className="group hover:bg-slate-50">
-                        {view === "hospital" ? (
+                      <tr key={isHospitalView ? row.hospcode : row.amp_code} className="group hover:bg-slate-50">
+                        {isHospitalView ? (
                           <>
                             <td className="whitespace-nowrap px-5 py-2.5 text-[11px] font-black text-slate-500 sticky left-0 bg-white group-hover:bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                               {row.hospcode}
@@ -813,11 +816,11 @@ export default async function DailyPage({
                 </tbody>
                 <tfoot className="sticky bottom-0 z-10 bg-white border-t-2 border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
                   <tr className="text-center">
-                    <td className="px-5 py-5 text-left font-black bg-slate-50 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" colSpan={view === "hospital" ? 2 : 1}>
+                    <td className="px-5 py-5 text-left font-black bg-slate-50 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" colSpan={isHospitalView ? 2 : 1}>
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-1.5 rounded-full bg-slate-400"></div>
                         <span className="text-base font-black text-slate-700">
-                          {view === "hospital" ? "รวมทั้งหมด" : "รวมทั้งจังหวัด"}
+                          {isHospitalView ? "รวมทั้งหมด" : "รวมทั้งจังหวัด"}
                         </span>
                       </div>
                     </td>
@@ -845,7 +848,7 @@ export default async function DailyPage({
           <div className="mb-4 px-1">
             <h3 className="text-xl sm:text-2xl font-black text-[#1E1B4B] tracking-tight">10 อันดับหน่วยบริการ (แพทย์ทางไกล)</h3>
           </div>
-          <TopPerformance policy={policy} />
+          <TopPerformance policy={policy} year={fiscalYear} />
         </section>
 
         <Footer />
