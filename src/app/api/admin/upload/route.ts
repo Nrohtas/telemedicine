@@ -276,6 +276,35 @@ export async function POST(request: NextRequest) {
             [results] = await pool.query(hdcQuery, [hdcValues]);
             importedCount = hdcValues.length;
 
+            try {
+                const telemedHdcQuery = `
+                    INSERT INTO telemed (id, hospcode, b_year, hdc, result, hdc_date, result_date)
+                    VALUES ?
+                    ON DUPLICATE KEY UPDATE
+                        id = VALUES(id),
+                        b_year = VALUES(b_year),
+                        hdc = VALUES(hdc),
+                        result = COALESCE(moph, 0) + COALESCE(buddycare, 0) + VALUES(hdc) + COALESCE(healthconnex, 0),
+                        hdc_date = VALUES(hdc_date),
+                        result_date = CASE 
+                            WHEN VALUES(hdc_date) IS NOT NULL AND (result_date IS NULL OR VALUES(hdc_date) > result_date) THEN VALUES(hdc_date) 
+                            ELSE result_date 
+                        END
+                `;
+                const telemedHdcValues = hdcValues.map((item: any) => [
+                    item[0], // id
+                    item[1], // hospcode
+                    item[2], // b_year
+                    item[4], // telemedicine (hdc)
+                    item[4], // result
+                    item[6], // hdc_date
+                    item[6], // result_date
+                ]);
+                await pool.query(telemedHdcQuery, [telemedHdcValues]);
+            } catch (syncErr) {
+                console.error('Failed to sync telemed table in upload route:', syncErr);
+            }
+
         } else {
             // Helper to find key by partial match
             const findKeyInRow = (row: any, keywords: string[]) => {
@@ -343,6 +372,7 @@ export async function POST(request: NextRequest) {
                 )
                 VALUES ?
                 ON DUPLICATE KEY UPDATE
+                    id = VALUES(id),
                     moph_compare = CASE WHEN VALUES(moph) > 0 THEN VALUES(moph) - COALESCE(moph, 0) ELSE 0 END,
                     buddycare_compare = CASE WHEN VALUES(buddycare) > 0 THEN VALUES(buddycare) - COALESCE(buddycare, 0) ELSE 0 END,
                     result_compare = CASE WHEN (

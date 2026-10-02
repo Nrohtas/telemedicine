@@ -108,6 +108,22 @@ def sync_year(target_year: str):
                 d_update = NOW()
         """
 
+        # 3. Insert / update into telemed table
+        insert_telemed_sql = """
+            INSERT INTO telemed (id, hospcode, b_year, hdc, result, hdc_date, result_date)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE 
+                id = VALUES(id),
+                b_year = VALUES(b_year),
+                hdc = VALUES(hdc),
+                result = COALESCE(moph, 0) + COALESCE(buddycare, 0) + VALUES(hdc) + COALESCE(healthconnex, 0),
+                hdc_date = VALUES(hdc_date),
+                result_date = CASE 
+                    WHEN VALUES(hdc_date) IS NOT NULL AND (result_date IS NULL OR VALUES(hdc_date) > result_date) THEN VALUES(hdc_date) 
+                    ELSE result_date 
+                END
+        """
+
         for item in filtered_data:
             try:
                 hospcode = item.get("hospcode")
@@ -135,6 +151,10 @@ def sync_year(target_year: str):
                 # Insert into telemed_opd_hdc
                 val_opd = (record_id, hospcode, b_year, target, result, percent, hdc_update)
                 cursor.execute(insert_opd_sql, val_opd)
+
+                # Insert into telemed
+                val_telemed = (record_id, hospcode, b_year, result, result, hdc_update, hdc_update)
+                cursor.execute(insert_telemed_sql, val_telemed)
 
                 h_y += 1
             except Exception as e:

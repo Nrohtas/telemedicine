@@ -786,7 +786,7 @@ export default async function DailyPage({
                         ) : (
                           <td className="whitespace-nowrap px-5 py-2.5 sticky left-0 bg-white group-hover:bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                             <Link
-                              href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}${policy !== "normal" ? `&policy=${policy}` : ""}${view === "primary" ? "&view=primary" : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
+                              href={`/daily/hospital?amp_code=${encodeURIComponent(row.amp_code)}${policy !== "normal" ? `&policy=${policy}` : ""}${fiscalYear !== "2569" ? `&year=${fiscalYear}` : ""}`}
                               className="flex items-center gap-2 font-black text-slate-900 underline-offset-4 group-hover:text-emerald-700 group-hover:underline decoration-emerald-500/30"
                             >
                               {row.amp_name}
