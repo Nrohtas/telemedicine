@@ -83,8 +83,18 @@ function HospitalDirectoryContent() {
         return searchParams.get('amp_code') || "เลือกอำเภอ";
     });
     const [selectedStation, setSelectedStation] = useState("ทั้งหมด");
+    const [selectedYear, setSelectedYear] = useState(() => {
+        return searchParams.get('year') || "2569";
+    });
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedSort, setSelectedSort] = useState("percent");
+
+    useEffect(() => {
+        const yearParam = searchParams.get('year');
+        if (yearParam && yearParam !== selectedYear) {
+            setSelectedYear(yearParam);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         fetch('/telemedicine/api/affiliations')
@@ -106,6 +116,7 @@ function HospitalDirectoryContent() {
         if (selectedType !== "ทั้งหมด") params.append('type', selectedType);
         if (selectedDistrict !== "ทั้งหมด") params.append('amp_code', selectedDistrict);
         if (selectedStation !== "ทั้งหมด") params.append('hospcode', selectedStation);
+        if (selectedYear) params.append('year', selectedYear);
 
         const url = `/telemedicine/api/hospital-directory?${params.toString()}`;
 
@@ -124,7 +135,7 @@ function HospitalDirectoryContent() {
                 console.error(err);
                 setLoading(false);
             });
-    }, [selectedAffiliation, selectedType, selectedDistrict, selectedStation]);
+    }, [selectedAffiliation, selectedType, selectedDistrict, selectedStation, selectedYear]);
 
     const filteredData = data.map(group => ({
         ...group,
@@ -312,8 +323,8 @@ function HospitalDirectoryContent() {
             fileNameDistrict = filteredData[0].amp_name;
         }
 
-        writeFileXLSX(wb, `Telemedicine_${fileNameDistrict}_${dateStr}_${timeStr}.xlsx`);
-    }, [filteredData, selectedDistrict]);
+        writeFileXLSX(wb, `Telemedicine_${fileNameDistrict}_ปีงบ${selectedYear}_${dateStr}_${timeStr}.xlsx`);
+    }, [filteredData, selectedDistrict, selectedYear]);
 
     const getRowColor = (hostypeName: string) => {
         if (hostypeName === 'กระทรวงสาธารณสุข') return 'text-green-600';
@@ -390,6 +401,8 @@ function HospitalDirectoryContent() {
     return (
         <main className="min-h-screen flex flex-col bg-background">
             <Navbar
+                selectedFiscalYear={selectedYear}
+                onFiscalYearChange={setSelectedYear}
                 selectedAffiliation={selectedAffiliation}
                 onAffiliationChange={setSelectedAffiliation}
                 selectedType={selectedType}
@@ -436,7 +449,12 @@ function HospitalDirectoryContent() {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                     </div>
-                                    <h3 className="text-lg font-bold text-nm-primary opacity-80">สรุปข้อมูลทั้งจังหวัด</h3>
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="text-lg font-bold text-nm-primary opacity-80">สรุปข้อมูลทั้งจังหวัด</h3>
+                                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-sm">
+                                            ปีงบประมาณ {selectedYear}
+                                        </span>
+                                    </div>
                                     <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
                                     <LastUpdate className="mb-0 flex-shrink-0" />
                                     <button
@@ -663,7 +681,12 @@ function HospitalDirectoryContent() {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
                                         </div>
-                                                        <h3 className="text-lg font-bold text-nm-primary opacity-80">อำเภอ{group.amp_name}</h3>
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="text-lg font-bold text-nm-primary opacity-80">อำเภอ{group.amp_name}</h3>
+                                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-sm">
+                                                ปีงบประมาณ {selectedYear}
+                                            </span>
+                                        </div>
                                         <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
                                         {groupIndex === 0 && <LastUpdate className="mb-0 flex-shrink-0" />}
                                         <button

@@ -34,6 +34,8 @@ interface NavbarProps {
     onSearchChange?: (value: string) => void;
     selectedSort?: string;
     onSortChange?: (value: string) => void;
+    selectedFiscalYear?: string;
+    onFiscalYearChange?: (value: string) => void;
 }
 
 const Navbar = ({
@@ -52,12 +54,20 @@ const Navbar = ({
     searchValue,
     onSearchChange,
     selectedSort,
-    onSortChange
+    onSortChange,
+    selectedFiscalYear,
+    onFiscalYearChange
 }: NavbarProps) => {
     const pathname = usePathname();
-    const [fiscalYear, setFiscalYear] = useState('');
+    const [internalFiscalYear, setInternalFiscalYear] = useState('');
     const [month, setMonth] = useState('ทั้งหมด');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const fiscalYear = selectedFiscalYear !== undefined ? selectedFiscalYear : internalFiscalYear;
+    const setFiscalYear = (val: string) => {
+        setInternalFiscalYear(val);
+        if (onFiscalYearChange) onFiscalYearChange(val);
+    };
 
     // Internal state for backward compatibility
     const [internalDistrict, setInternalDistrict] = useState('เลือกอำเภอ');
@@ -113,7 +123,7 @@ const Navbar = ({
             .then(data => {
                 if (Array.isArray(data)) {
                     setFiscalYears(data);
-                    if (data.length > 0) {
+                    if (data.length > 0 && !selectedFiscalYear && !internalFiscalYear) {
                         setFiscalYear(data[0].b_year);
                     }
                 }
@@ -265,7 +275,7 @@ const Navbar = ({
                         </Link>
 
                         <Link
-                            href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}` : ''}`}
+                            href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}${fiscalYear ? `&year=${fiscalYear}` : ''}` : (fiscalYear ? `?year=${fiscalYear}` : '')}`}
                             className="hover:opacity-80 transition-opacity"
                         >
                             <SoftButton
@@ -376,7 +386,7 @@ const Navbar = ({
                             </SoftButton>
                         </Link>
                         <Link
-                            href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}` : ''}`}
+                            href={`/hospital${district !== 'เลือกอำเภอ' && district !== 'ทั้งหมด' ? `?amp_code=${district}${fiscalYear ? `&year=${fiscalYear}` : ''}` : (fiscalYear ? `?year=${fiscalYear}` : '')}`}
                             onClick={() => setIsMenuOpen(false)}
                         >
                             <SoftButton

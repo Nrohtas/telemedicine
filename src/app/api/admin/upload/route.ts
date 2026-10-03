@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import * as XLSX from 'xlsx';
 import { verifyJWT } from '@/lib/auth';
+import { getThaiFiscalYear, parseFiscalYearAndDateFromFilename } from '@/utils/date';
 
 const cleanExcelDate = (val: any, defaultDate: string | null): string | null => {
     if (val === undefined || val === null || val === '') return defaultDate;
@@ -38,15 +39,6 @@ const cleanExcelDate = (val: any, defaultDate: string | null): string | null => 
     return defaultDate;
 };
 
-const getThaiFiscalYear = (dateStr?: string | null): string => {
-    if (!dateStr) return '2570';
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return '2570';
-    const yearCE = d.getFullYear();
-    const month = d.getMonth() + 1; // 1-12
-    const fiscalYear = month >= 10 ? yearCE + 544 : yearCE + 543;
-    return fiscalYear.toString();
-};
 
 export async function POST(request: NextRequest) {
     try {
@@ -79,6 +71,11 @@ export async function POST(request: NextRequest) {
         if (!file) {
             return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
         }
+
+        // Parse fiscal year and date from filename if present
+        const parsedFileInfo = parseFiscalYearAndDateFromFilename(file.name);
+        const effectiveFiscalYear = parsedFileInfo.fiscalYear || getThaiFiscalYear(date);
+        const effectiveDate = parsedFileInfo.date || date;
 
         const isCsv = file.name.toLowerCase().endsWith('.csv');
         let rawData: any[] = [];
@@ -143,7 +140,8 @@ export async function POST(request: NextRequest) {
         if (type === 'HDC' || type === 'HDC_PHEOC') {
             const hdcTable = type === 'HDC' ? 'telemed_opd_hdc' : 'telemed_opd_hdc_pheoc';
             // Processing for HDC (telemed_opd_hdc or telemed_opd_hdc_pheoc table)
-            const targetBYear = getThaiFiscalYear(date);
+            const targetBYear = effectiveFiscalYear;
+            const uploadDate = effectiveDate || date;
 
             const hdcValues = rawData.map((row, index) => {
                 // Helper to find key by partial match (case-insensitive)
@@ -221,7 +219,7 @@ export async function POST(request: NextRequest) {
                         percent = opd > 0 ? (telemedicine * 100) / opd : 0;
                     }
 
-                    return [id, hospcode, targetBYear, opd, telemedicine, percent, date, new Date()];
+                    return [id, hospcode, targetBYear, opd, telemedicine, percent, uploadDate, new Date()];
 
                 } else {
                     // ORIGINAL CONDITION FOR EXCEL UPLOADS (RETAINED):
@@ -253,7 +251,7 @@ export async function POST(request: NextRequest) {
                         percent = opd > 0 ? (telemedicine * 100) / opd : 0;
                     }
 
-                    return [id, hospcode, targetBYear, opd, telemedicine, percent, date, new Date()];
+                    return [id, hospcode, targetBYear, opd, telemedicine, percent, uploadDate, new Date()];
                 }
             }).filter(item => item !== null);
 
@@ -340,15 +338,15 @@ export async function POST(request: NextRequest) {
                 if (!rawHospcode || rawHospcode === 'undefined' || rawHospcode.includes('รวม')) return;
 
                 const hospcode = rawHospcode.padStart(5, '0');
-                const rowDate = cleanExcelDate(dateKey ? row[dateKey] : null, date);
-                const b_year = String(row[byearKey || ''] || '').trim() || getThaiFiscalYear(rowDate || date);
+                const rowDate = cleanExcelDate(dateKey ? row[dateKey] : null, effectiveDate || date);
+                const b_year = parsedFileInfo.fiscalYear || String(row[byearKey || ''] || '').trim() || getThaiFiscalYear(rowDate || effectiveDate || date);
                 const platform = String(row[platformKey || ''] || '').trim().toLowerCase();
                 const count = parseInt(row[countKey || ''] || '0') || 0;
 
                 const id = `${hospcode}_${b_year}`;
 
                 if (!aggregatedData[id]) {
-                    aggregatedData[id] = { id, hospcode, b_year, moph: 0, buddycare: 0, hdc: 0, healthconnex: 0, rowDate: rowDate };
+                    aggregatedData[id] = { id, hospcode, b_year, moph: 0, buddycare: 0, hdc: 0, healthconnex: 0, rowDate: rowDate || effectiveDate || date };
                 } else if (rowDate && (!aggregatedData[id].rowDate || rowDate > aggregatedData[id].rowDate)) {
                     aggregatedData[id].rowDate = rowDate;
                 }
@@ -449,7 +447,7 @@ export async function POST(request: NextRequest) {
 
             const compareValues = Object.values(aggregatedData).map((item: any) => {
                 const result = item.moph + item.buddycare + item.hdc + item.healthconnex;
-                const rowDate = item.rowDate || date;
+                const rowDate = item.rowDate || effectiveDate || date;
                 return [
                     item.id, 
                     item.hospcode, 
@@ -474,9 +472,8 @@ export async function POST(request: NextRequest) {
         // Log to fileupload table
         try {
             // Determine fiscal year for logging
-            const targetBYear = getThaiFiscalYear(date);
-            const excelBYear = rawData[0]['ปีงบประมาณ'] || rawData[0]['b_year'];
-            const logType = excelBYear ? String(excelBYear).trim() : ((type === 'HDC' || type === 'HDC_PHEOC') ? targetBYear : 'Telemed');
+            const excelBYear = rawData[0]?.['ปีงบประมาณ'] || rawData[0]?.['b_year'];
+            const logType = parsedFileInfo.fiscalYear || (excelBYear ? String(excelBYear).trim() : effectiveFiscalYear);
 
             // Determine file_platform based on type
             const file_platform = type === 'HDC' ? 'hdc' : (type === 'HDC_PHEOC' ? 'hdc_pheoc' : 'platform');
@@ -500,6 +497,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
             success: true,
+            fiscalYear: effectiveFiscalYear,
             count: results.affectedRows,
             imported: importedCount,
             message: 'Data synchronized successfully'

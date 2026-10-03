@@ -5,7 +5,7 @@ import SoftCard from '@/components/ui/SoftCard';
 import SoftButton from '@/components/ui/SoftButton';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { formatThaiDate, formatThaiDateOnly, formatThaiDateNumeric, formatEnglishDate, formatEnglishDateOnly } from '@/utils/date';
+import { formatThaiDate, formatThaiDateOnly, formatThaiDateNumeric, formatEnglishDate, formatEnglishDateOnly, parseFiscalYearAndDateFromFilename } from '@/utils/date';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface UploadHistory {
@@ -39,6 +39,7 @@ const UploadCard = ({
 }) => {
     const [file, setFile] = useState<File | null>(null);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [detectedFiscalYear, setDetectedFiscalYear] = useState<string | null>(null);
     const dateInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -46,8 +47,19 @@ const UploadCard = ({
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0]);
+            const selectedFile = e.target.files[0];
+            setFile(selectedFile);
             setStatus(null);
+
+            const parsed = parseFiscalYearAndDateFromFilename(selectedFile.name);
+            if (parsed.fiscalYear) {
+                setDetectedFiscalYear(parsed.fiscalYear);
+            } else {
+                setDetectedFiscalYear(null);
+            }
+            if (parsed.date) {
+                setSelectedDate(parsed.date);
+            }
         }
     };
 
@@ -66,8 +78,12 @@ const UploadCard = ({
             });
             const data = await res.json();
             if (res.ok) {
-                setStatus({ type: 'success', message: `Imported ${data.count} items successfully` });
+                setStatus({ 
+                    type: 'success', 
+                    message: `Imported ${data.count} items (ปีงบ ${data.fiscalYear || 'สำเร็จ'}) successfully` 
+                });
                 setFile(null);
+                setDetectedFiscalYear(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
                 onUploadSuccess();
             } else {
@@ -161,9 +177,15 @@ const UploadCard = ({
                                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
                                         {fileLabel || 'Excel File'}
                                     </p>
-                                    <p className="text-xs font-black text-slate-700 truncate">
+                                    <p className="text-xs font-black text-slate-700 truncate" title={file ? file.name : 'Choose file'}>
                                         {file ? file.name : 'Choose file'}
                                     </p>
+                                    {detectedFiscalYear && (
+                                        <p className="text-[9px] font-bold text-indigo-600 mt-1 uppercase tracking-tight flex items-center gap-1">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                                            ปีงบประมาณ {detectedFiscalYear}
+                                        </p>
+                                    )}
                                 </div>
                             </button>
                             <input ref={fileInputRef} type="file" className="hidden" accept=".xlsx, .xls, .csv" onChange={handleFileChange} />
@@ -245,7 +267,7 @@ const HistoryItem = ({ item, idx }: { item: UploadHistory, idx: number }) => (
             <div className="min-w-0">
                 <p className="text-slate-900 font-black text-[13px] truncate max-w-[150px]">{item.file_name}</p>
                 <p className="text-slate-500 text-[9px] font-bold mt-0.5 uppercase tracking-widest">
-                    By {item.username} • {(item.file_size).toFixed(1)} KB
+                    By {item.username} • {(item.file_size).toFixed(1)} KB {item.file_log ? `• ปีงบ ${item.file_log}` : ''}
                 </p>
             </div>
         </div>
