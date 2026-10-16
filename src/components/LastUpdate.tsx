@@ -9,13 +9,19 @@ interface LastUpdateProps {
     sourceLink?: string;
     sourceLabel?: string;
     className?: string;
+    year?: string;
 }
 
-export default function LastUpdate({ showLogo = true, type, sourceLink, sourceLabel, className = "mb-2 md:mb-1" }: LastUpdateProps) {
+export default function LastUpdate({ showLogo = true, type, sourceLink, sourceLabel, className = "mb-2 md:mb-1", year }: LastUpdateProps) {
     const [lastUpdate, setLastUpdate] = useState<string | null>(null);
 
     useEffect(() => {
-        const url = type ? `/telemedicine/api/last-update?type=${type}` : '/telemedicine/api/last-update';
+        const queryParams = new URLSearchParams();
+        if (type) queryParams.set('type', type);
+        if (year) queryParams.set('year', year);
+        const qs = queryParams.toString();
+        const url = `/telemedicine/api/last-update${qs ? `?${qs}` : ''}`;
+
         fetch(url)
             .then(res => res.json())
             .then(data => {
@@ -24,7 +30,7 @@ export default function LastUpdate({ showLogo = true, type, sourceLink, sourceLa
                 }
             })
             .catch(err => console.error('Error fetching last update:', err));
-    }, [type]);
+    }, [type, year]);
 
     if (!lastUpdate) return null;
 

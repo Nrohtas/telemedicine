@@ -456,7 +456,7 @@ function HospitalDirectoryContent() {
                                         </span>
                                     </div>
                                     <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
-                                    <LastUpdate className="mb-0 flex-shrink-0" />
+                                    <LastUpdate year={selectedYear} className="mb-0 flex-shrink-0" />
                                     <button
                                         onClick={handleExportExcel}
                                         className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-full transition-all duration-200 group text-emerald-700 hover:text-emerald-800 leading-none shadow-sm"
@@ -688,7 +688,7 @@ function HospitalDirectoryContent() {
                                             </span>
                                         </div>
                                         <div className="h-px flex-1 bg-gradient-to-r from-nm-primary/20 to-transparent"></div>
-                                        {groupIndex === 0 && <LastUpdate className="mb-0 flex-shrink-0" />}
+                                        {groupIndex === 0 && <LastUpdate year={selectedYear} className="mb-0 flex-shrink-0" />}
                                         <button
                                             onClick={handleExportExcel}
                                             className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-full transition-all duration-200 group text-emerald-700 hover:text-emerald-800 leading-none shadow-sm ml-1"

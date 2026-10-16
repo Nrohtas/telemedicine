@@ -189,7 +189,7 @@ export default function Home() {
               </span>
             )}
           </div>
-          <LastUpdate />
+          <LastUpdate year={selectedYear} />
         </div>
 
         {/* Stats Section Cards (Top Row: Integrated Overview) */}
